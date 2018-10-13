@@ -20,6 +20,7 @@ import yaml
 # import configparser
 import random as pyrandom
 import statistics
+import typing
 
 # Custom Imports
 from modules.misc import merge_dicts, AttrDict
@@ -237,6 +238,7 @@ async def members(ctx):
         # """
 
         bungie_num_members, bungie_member_list = get_bungie_member_list()
+        _, bungie_member_types_dict = get_bungie_member_type_dict()
         bungie_member_list_alpha_sorted = sorted(bungie_member_list, key=str.lower)
         logger.info("GP Members Bungie.net ({}):\n{}\n".format(bungie_num_members, bungie_member_list_alpha_sorted))
         # """
@@ -311,11 +313,14 @@ async def members(ctx):
             member_missing = True
             for discord_member in alpha_sorted_gp_members:
                 #print('comparing: {} to {}'.format(bungie_member.lower(), discord_member.lower()))
-                if bungie_member.lower() in discord_member.lower():
+                if bungie_member.lower() in discord_member.lower() or discord_member.lower() in bungie_member.lower():
                     member_missing = False
                     break
             if member_missing:
-                missing_discord_members.append(bungie_member)
+                if bungie_member in bungie_member_types_dict['members']:
+                    missing_discord_members.append(bungie_member)
+                elif bungie_member in bungie_member_types_dict['admins']:
+                    missing_discord_admins.append(bungie_member)
 
         invalid_discord_members = []
         member_found = False
@@ -330,6 +335,7 @@ async def members(ctx):
                 invalid_discord_members.append(discord_member)
 
         logger.info("GP Members missing from Discord ({}):\n{}\n".format(len(missing_discord_members), missing_discord_members))
+        logger.info("GP Admins missing from Discord: ({}):\n{}\n".format(len(missing_discord_admins), missing_discord_admins))
 
         logger.info('Number of Fuzz Results: {}\nFuzz Results:\n{}'.format(
             len(fuzzy_missing_members),
@@ -342,18 +348,30 @@ async def members(ctx):
         # )
         # """
 
+        # TODO: create 'num_" vars for `len()` below...
+
         msg_final = '---\n**Ghost Proxy Members on Discord: {}**\n' \
                     '_Total Discord Members: {}_\n' \
                     'Ghost Proxy Members (Bungie.net): {}\n' \
-                    'Ghost Proxy Members Missing from Discord: {}\n' \
-                    '  _Error Diff: {} -- Raw Diff (Bungie - Discord): {}_\n' \
+                    'Total Ghost Proxy Members Missing from Discord: {}\n' \
+                    '  _Error Diff: {} -- Raw Diff (Bungie - Discord): {}_\n\n' \
+                    'Percent Members on Discord: ~{}%\n\n' \
+                    'Admins Missing ({}):\n' \
+                    '```  {}```\n' \
+                    'Members Missing ({}):\n' \
                     '```  {}```'.format(
                         len(alpha_sorted_gp_members),
                         len(member_dict),
                         bungie_num_members,
-                        len(missing_discord_members),
-                        (bungie_num_members - len(alpha_sorted_gp_members)) - len(missing_discord_members),
+                        len(missing_discord_members) + len(missing_discord_admins),
+                        (bungie_num_members - len(alpha_sorted_gp_members)) - len(missing_discord_members) - len(missing_discord_admins),
                         bungie_num_members - len(alpha_sorted_gp_members),
+                        math.ceil(
+                            ((len(member_dict) - (len(missing_discord_members) + len(missing_discord_admins))) / len(member_dict)) * 100
+                        ),
+                        len(missing_discord_admins),
+                        '\n  '.join(missing_discord_admins),
+                        len(missing_discord_members),
                         '\n  '.join(missing_discord_members)
                     )
         msg_final2 = '---\nPotential role updates needed: {}\n```  {}```'.format(
@@ -370,38 +388,73 @@ async def members(ctx):
         await send_multipart_msg(ctx, msg_final2)
 
 
+async def filter_character_types(clan_characters, min_level):
+    hunters = []
+    titans = []
+    warlocks = []
+    for characters in clan_characters:
+        for char in characters:
+            if min_level > 0 and char['light'] < min_level:
+                continue
+
+            if char['classType'] == 0:
+                titans.append(char['light'])
+            elif char['classType'] == 1:
+                hunters.append(char['light'])
+            elif char['classType'] == 2:
+                warlocks.append(char['light'])
+    return hunters, titans, warlocks
+
+
+async def filter_characters_from_members(destiny_members, platform_type):
+    clan_characters = []
+    for d_member in destiny_members:
+        destiny_member_id = await async_get_member_data_by_id(
+            d_member['membershipId'],
+            d_member['membershipType']
+        )
+        clan_characters.append(await aysnc_get_destiny_profile_characters(destiny_member_id, platform_type))
+    return clan_characters
+
+
+async def generate_stats_message(light_levels, total_chars, char_type):
+    num_chars = len(light_levels)
+    percent_total = round(((num_chars / total_chars) * 100), 2)
+    max_ll = max(light_levels)
+    min_ll = min(light_levels)
+    mean_ll = statistics.mean(light_levels)
+    median_ll = statistics.median(light_levels)
+    stats_msg = 'Number of {}: **{}**\n' \
+                '  - Percent of Clan: {}\n' \
+                '  - Lowest LL: {}\n' \
+                '  - Mean LL: {}\n' \
+                '  - Median LL: {}\n' \
+                '  - Highest LL: {}'.format(
+                    char_type,
+                    num_chars,
+                    percent_total,
+                    min_ll,
+                    mean_ll,
+                    median_ll,
+                    max_ll
+                )
+    return stats_msg
+
 @bot.command(name='clan-stats')
-async def clan_stats(ctx):
+async def clan_stats(ctx, min_level: int = 0):
     async with ctx.typing():
         platform_type = 4
-        num_members, member_list = get_clan_members()
+        num_members, member_list = get_clan_members()  # TODO: Make async... aiohttp
         destiny_members = [get_destiny_member_info(mem) for mem in member_list]
-        clan_characters = []
-        for d_member in destiny_members:
-            destiny_member_id = get_member_data_by_id(
-                d_member['membershipId'],
-                d_member['membershipType']
-            )
-            clan_characters.append(await aysnc_get_destiny_profile_characters(destiny_member_id, platform_type))
-
+        clan_characters = await filter_characters_from_members(destiny_members, platform_type)
         logger.info('clan_characters:\n{}\n'.format(clan_characters))
-
-        hunters = []
-        titans = []
-        warlocks = []
-
-        for characters in clan_characters:
-            for char in characters:
-                if char['classType'] == 0:
-                    titans.append(char['light'])
-                elif char['classType'] == 1:
-                    hunters.append(char['light'])
-                elif char['classType'] == 2:
-                    warlocks.append(char['light'])
+        hunters, titans, warlocks = await filter_character_types(clan_characters, min_level)
 
         result_msg = '--\\\\\\\\//--\n' \
             '**Clan Character Stats**\n\n' \
+            '{}' \
             'Total Number of Characters: **{}**\n' \
+            '  - Min Light Level: {}\n' \
             '  - Mean Light Level: {}\n' \
             '  - Median Light Level: {}\n' \
             '  - Highest Light Level: {}\n\n' \
@@ -417,18 +470,23 @@ async def clan_stats(ctx):
             '  - Mean LL: {}\n' \
             '  - Median LL: {}\n' \
             '  - Highest LL: {}'.format(
+                'Minimum Light Level Threshold: {}'.format(min_level) if min_level else '',
                 (len(hunters) + len(titans) + len(warlocks)),
+                min(hunters + titans + warlocks),
                 math.ceil(statistics.mean(hunters + titans + warlocks)),
                 math.ceil(statistics.median(hunters + titans + warlocks)),
                 max(hunters + titans + warlocks),
+
                 len(hunters),
                 math.ceil(statistics.mean(hunters)),
                 math.ceil(statistics.median(hunters)),
                 max(hunters),
+
                 len(titans),
                 math.ceil(statistics.mean(titans)),
                 math.ceil(statistics.median(titans)),
                 max(titans),
+
                 len(warlocks),
                 math.ceil(statistics.mean(warlocks)),
                 math.ceil(statistics.median(warlocks)),
@@ -481,6 +539,20 @@ async def aysnc_get_destiny_profile_characters(destiny_membership_id, membership
                 for char in characters_data.values():
                     characters.append({'classType': char['classType'], 'light': char['light']})
                 return characters
+
+
+async def async_get_member_data_by_id(membership_id, membership_type, platform_type=4):  # platform_type 4 is PC
+    target_endpoint = '/User/GetMembershipsById/{}/{}/'.format(membership_id, membership_type)
+    request_url = 'https://www.bungie.net/platform{}'.format(target_endpoint)
+    async with aiohttp.ClientSession() as session:
+        async with session.get(request_url, headers={'X-API-Key': config.Bungie.api_key}) as r:
+            if r.status == 200:
+                raw_json = await r.json()
+                bungie_response = raw_json['Response']
+                destiny_memberships = bungie_response['destinyMemberships']
+                destiny_membership_info = [dm for dm in destiny_memberships if dm['membershipType'] == platform_type][0]
+                # logger.info('> Returning: {}'.format(destiny_membership_info['membershipId']))
+                return destiny_membership_info['membershipId']
 
 
 def get_member_data_by_id(membership_id, membership_type, platform_type=4):  # platform_type 4 is PC
@@ -537,7 +609,7 @@ def get_bungie_member_list():
     return num_members, member_list
 
 
-def get_bungie_member_dict():
+def get_bungie_member_type_dict():
     member_list_url = "https://www.bungie.net/platform/GroupV2/{}/Members/".format(config.Bungie.clan_group_id)
     r = requests.get(member_list_url, headers={'X-API-Key': config.Bungie.api_key})
     raw_json = r.json()
@@ -545,8 +617,17 @@ def get_bungie_member_dict():
     logger.info('BUNGIE MEMBER LIST:\n{}'.format(bungie_results))
     member_results = bungie_results['results']
     num_members = raw_json['Response']['totalResults']
-    member_list = [{'displayName': member['destinyUserInfo']['displayName'], 'memberType': member['memberType']} for member in member_results]
-    return num_members, member_list
+    #member_list = [{'displayName': member['destinyUserInfo']['displayName'], 'memberType': member['memberType']} for member in member_results]
+    member_dict = {'members': [], 'admins': []}
+    # Member type 2 is normal member
+    # Member type 3 is admin
+    # Member type 5 is founder
+    for member in member_results:
+        if member['memberType'] == 2:
+            member_dict['members'].append(member['destinyUserInfo']['displayName'])
+        elif member['memberType'] in {3, 5}:
+            member_dict['admins'].append(member['destinyUserInfo']['displayName'])
+    return num_members, member_dict
 
 
 def filter_members_by_field(member_dict, field_name):
