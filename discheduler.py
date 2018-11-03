@@ -21,6 +21,7 @@ import yaml
 import random as pyrandom
 import statistics
 import typing
+import datetime
 
 # Custom Imports
 from modules.misc import merge_dicts, AttrDict
@@ -114,6 +115,8 @@ async def on_ready():
     logger.info('*** Logged in as: {} (ID: {}) ***'.format(bot.user.name, bot.user.id))
     logger.info('// VOLUSPA WARMIND ONLINE!!')
 
+    if not hasattr(bot, 'uptime'):
+        bot.uptime = datetime.datetime.utcnow()
     #await bot.change_presence(activity=discord.Game(name="with fire!"), status=discord.Status.online)
     await bot.change_presence(activity=discord.Game(name=await quotes.pick_quote('status')), status=discord.Status.online)
     bot.loop.create_task(update_status_task(bot))
@@ -121,6 +124,33 @@ async def on_ready():
     # ' bot.send_message('message.channel')
     # ' general_channel = discord.Object(id='channel_id_here')
     # ' await bot.send_message(message.channel, fmt.format(message))
+
+
+def get_bot_uptime(bot, *, brief=False):
+    now = datetime.datetime.utcnow()
+    delta = now - bot.uptime
+    hours, remainder = divmod(int(delta.total_seconds()), 3600)
+    minutes, seconds = divmod(remainder, 60)
+    days, hours = divmod(hours, 24)
+
+    if not brief:
+        if days:
+            fmt = '{d} days, {h} hours, {m} minutes, and {s} seconds'
+        else:
+            fmt = '{h} hours, {m} minutes, and {s} seconds'
+    else:
+        fmt = '{h}h {m}m {s}s'
+        if days:
+            fmt = '{d}d ' + fmt
+
+    return fmt.format(d=days, h=hours, m=minutes, s=seconds)
+
+
+@bot.command()
+async def uptime(ctx):
+    """Tells you how long the bot has been up for."""
+    await ctx.send(f'Uptime: **{get_bot_uptime(bot)}**')
+
 
 
 @bot.command()
@@ -350,7 +380,8 @@ async def members(ctx):
 
         # TODO: create 'num_" vars for `len()` below...
 
-        msg_final = '---\n**Ghost Proxy Members on Discord: {}**\n' \
+        msg_final = '--\\\\\\\\//--\n' \
+                    '**Ghost Proxy Members on Discord: {}**\n' \
                     '_Total Discord Members: {}_\n' \
                     'Ghost Proxy Members (Bungie.net): {}\n' \
                     'Total Ghost Proxy Members Missing from Discord: {}\n' \
@@ -388,25 +419,31 @@ async def members(ctx):
         await send_multipart_msg(ctx, msg_final2)
 
 
-async def filter_character_types(clan_characters, min_level):
+def filter_character_types(clan_characters, min_level=0):
     hunters = []
     titans = []
     warlocks = []
+    total_num_chars = 0
     for characters in clan_characters:
         for char in characters:
+            total_num_chars += 1
             if min_level > 0 and char['light'] < min_level:
                 continue
 
+            # Destiny Class
+            # Titan: 0
+            # Hunter: 1
+            # Warlock: 2
             if char['classType'] == 0:
                 titans.append(char['light'])
             elif char['classType'] == 1:
                 hunters.append(char['light'])
             elif char['classType'] == 2:
                 warlocks.append(char['light'])
-    return hunters, titans, warlocks
+    return hunters, titans, warlocks, total_num_chars
 
 
-async def filter_characters_from_members(destiny_members, platform_type):
+async def filter_characters_from_members(destiny_members, platform_type=4):
     clan_characters = []
     for d_member in destiny_members:
         destiny_member_id = await async_get_member_data_by_id(
@@ -417,18 +454,17 @@ async def filter_characters_from_members(destiny_members, platform_type):
     return clan_characters
 
 
-async def generate_stats_message(light_levels, total_chars, char_type):
+async def generate_char_stats_message(light_levels, total_chars, char_type):
     num_chars = len(light_levels)
     percent_total = round(((num_chars / total_chars) * 100), 2)
     max_ll = max(light_levels)
     min_ll = min(light_levels)
-    mean_ll = statistics.mean(light_levels)
-    median_ll = statistics.median(light_levels)
+    mean_ll = math.ceil(statistics.mean(light_levels))
+    median_ll = math.ceil(statistics.median(light_levels))
     stats_msg = 'Number of {}: **{}**\n' \
-                '  - Percent of Clan: {}\n' \
+                '  - Percent of Chars: {}%\n' \
                 '  - Lowest LL: {}\n' \
-                '  - Mean LL: {}\n' \
-                '  - Median LL: {}\n' \
+                '  - Mean / Median LL: {} / {}\n' \
                 '  - Highest LL: {}'.format(
                     char_type,
                     num_chars,
@@ -440,65 +476,60 @@ async def generate_stats_message(light_levels, total_chars, char_type):
                 )
     return stats_msg
 
+
 @bot.command(name='clan-stats')
 async def clan_stats(ctx, min_level: int = 0):
     async with ctx.typing():
         platform_type = 4
-        num_members, member_list = get_clan_members()  # TODO: Make async... aiohttp
+        num_members, member_list = await async_get_clan_members()
         destiny_members = [get_destiny_member_info(mem) for mem in member_list]
         clan_characters = await filter_characters_from_members(destiny_members, platform_type)
         logger.info('clan_characters:\n{}\n'.format(clan_characters))
-        hunters, titans, warlocks = await filter_character_types(clan_characters, min_level)
-
+        hunters, titans, warlocks, num_clan_chars = filter_character_types(clan_characters, min_level)
+        num_filtered_chars = len(hunters) + len(titans) + len(warlocks)
+        all_chars = hunters + titans + warlocks
         result_msg = '--\\\\\\\\//--\n' \
             '**Clan Character Stats**\n\n' \
-            '{}' \
-            'Total Number of Characters: **{}**\n' \
-            '  - Min Light Level: {}\n' \
-            '  - Mean Light Level: {}\n' \
-            '  - Median Light Level: {}\n' \
+            '{}{}' \
+            'Total Number of Characters {}: **{}**\n' \
+            '  - Lowest Light Level: {}\n' \
+            '  - Mean / Median Light Level: {} / {}\n' \
             '  - Highest Light Level: {}\n\n' \
-            'Number of Hunters: **{}**\n' \
-            '  - Mean LL: {}\n' \
-            '  - Median LL: {}\n' \
-            '  - Highest LL: {}\n\n' \
-            'Number of Titans: **{}**\n' \
-            '  - Mean LL: {}\n' \
-            '  - Median LL: {}\n' \
-            '  - Highest LL: {}\n\n' \
-            'Number of Warlocks: **{}**\n' \
-            '  - Mean LL: {}\n' \
-            '  - Median LL: {}\n' \
-            '  - Highest LL: {}'.format(
-                'Minimum Light Level Threshold: {}'.format(min_level) if min_level else '',
-                (len(hunters) + len(titans) + len(warlocks)),
-                min(hunters + titans + warlocks),
-                math.ceil(statistics.mean(hunters + titans + warlocks)),
-                math.ceil(statistics.median(hunters + titans + warlocks)),
-                max(hunters + titans + warlocks),
-
-                len(hunters),
-                math.ceil(statistics.mean(hunters)),
-                math.ceil(statistics.median(hunters)),
-                max(hunters),
-
-                len(titans),
-                math.ceil(statistics.mean(titans)),
-                math.ceil(statistics.median(titans)),
-                max(titans),
-
-                len(warlocks),
-                math.ceil(statistics.mean(warlocks)),
-                math.ceil(statistics.median(warlocks)),
-                max(warlocks)
+            '{}\n\n' \
+            '{}\n\n' \
+            '{}'.format(
+                'Minimum Light Level Threshold: {}\n'.format(min_level) if min_level else '',
+                'Total Number of Characters in Clan: {}\n\n'.format(num_clan_chars) if min_level else '',
+                f'>={min_level}' if min_level else '',
+                num_filtered_chars,
+                min(all_chars),
+                math.ceil(statistics.mean(all_chars)),
+                math.ceil(statistics.median(all_chars)),
+                max(all_chars),
+                await generate_char_stats_message(hunters, num_filtered_chars, 'Hunters'),
+                await generate_char_stats_message(titans, num_filtered_chars, 'Titans'),
+                await generate_char_stats_message(warlocks, num_filtered_chars, 'Warlocks')
             )
-
-    # Destiny Class
-    # Titan: 0
-    # Hunter: 1
-    # Warlock: 2
-
     #await send_multipart_msg(ctx, msg_final)
+    await ctx.send(result_msg)
+
+
+@bot.command(name='members-online')
+async def members_online(ctx):
+    async with ctx.typing():
+        logger.info('Looking up currently online Ghost Proxy members...')
+        num_members, member_list = await async_get_clan_members()
+        cur_members_online = [
+            member['destinyUserInfo']['displayName']
+            for member in member_list
+            if member['isOnline']
+        ]
+        result_msg = '--\\\\\\\\//--\n\n' \
+            '**Ghost Proxy Members In-Game: {}**\n' \
+            '```  {}```'.format(
+                len(cur_members_online),
+                '\n  '.join(cur_members_online)
+            )
     await ctx.send(result_msg)
 
 
@@ -553,6 +584,20 @@ async def async_get_member_data_by_id(membership_id, membership_type, platform_t
                 destiny_membership_info = [dm for dm in destiny_memberships if dm['membershipType'] == platform_type][0]
                 # logger.info('> Returning: {}'.format(destiny_membership_info['membershipId']))
                 return destiny_membership_info['membershipId']
+
+
+async def async_get_clan_members():
+    target_endpoint = '/GroupV2/{}/Members/'.format(config.Bungie.clan_group_id)
+    request_url = 'https://www.bungie.net/platform{}'.format(target_endpoint)
+    async with aiohttp.ClientSession() as session:
+        async with session.get(request_url, headers={'X-API-Key': config.Bungie.api_key}) as r:
+            if r.status == 200:
+                raw_json = await r.json()
+                bungie_results = raw_json['Response']
+                member_list = bungie_results['results']
+                num_members = bungie_results['totalResults']
+                # logger.info('BUNGIE MEMBER LIST:\n{}'.format(member_list))
+                return num_members, member_list
 
 
 def get_member_data_by_id(membership_id, membership_type, platform_type=4):  # platform_type 4 is PC
@@ -661,7 +706,15 @@ def bungie_search_users(player_name):
     r = requests.get(search_url, headers={'X-API-Key': config.Bungie.api_key})
     raw_json = r.json()
     bungie_results = raw_json['Response']
-    logger.info('Bungie response:\n{}'.format(bungie_results))
+    logger.info('Bungie Search response:\n{}'.format(bungie_results))
+
+    if len(bungie_results) == 0:
+        endpoint_path = f'/Destiny2/SearchDestinyPlayer/{4}/{player_name}/'
+        target_url = f'https://www.bungie.net/platform{endpoint_path}'
+        r = requests.get(target_url, headers={'X-API-Key': config.Bungie.api_key})
+        raw_json = r.json()
+        bungie_results = raw_json['Response']
+        logger.info(f'Destiny Search response:\n{bungie_results}')
     '''
     # [{'membershipId': '1595120', 'uniqueName': 'DESTROYRofWRLDS', 
     # 'displayName': 'Mirage', 'profilePicture': 70655, 'profileTheme': 1101, 
@@ -753,22 +806,35 @@ async def get_player_profile(ctx, *, player_name):
 async def find_player(ctx, *, player_name):
     #num_players, results = bungie_search_users(player_name)
     results = bungie_search_users(player_name)
+    logger.info('>> Bungie Player Search Results: {}'.format(results))
     # TAKE FIRST ONLY FOR NOW
-    player = results[0]
-    logger.info('Found Player:\n MemberID: {} Name: {} BlizzardName: {}'.format(
-        player['membershipId'],
-        player['displayName'],
-        player['blizzardDisplayName']
-    ))
-    #logger.info('Player Results:\n{}'.format(results))
-    embed = discord.Embed(
-        title="{}".format(player['displayName']),
-        description="{}".format(player['about']),
-        color=0x009933
-    )
-    #embed.set_image(url='https://www.bungie.net{}'.format(player['profilePicturePath']))
-    embed.add_field(name='Blizzard ID', value="{}".format(player['blizzardDisplayName']))
-    embed.set_thumbnail(url='https://www.bungie.net{}'.format(player['profilePicturePath']))
+    await ctx.send(f'Found {len(results)} Matching Players{" , top result below." if len(results) > 0 else ""}')
+    player = None
+    for player_result in itertools.islice(results, 0, 10):
+        if 'blizzardDisplayName' in player_result:
+            #if player_name.lower() == player_result['displayName'].lower() or player_result['displayName'].lower() in player_name.lower():
+            player = player_result
+    if player:
+        logger.info('Found Player:\n MemberID: {} Name: {} BlizzardName: {}'.format(
+            player['membershipId'],
+            player['displayName'],
+            player.get('blizzardDisplayName', 'N/A')
+        ))
+        #logger.info('Player Results:\n{}'.format(results))
+        embed = discord.Embed(
+            title="{}".format(player['displayName']),
+            description="{}".format(player['about']),
+            color=0x009933
+        )
+        #embed.set_image(url='https://www.bungie.net{}'.format(player['profilePicturePath']))
+        embed.add_field(name='Blizzard ID', value="{}".format(player['blizzardDisplayName']))
+        embed.set_thumbnail(url='https://www.bungie.net{}'.format(player['profilePicturePath']) if 'http' not in player['profilePicturePath'] else player['profilePicturePath'])
+    else:
+        embed = discord.Embed(
+            title='{}'.format('Search for "{}"'.format(player_name)),
+            description='{}'.format('No results found or player is not registered on Bungie.net'),
+            color=0x993300
+        )
     await ctx.send(embed=embed)
 
 
@@ -826,16 +892,19 @@ async def info(ctx):
     logger.info('ctx: {}'.format(ctx))
     embed = discord.Embed(
         title="Völuspá",
-        description="Völuspá the Ghost Proxy Proto-Warmind AI",
+        description="The Ghost Proxy Proto-Warmind AI <:ghost_proxy:455130405398380564>",
         color=0x009933
     )
 
     # Shows the number of servers the bot is member of.
     embed.add_field(name="Warsats", value=f"{len(bot.guilds)}")
 
+    embed.add_field(name='Version', value='v0.0.2a', inline=False)
+
     # give info about you here
-    #embed.add_field(name='_ _', value="_Discovered by Mirage ,'}_")
-    embed.add_field(name='_ _', value="<:ghost_proxy:455130405398380564>")
+    # embed.add_field(name='_ _', value="_Discovered by Mirage ,'}_")
+    # embed.add_field(name='_ _', value="<:ghost_proxy:455130405398380564>")
+    embed.add_field(name='Uptime', value=f'{get_bot_uptime(bot)}', inline=False)
 
     # Logo
     embed.set_image(url="https://raw.githubusercontent.com/RecursiveHook/voluspa-public/master/images/voluspa_white_icon_65.png")
