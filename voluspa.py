@@ -796,10 +796,10 @@ def bungie_get_profile(player_name=None):
     return
 
 
-@bot.command(name='get-profile')
-async def get_player_profile(ctx, *, player_name):
-    bungie_get_profile()
-    return
+# @bot.command(name='get-profile')
+# async def get_player_profile(ctx, *, player_name):
+#     bungie_get_profile()
+#     return
 
 
 @bot.command(name='find-player')
