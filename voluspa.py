@@ -252,6 +252,7 @@ async def members(ctx):
     # print(member for member in ctx.message.server.members)
         #dis_client = discord.Client()
         #member_list = [member for member in dis_client.get_all_members()]
+        regex_alphanumeric = re.compile('[\W_]+', re.UNICODE)
         member_list = [member for member in bot.get_all_members()]
         member_dict = {}
         for member in member_list:
@@ -311,7 +312,8 @@ async def members(ctx):
         regex_pattern = re.compile(r'\W+')
 
         def sanitize_string(_string):
-            return regex_pattern.sub('', _string)
+            stage_1 = regex_pattern.sub('', _string)
+            return regex_alphanumeric.sub('', stage_1)
             #return re.sub(r'\W+', '', _string)
             # return re.sub(r'([^\s\w]|_)+', '', _string)
             # return re.sub(r'\W+', '', _string)
