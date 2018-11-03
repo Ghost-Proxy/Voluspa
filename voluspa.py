@@ -14,7 +14,6 @@ import itertools
 import traceback
 import pprint
 import sqlite3
-import requests
 import random
 import statistics
 import yaml
@@ -30,6 +29,7 @@ from modules.fun import Quotes, RandomQuotes, get_xckd_comic
 from modules.database import Database
 
 # Third-Party Imports
+import requests
 import fuzzyset
 import discord
 import aiohttp
@@ -359,6 +359,7 @@ async def members(ctx):
             member_missing = True
             for discord_member in alpha_sorted_gp_members:
                 #print('comparing: {} to {}'.format(bungie_member.lower(), discord_member.lower()))
+                logger.info(f'Comparing -- Bungie member: [{bungie_member.lower()}] | Discord member: [{discord_member.lower()}]')
                 if bungie_member.lower() in discord_member.lower() or discord_member.lower() in bungie_member.lower():
                     member_missing = False
                     break
