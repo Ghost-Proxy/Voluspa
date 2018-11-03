@@ -3,6 +3,7 @@
 """Voluspa Ghost Proxy Discord Bot"""
 
 # Built-in Imports
+import os
 import sys
 import asyncio
 import logging
@@ -66,8 +67,21 @@ def read_yaml(yaml_file):
         return yaml.load(yfile)
 
 
+# TODO CLEANUP
 config = read_yaml('./config/config.yaml')
-secrets = read_yaml('./secrets/secrets.yaml')
+if os.path.isfile(os.path.join(os.getcwd(), './secrets/secrets.yaml')):
+    secrets = read_yaml('./secrets/secrets.yaml')
+else:
+    secrets = {
+        'Bungie': {
+            'api_key': os.environ['BUNGIE_API_KEY'],
+            'clan_group_id': os.environ['BUNGIE_CLAN_GROUP_ID'],
+            'oauth_client_id': os.environ['BUNGIE_OAUTH_ID']
+        },
+        'Discord': {
+            'api_key': os.environ['DISCORD_API_KEY']
+        }}
+
 config = merge_dicts(config, secrets)
 config = AttrDict.from_nested_dict(config)
 # print(config)
