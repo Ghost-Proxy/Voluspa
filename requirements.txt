@@ -1,3 +1,4 @@
-git+https://github.com/Rapptz/discord.py@rewrite#egg=discord.py[voice]
 PyYAML==3.13
+requests==2.19.1
+git+https://github.com/Rapptz/discord.py@rewrite#egg=discord.py[voice]
 git+https://github.com/axiak/fuzzyset.git#egg=fuzzyset --install-option="--pure-python"
