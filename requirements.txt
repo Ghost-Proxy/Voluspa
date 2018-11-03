@@ -4,7 +4,8 @@ attrs==18.1.0
 certifi==2018.4.16
 chardet==3.0.4
 click==6.7
-discord.py==1.0.0a1481+g983be10
+#discord.py==1.0.0a1481+g983be10
+git+https://github.com/Rapptz/discord.py@rewrite#egg=discord.py[voice]
 Flask==1.0.2
 fuzzyset==0.0.15
 idna==2.7
