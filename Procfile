@@ -1,1 +1,1 @@
-worker: python3 voluspa.py
+worker: python voluspa.py
