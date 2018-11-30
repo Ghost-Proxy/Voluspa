@@ -54,10 +54,15 @@ logger.addHandler(stream_handler)
 
 # Setup Initial Stuff
 client = discord.Client()
+# bot = commands.AutoShardedBot(
 bot = commands.Bot(command_prefix='$', description='Völuspá the Ghost Proxy Proto-Warmind AI')
 quotes = Quotes()
 random_quotes = RandomQuotes()
 db = Database()
+
+cog_extensions = [
+    'cogs.autorole'
+]
 
 
 # Load in our secrets and config files
@@ -164,7 +169,6 @@ def get_bot_uptime(bot, *, brief=False):
 async def uptime(ctx):
     """Tells you how long the bot has been up for."""
     await ctx.send(f'Uptime: **{get_bot_uptime(bot)}**')
-
 
 
 @bot.command()
@@ -550,7 +554,6 @@ async def members_online(ctx):
     await ctx.send(result_msg)
 
 
-#async \
 async def get_destiny_profile_characters(destiny_membership_id, membership_type):
     # https://bungie-net.github.io/multi/operation_get_Destiny2-GetProfile.html#operation_get_Destiny2-GetProfile
     # {'iconPath': '', 'membershipType': 4, 'membershipId': '4611686018467468651', 'displayName': 'Mirage'}
@@ -964,7 +967,16 @@ async def info(ctx):
 #     traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
 
 
-bot.run(config.Discord.api_key)
+# https://gist.github.com/EvieePy/d78c061a4798ae81be9825468fe146be
 
+
+def main():
+    for extension in cog_extensions:
+        bot.load_extension(extension)
+    bot.run(config.Discord.api_key)
+
+
+if __name__ == '__main__':
+    main()
 
 
