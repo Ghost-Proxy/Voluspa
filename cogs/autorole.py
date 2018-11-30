@@ -41,9 +41,13 @@ class AutoroleCog:
                         roles_to_add.add(role)
                         break
 
+        print(f'Roles to Add: {roles_to_add}')
+        print(f'Role Dict: {role_dict}')
+
         # Build list of roles to add
         new_roles = [discord.utils.get(ctx.guild.roles, name=role) for role in roles_to_add]
 
+        print(f'New Roles: {new_roles}')
         #role = discord.utils.get(ctx.guild.roles, name="role to add name")
         user = ctx.message.author
         await user.add_roles(new_roles)
