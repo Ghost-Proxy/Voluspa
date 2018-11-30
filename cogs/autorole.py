@@ -12,6 +12,7 @@ class AutoRole:
         """Adds Game Mode roles for @ pings.
 
         Uses either short names like 'c' for crucible, or full names like 'gambit'.
+
         Multiple roles can be added at once, e.g. `$lfg-add c g` adds @crucible and @gambit.
         """
 
@@ -69,6 +70,7 @@ class AutoRole:
         """Removes Game Mode roles for @ pings.
 
         Uses either short names like 'c' for crucible, or full names like 'gambit'.
+        
         Multiple roles can be removed at once, e.g. `$lfg-remove c g` removes @crucible and @gambit.
         """
 
