@@ -50,7 +50,7 @@ class AutoroleCog:
         print(f'New Roles: {new_roles}')
         #role = discord.utils.get(ctx.guild.roles, name="role to add name")
         user = ctx.message.author
-        await user.add_roles(new_roles)
+        await user.add_roles(*new_roles)
 
 def setup(bot):
     bot.add_cog(AutoroleCog(bot))
