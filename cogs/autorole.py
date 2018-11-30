@@ -8,7 +8,7 @@ class AutoRole:
 
     @commands.command(name='lfg add')  # , aliases=['game-role', 'lfg-role'])
     @commands.guild_only()
-    async def update_roles(self, ctx, *roles: str):  # roles: list):
+    async def add_roles(self, ctx, *roles: str):  # roles: list):
         """Adds Game Mode roles for @ pings.
 
         Uses either short names like 'c' for crucible, or full names like 'gambit'.
@@ -63,10 +63,9 @@ class AutoRole:
         await user.add_roles(*new_roles)
         await ctx.send(f'{ctx.message.author.mention} added Game Mode roles `{", ".join(roles_to_add)}`')
 
-
     @commands.command(name='lfg remove')  # , aliases=['game-role', 'lfg-role'])
     @commands.guild_only()
-    async def update_roles(self, ctx, *roles: str):  # roles: list):
+    async def remove_roles(self, ctx, *roles: str):  # roles: list):
         """Removes Game Mode roles for @ pings.
 
         Uses either short names like 'c' for crucible, or full names like 'gambit'.
