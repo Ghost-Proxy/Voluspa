@@ -6,10 +6,14 @@ class AutoRole:
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name='lfg', aliases=['game-role', 'role'])
+    @commands.command(name='lfg', aliases=['game-role', 'lfg-role'])
     @commands.guild_only()
-    async def update_roles(self, ctx, *args: str):  # roles: list):
-        """Sets a Game Mode role for @ pings"""
+    async def update_roles(self, ctx, *roles: str):  # roles: list):
+        """Sets Game Mode roles for @ pings.
+
+        Uses either short names like 'c' for crucible, or full names like 'gambit'.
+        Multiple roles can be added at once, e.g. `$lfg c g` adds @crucible and @gambit.
+        """
 
         # $lfg (no param) -- Lists current LFG roles set
         # $lfg role1 role2 -- adds/removes the roles
@@ -35,7 +39,7 @@ class AutoRole:
         # Process input and sanitize
         roles_to_add = set()
 
-        for r in args:
+        for r in roles:
             for role, allowed_names in role_dict.items():
                 for name in allowed_names:
                     if r == name:
