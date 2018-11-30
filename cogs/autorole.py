@@ -62,7 +62,7 @@ class AutoRole:
         #role = discord.utils.get(ctx.guild.roles, name="role to add name")
         user = ctx.message.author
         await user.add_roles(*new_roles)
-        await ctx.send(f'{ctx.message.author.mention} added Game Mode roles `{", ".join(roles_to_add)}`')
+        await ctx.send(f'{ctx.message.author.mention} added Game Mode role(s):  `{", ".join(roles_to_add)}`')
 
     @commands.command(name='lfg-remove')  # , aliases=['game-role', 'lfg-role'])
     @commands.guild_only()
@@ -70,7 +70,7 @@ class AutoRole:
         """Removes Game Mode roles for @ pings.
 
         Uses either short names like 'c' for crucible, or full names like 'gambit'.
-        
+
         Multiple roles can be removed at once, e.g. `$lfg-remove c g` removes @crucible and @gambit.
         """
 
@@ -120,7 +120,7 @@ class AutoRole:
         #role = discord.utils.get(ctx.guild.roles, name="role to add name")
         user = ctx.message.author
         await user.remove_roles(*new_roles)
-        await ctx.send(f'{ctx.message.author.mention} removed Game Mode roles `{", ".join(roles_to_add)}`')
+        await ctx.send(f'{ctx.message.author.mention} removed Game Mode role(s):  `{", ".join(roles_to_add)}`')
 
 
 def setup(bot):
