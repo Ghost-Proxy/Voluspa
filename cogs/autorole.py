@@ -1,11 +1,12 @@
 import discord
 from discord.ext import commands
 
-class AutoroleCog:
+
+class AutoRole:
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name='lfg', aliases=['role'])
+    @commands.command(name='lfg', aliases=['game-role', 'role'])
     @commands.guild_only()
     async def update_roles(self, ctx, *args: str):  # roles: list):
         """Sets a Game Mode role for @ pings"""
@@ -44,13 +45,19 @@ class AutoroleCog:
         print(f'Roles to Add: {roles_to_add}')
         print(f'Role Dict: {role_dict}')
 
+        if not list(roles_to_add):
+            return
+
         # Build list of roles to add
         new_roles = [discord.utils.get(ctx.guild.roles, name=role) for role in roles_to_add]
+
+        # Add check if roles are already applied and avoid doing it again
 
         print(f'New Roles: {new_roles}')
         #role = discord.utils.get(ctx.guild.roles, name="role to add name")
         user = ctx.message.author
         await user.add_roles(*new_roles)
 
+
 def setup(bot):
-    bot.add_cog(AutoroleCog(bot))
+    bot.add_cog(AutoRole(bot))
