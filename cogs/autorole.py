@@ -9,7 +9,7 @@ class AutoRole:
     @commands.command(name='lfg add')  # , aliases=['game-role', 'lfg-role'])
     @commands.guild_only()
     async def update_roles(self, ctx, *roles: str):  # roles: list):
-        """Sets Game Mode roles for @ pings.
+        """Adds Game Mode roles for @ pings.
 
         Uses either short names like 'c' for crucible, or full names like 'gambit'.
         Multiple roles can be added at once, e.g. `$lfg add c g` adds @crucible and @gambit.
@@ -67,10 +67,10 @@ class AutoRole:
     @commands.command(name='lfg remove')  # , aliases=['game-role', 'lfg-role'])
     @commands.guild_only()
     async def update_roles(self, ctx, *roles: str):  # roles: list):
-        """Sets Game Mode roles for @ pings.
+        """Removes Game Mode roles for @ pings.
 
         Uses either short names like 'c' for crucible, or full names like 'gambit'.
-        Multiple roles can be added at once, e.g. `$lfg add c g` adds @crucible and @gambit.
+        Multiple roles can be removed at once, e.g. `$lfg remove c g` removes @crucible and @gambit.
         """
 
         # $lfg (no param) -- Lists current LFG roles set
