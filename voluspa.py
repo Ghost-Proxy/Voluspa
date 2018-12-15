@@ -54,6 +54,23 @@ logger.addHandler(stream_handler)
 
 # Setup Initial Stuff
 client = discord.Client()
+
+# https://gist.github.com/EvieePy/d78c061a4798ae81be9825468fe146be
+def get_prefix(bot, message):
+    """A callable Prefix for our bot. This could be edited to allow per server prefixes."""
+
+    # Notice how you can use spaces in prefixes. Try to keep them simple though.
+    prefixes = ['$']
+
+    # Check to see if we are outside of a guild. e.g DM's etc.
+    if not message.guild:
+        # Only allow ? to be used in DMs
+        return '?'
+
+    # If we are in a guild, we allow for the user to mention us or use any of the prefixes in our list.
+    return commands.when_mentioned_or(*prefixes)(bot, message)
+
+
 # bot = commands.AutoShardedBot(
 bot = commands.Bot(command_prefix=get_prefix, description='Völuspá the Ghost Proxy Proto-Warmind AI')
 quotes = Quotes()
@@ -115,20 +132,7 @@ config = AttrDict.from_nested_dict(config)
 #     return quote
 
 
-# https://gist.github.com/EvieePy/d78c061a4798ae81be9825468fe146be
-def get_prefix(bot, message):
-    """A callable Prefix for our bot. This could be edited to allow per server prefixes."""
 
-    # Notice how you can use spaces in prefixes. Try to keep them simple though.
-    prefixes = ['$']
-
-    # Check to see if we are outside of a guild. e.g DM's etc.
-    if not message.guild:
-        # Only allow ? to be used in DMs
-        return '?'
-
-    # If we are in a guild, we allow for the user to mention us or use any of the prefixes in our list.
-    return commands.when_mentioned_or(*prefixes)(bot, message)
 
 
 def create_event():
