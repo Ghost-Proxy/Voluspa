@@ -424,6 +424,17 @@ async def members(ctx):
 
         # TODO: create 'num_" vars for `len()` below...
 
+        num_gp_members_missing = len(missing_discord_members)
+        num_gp_admins_missing = len(missing_discord_admins)
+        num_gp_all_members_discord = len(alpha_sorted_gp_members)
+        num_discord_users = len(member_dict)
+        num_gp_all_members_bungie = bungie_num_members
+
+        num_gp_all_members_missing = num_gp_members_missing + num_gp_admins_missing
+        error_diff = (num_gp_all_members_bungie - num_gp_all_members_discord) - num_gp_all_members_missing
+        raw_bungie_diff = num_gp_all_members_bungie - num_gp_all_members_discord
+        percent_gp_all_members_missing = math.ceil(num_gp_all_members_discord / num_gp_all_members_bungie) * 100
+
         msg_final = '--\\\\\\\\//--\n' \
                     '**Ghost Proxy Members on Discord: {}**\n' \
                     '_Total Discord Members: {}_\n' \
@@ -435,18 +446,16 @@ async def members(ctx):
                     '```  {}```\n' \
                     'Members Missing ({}):\n' \
                     '```  {}```'.format(
-                        len(alpha_sorted_gp_members),
-                        len(member_dict),
-                        bungie_num_members,
-                        len(missing_discord_members) + len(missing_discord_admins),
-                        (bungie_num_members - len(alpha_sorted_gp_members)) - len(missing_discord_members) - len(missing_discord_admins),
-                        bungie_num_members - len(alpha_sorted_gp_members),
-                        math.ceil(
-                            (len(alpha_sorted_gp_members) / len(member_dict)) * 100
-                        ),
-                        len(missing_discord_admins),
+                        num_gp_all_members_discord,
+                        num_discord_users,
+                        num_gp_all_members_bungie,
+                        num_gp_all_members_missing,
+                        error_diff,
+                        raw_bungie_diff,
+                        percent_gp_all_members_missing,
+                        num_gp_admins_missing,
                         '\n  '.join(missing_discord_admins),
-                        len(missing_discord_members),
+                        num_gp_members_missing,
                         '\n  '.join(missing_discord_members)
                     )
         msg_final2 = '---\nPotential role updates needed: {}\n```  {}```'.format(
