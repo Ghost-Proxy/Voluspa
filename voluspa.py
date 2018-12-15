@@ -55,6 +55,7 @@ logger.addHandler(stream_handler)
 # Setup Initial Stuff
 client = discord.Client()
 
+
 # https://gist.github.com/EvieePy/d78c061a4798ae81be9825468fe146be
 def get_prefix(bot, message):
     """A callable Prefix for our bot. This could be edited to allow per server prefixes."""
@@ -65,7 +66,7 @@ def get_prefix(bot, message):
     # Check to see if we are outside of a guild. e.g DM's etc.
     if not message.guild:
         # Only allow ? to be used in DMs
-        return '?'
+        return '$'
 
     # If we are in a guild, we allow for the user to mention us or use any of the prefixes in our list.
     return commands.when_mentioned_or(*prefixes)(bot, message)
@@ -271,6 +272,7 @@ async def send_multipart_msg(ctx, raw_msg):
 
 
 @bot.command()
+@commands.guild_only()
 async def members(ctx):
     """Returns Discord member information"""
     async with ctx.typing():
@@ -520,6 +522,7 @@ async def generate_char_stats_message(light_levels, total_chars, char_type):
 
 
 @bot.command(name='clan-stats')
+@commands.guild_only()
 async def clan_stats(ctx, min_level: int = 0):
     async with ctx.typing():
         platform_type = 4
@@ -557,6 +560,7 @@ async def clan_stats(ctx, min_level: int = 0):
 
 
 @bot.command(name='members-online')
+@commands.guild_only()
 async def members_online(ctx):
     async with ctx.typing():
         logger.info('Looking up currently online Ghost Proxy members...')
@@ -844,6 +848,7 @@ def bungie_get_profile(player_name=None):
 
 
 @bot.command(name='find-player')
+@commands.guild_only()
 async def find_player(ctx, *, player_name):
     #num_players, results = bungie_search_users(player_name)
     results = bungie_search_users(player_name)
