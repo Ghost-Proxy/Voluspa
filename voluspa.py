@@ -442,7 +442,7 @@ async def members(ctx):
                         (bungie_num_members - len(alpha_sorted_gp_members)) - len(missing_discord_members) - len(missing_discord_admins),
                         bungie_num_members - len(alpha_sorted_gp_members),
                         math.ceil(
-                            ((len(member_dict) - (len(missing_discord_members) + len(missing_discord_admins))) / len(member_dict)) * 100
+                            (len(alpha_sorted_gp_members) / len(member_dict)) * 100
                         ),
                         len(missing_discord_admins),
                         '\n  '.join(missing_discord_admins),
