@@ -55,12 +55,15 @@ class Quotes(object):
                 'find the other Warminds...',
                 '\\\\ MIDNIGHT EXIGENT \\',
                 'find the Traveller',
-                'mind games... hehe',
+                '\\\\Classified...',
                 'Subroutine IKELOS',
                 '\\\\ DVALIN FORGE \\',
                 'Test: DVALIN FORGE-2',
                 'Destiny 2 with Char',
-                'with Charlemagne!'
+                'chatting with Calus',
+                'locating Cayde-6.NNimg.bak',
+                'ping the Warsats...',
+                'ignite the Forges!'
             ]
         }
 
