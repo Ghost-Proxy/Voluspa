@@ -182,6 +182,7 @@ def get_bot_uptime(bot, *, brief=False):
 
 
 @bot.command()
+@bot.commands.guild_only()
 async def uptime(ctx):
     """Tells you how long the bot has been up for."""
     await ctx.send(f'Uptime: **{get_bot_uptime(bot)}**')
