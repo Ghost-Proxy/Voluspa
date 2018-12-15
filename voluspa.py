@@ -433,7 +433,7 @@ async def members(ctx):
         num_gp_all_members_missing = num_gp_members_missing + num_gp_admins_missing
         error_diff = (num_gp_all_members_bungie - num_gp_all_members_discord) - num_gp_all_members_missing
         raw_bungie_diff = num_gp_all_members_bungie - num_gp_all_members_discord
-        percent_gp_all_members_missing = math.ceil(num_gp_all_members_discord / num_gp_all_members_bungie) * 100
+        percent_gp_all_members_missing = math.ceil(num_gp_all_members_discord / num_gp_all_members_bungie * 100)
 
         msg_final = '--\\\\\\\\//--\n' \
                     '**Ghost Proxy Members on Discord: {}**\n' \
