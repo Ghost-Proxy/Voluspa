@@ -254,10 +254,12 @@ async def xkcd(ctx):
         title=xkcd_comic['safe_title'],
         description=f'#{xkcd_comic["num"]} - {xkcd_comic["date"]}',
         color=0x96A8C8,  # rgb(150,168,200)
-        footer=xkcd_comic['alt'],
-        img=xkcd_comic['img'],
+        # footer=xkcd_comic['alt'],
+        # img=xkcd_comic['img'],
         # thumbnail='img'
     )
+    xkcd_embed.set_image(url=xkcd_comic['img'])
+    xkcd_embed.set_footer(text=xkcd_comic['alt'])
     await ctx.send(embed=xkcd_embed)
 
 
