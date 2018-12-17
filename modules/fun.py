@@ -18,7 +18,7 @@ async def get_latest_xkcd_comic():
                 return latest_xkcd_num, latest_xkcd_comic
 
 
-async def get_xkcd_comic(num: int = 1):
+async def get_xkcd_comic_num(num: int = 1):
     xkcd_url = f'https://xkcd.com/{num}/info.0.json'
     async with aiohttp.ClientSession() as session:
         async with session.get(xkcd_url) as r:
@@ -47,7 +47,7 @@ async def get_xkcd_comic(latest=False):
     if not latest:
         rand_idx = random.randint(1, latest_xkcd_num)
         original_xkcd_url = f'http://xkcd.com/{rand_idx}'
-        xkcd_comic = await get_xkcd_comic(rand_idx)
+        xkcd_comic = await get_xkcd_comic_num(rand_idx)
     else:
         original_xkcd_url = f'http://xkcd.com/{latest_xkcd_num}'
         xkcd_comic = latest_xkcd_comic
