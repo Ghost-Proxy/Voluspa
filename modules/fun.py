@@ -3,25 +3,59 @@ import re
 import asyncio
 import requests
 import random
+import aiohttp
 
 logger = logging.getLogger('discord')
 
 
-async def get_xckd_comic():
-    req = requests.get('https://xkcd.com/info.0.json')
-    latest_xkcd = req.json()
-    latest_xkcd_num = latest_xkcd['num']
-    rand_idx = random.randint(1, latest_xkcd_num)
-    req2 = requests.get('http://xkcd.com/{}/info.0.json'.format(rand_idx))
-    rand_xkcd = req2.json()
-    rand_xkcd_img = rand_xkcd['img']
-    rand_xkcd_title = rand_xkcd['safe_title']
-    rand_xkcd_alt = rand_xkcd['alt']
-    return '**{}**\n_{}_\n{}'.format(
-        rand_xkcd_title,
-        rand_xkcd_alt,
-        rand_xkcd_img
-    )
+async def get_latest_xkcd_comic():
+    xkcd_index_url = 'https://xkcd.com/info.0.json'
+    async with aiohttp.ClientSession() as session:
+        async with session.get(xkcd_index_url) as r:
+            if r.status == 200:
+                latest_xkcd_comic = await r.json()
+                latest_xkcd_num = latest_xkcd_comic['num']
+                return latest_xkcd_num, latest_xkcd_comic
+
+
+async def get_xkcd_comic(num: int = 1):
+    xkcd_url = f'https://xkcd.com/{num}/info.0.json'
+    async with aiohttp.ClientSession() as session:
+        async with session.get(xkcd_url) as r:
+            if r.status == 200:
+                xkcd_comic = await r.json()
+                return xkcd_comic
+
+
+async def get_xkcd_comic(latest=False):
+    latest_xkcd_num, latest_xkcd_comic = await get_latest_xkcd_comic()
+
+    # {
+    #     "month": "12",
+    #     "num": 2085,
+    #     "link": "",
+    #     "year": "2018",
+    #     "news": "",
+    #     "safe_title": "arXiv",
+    #     "transcript": "",
+    #     "alt": "Both arXiv and archive.org are invaluable projects which, if they didn't exist, we would dismiss as obviously ridiculous and unworkable.",
+    #     "img": "https://imgs.xkcd.com/comics/arxiv.png",
+    #     "title": "arXiv",
+    #     "day": "14"
+    # }
+
+    if not latest:
+        rand_idx = random.randint(1, latest_xkcd_num)
+        original_xkcd_url = f'http://xkcd.com/{rand_idx}'
+        xkcd_comic = await get_xkcd_comic(rand_idx)
+    else:
+        original_xkcd_url = f'http://xkcd.com/{latest_xkcd_num}'
+        xkcd_comic = latest_xkcd_comic
+
+    xkcd_comic['date'] = f'{xkcd_comic["year"]}/{xkcd_comic["month"]}/{xkcd_comic["day"]}'
+    xkcd_comic['url'] = original_xkcd_url
+
+    return xkcd_comic
 
 
 class Quotes(object):

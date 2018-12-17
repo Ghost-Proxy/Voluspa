@@ -25,7 +25,7 @@ import datetime
 
 # Custom Imports
 from modules.misc import merge_dicts, AttrDict
-from modules.fun import Quotes, RandomQuotes, get_xckd_comic
+from modules.fun import Quotes, RandomQuotes, get_xkcd_comic
 from modules.database import Database
 
 # Third-Party Imports
@@ -248,8 +248,17 @@ async def goodbye(ctx):
 
 @bot.command()
 async def xkcd(ctx):
-    """Display a random XKCD comic"""
-    await ctx.send(await get_xckd_comic())
+    """Display a random XKCD comic :)"""
+    xkcd_comic = await get_xkcd_comic()
+    xkcd_embed = discord.Embed(
+        title=xkcd_comic['safe_title'],
+        description=f'#{xkcd_comic["num"]} - {xkcd_comic["date"]}',
+        color=0x96A8C8,  # rgb(150,168,200)
+        footer=xkcd_comic['alt'],
+        img=xkcd_comic['image'],
+        #thumbnail=0
+    )
+    await ctx.send(embed=xkcd_embed)
 
 
 @bot.command()
