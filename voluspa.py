@@ -258,7 +258,7 @@ async def xkcd(ctx):
         # img=xkcd_comic['img'],
         # thumbnail='img'
     )
-    xkcd_embed.set_author(name=f'#{xkcd_comic["num"]} - {xkcd_comic["date"]}', url=xkcd_comic['url'])
+    xkcd_embed.set_author(name=f'xkcd #{xkcd_comic["num"]} - {xkcd_comic["date"]}', url=xkcd_comic['url'])
     xkcd_embed.set_image(url=xkcd_comic['img'])
     xkcd_embed.set_footer(text=xkcd_comic['alt'])
     await ctx.send(embed=xkcd_embed)
