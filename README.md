@@ -5,6 +5,8 @@
 > **Ghost Proxy** _Proto-Warmind AI_  
 > [_Destiny 2 Discord Bot_]
 
+---
+
 ### Requirements
 ```ini
 PyYAML==3.13
