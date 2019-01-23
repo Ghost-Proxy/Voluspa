@@ -9,8 +9,8 @@ roles_dicts = {
         'strike-nf-pve': ['s', 'nf', 'pve', 'strike', 'nightfall', 'strike-nf-pve']
     },
     'raid_leads': {
-        'active': ['on', 'active', 'true', 'enable', 'yes', '1'],
-        'inactive': ['off', 'inactive', 'false', 'disable', 'no', '0']
+        'sherpa-active': ['on', 'active', 'true', 'enable', 'yes', '1'],
+        'sherpa-inactive': ['off', 'inactive', 'false', 'disable', 'no', '0']
     }
 }
 
@@ -98,6 +98,28 @@ class AutoRole:
         """
 
         await update_roles(ctx, roles_dicts['game_modes'], 'removed Game Mode', action='remove', *roles)
+
+    @commands.command(name='sherpa-on')
+    @commands.has_role('raid-lead')
+    @commands.guild_only()
+    async def sherpa_on(self, ctx):
+        """Sets Sherpa status to Active.
+
+        Can only be used by Raid Leads.
+        """
+
+        await update_roles(ctx, roles_dicts['raid_leads'], 'set Sherpa to Active', 'add', 'sherpa-active')
+
+    @commands.command(name='sherpa-off')
+    @commands.has_role('raid-lead')
+    @commands.guild_only()
+    async def sherpa_off(self, ctx):
+        """Sets Sherpa status to Inactive.
+
+        Can only be used by Raid Leads.
+        """
+
+        await update_roles(ctx, roles_dicts['raid_leads'], 'set Sherpa to Inactive', 'remove', 'sherpa-inactive')
 
 
 def setup(bot):
