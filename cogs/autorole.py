@@ -108,7 +108,8 @@ class AutoRole:
         Can only be used by Raid Leads.
         """
 
-        await update_roles(ctx, roles_dicts['raid_leads'], 'set Sherpa to Active', 'add', 'sherpa-active')
+        await update_roles(ctx, roles_dicts['raid_leads'], 'added', 'add', 'active')
+        await update_roles(ctx, roles_dicts['raid_leads'], 'removed', 'remove', 'inactive')
 
     @commands.command(name='sherpa-off')
     @commands.has_role('raid-lead')
@@ -119,7 +120,8 @@ class AutoRole:
         Can only be used by Raid Leads.
         """
 
-        await update_roles(ctx, roles_dicts['raid_leads'], 'set Sherpa to Inactive', 'remove', 'sherpa-inactive')
+        await update_roles(ctx, roles_dicts['raid_leads'], 'added', 'add', 'inactive')
+        await update_roles(ctx, roles_dicts['raid_leads'], 'removed', 'remove', 'active')
 
 
 def setup(bot):
