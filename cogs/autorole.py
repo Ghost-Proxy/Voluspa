@@ -85,7 +85,7 @@ class AutoRole:
         ]
         # role_dict = {role_name: [] for role_name in role_list}
 
-        await update_roles(ctx, roles_dicts['game_modes'], 'added Game Mode', action='add', *roles)
+        await update_roles(ctx, roles_dicts['game_modes'], 'added Game Mode', 'add', *roles)
 
     @commands.command(name='lfg-remove')  # , aliases=['game-role', 'lfg-role'])
     @commands.guild_only()
@@ -97,7 +97,7 @@ class AutoRole:
         Multiple roles can be removed at once, e.g. `$lfg-remove c g` removes @crucible and @gambit.
         """
 
-        await update_roles(ctx, roles_dicts['game_modes'], 'removed Game Mode', action='remove', *roles)
+        await update_roles(ctx, roles_dicts['game_modes'], 'removed Game Mode', 'remove', *roles)
 
     @commands.command(name='sherpa-on')
     @commands.has_role('raid-lead')
