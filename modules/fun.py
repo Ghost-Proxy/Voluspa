@@ -94,8 +94,8 @@ class Quotes(object):
                 '\\\\ DVALIN FORGE \\',
                 'Test: DVALIN FORGE-2',
                 'Destiny 2 with Char',
-                'chatting with Calus',
-                'finding Cayde-6.NNimg.bak',
+                'chat with Calus',
+                'find Cayde-6.NNimg.bak',
                 'ping the Warsats...',
                 'ignite the Forges!'
             ]
