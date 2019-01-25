@@ -5,7 +5,7 @@ import pprint
 import re
 import statistics
 
-from modules.helpers import read_config
+from modules.config import CONFIG
 from modules.discord_utils import send_multipart_msg
 
 import aiohttp
@@ -14,7 +14,6 @@ from discord.ext import commands
 import requests
 import fuzzyset  # TODO: Meh, need to revisit
 
-config = read_config()
 logger = logging.getLogger('members')
 
 
@@ -87,7 +86,7 @@ async def get_destiny_profile_characters(destiny_membership_id, membership_type)
     profile_params = {'components': 'Profiles,Characters'}
     request_url = 'https://www.bungie.net/platform{}'.format(target_endpoint)
     # TODO: Replace requests with aiohttp
-    r = requests.get(request_url, headers={'X-API-Key': config.Bungie.api_key}, params=profile_params)
+    r = requests.get(request_url, headers={'X-API-Key': CONFIG.Bungie.api_key}, params=profile_params)
     raw_json = r.json()
     # logger.info('Destiny Profile:\n{}'.format(raw_json))
     bungie_response = raw_json['Response']
@@ -105,7 +104,7 @@ async def async_get_destiny_profile_characters(destiny_membership_id, membership
     request_url = 'https://www.bungie.net/platform{}'.format(target_endpoint)
 
     async with aiohttp.ClientSession() as session:
-        async with session.get(request_url, headers={'X-API-Key': config.Bungie.api_key}, params=profile_params) as r:
+        async with session.get(request_url, headers={'X-API-Key': CONFIG.Bungie.api_key}, params=profile_params) as r:
             if r.status == 200:
                 raw_json = await r.json()
                 bungie_response = raw_json['Response']
@@ -120,7 +119,7 @@ async def async_get_member_data_by_id(membership_id, membership_type, platform_t
     target_endpoint = '/User/GetMembershipsById/{}/{}/'.format(membership_id, membership_type)
     request_url = 'https://www.bungie.net/platform{}'.format(target_endpoint)
     async with aiohttp.ClientSession() as session:
-        async with session.get(request_url, headers={'X-API-Key': config.Bungie.api_key}) as r:
+        async with session.get(request_url, headers={'X-API-Key': CONFIG.Bungie.api_key}) as r:
             if r.status == 200:
                 raw_json = await r.json()
                 bungie_response = raw_json['Response']
@@ -131,10 +130,10 @@ async def async_get_member_data_by_id(membership_id, membership_type, platform_t
 
 
 async def async_get_clan_members():
-    target_endpoint = '/GroupV2/{}/Members/'.format(config.Bungie.clan_group_id)
+    target_endpoint = '/GroupV2/{}/Members/'.format(CONFIG.Bungie.clan_group_id)
     request_url = 'https://www.bungie.net/platform{}'.format(target_endpoint)
     async with aiohttp.ClientSession() as session:
-        async with session.get(request_url, headers={'X-API-Key': config.Bungie.api_key}) as r:
+        async with session.get(request_url, headers={'X-API-Key': CONFIG.Bungie.api_key}) as r:
             if r.status == 200:
                 raw_json = await r.json()
                 bungie_results = raw_json['Response']
@@ -148,7 +147,7 @@ def get_member_data_by_id(membership_id, membership_type, platform_type=4):  # p
     # https://bungie-net.github.io/multi/operation_get_User-GetMembershipDataById.html#operation_get_User-GetMembershipDataById
     target_endpoint = '/User/GetMembershipsById/{}/{}/'.format(membership_id, membership_type)
     request_url = 'https://www.bungie.net/platform{}'.format(target_endpoint)
-    r = requests.get(request_url, headers={'X-API-Key': config.Bungie.api_key})
+    r = requests.get(request_url, headers={'X-API-Key': CONFIG.Bungie.api_key})
     raw_json = r.json()
     # logger.info('MEMBER DATA INFO:\n{}'.format(raw_json))
     bungie_response = raw_json['Response']
@@ -175,9 +174,9 @@ def get_destiny_member_info(member):
 
 
 def get_clan_members():
-    target_endpoint = '/GroupV2/{}/Members/'.format(config.Bungie.clan_group_id)
+    target_endpoint = '/GroupV2/{}/Members/'.format(CONFIG.Bungie.clan_group_id)
     request_url = 'https://www.bungie.net/platform{}'.format(target_endpoint)
-    r = requests.get(request_url, headers={'X-API-Key': config.Bungie.api_key})
+    r = requests.get(request_url, headers={'X-API-Key': CONFIG.Bungie.api_key})
     raw_json = r.json()
     bungie_results = raw_json['Response']
     member_list = bungie_results['results']
@@ -187,8 +186,8 @@ def get_clan_members():
 
 
 def get_bungie_member_list():
-    member_list_url = "https://www.bungie.net/platform/GroupV2/{}/Members/".format(config.Bungie.clan_group_id)
-    r = requests.get(member_list_url, headers={'X-API-Key': config.Bungie.api_key})
+    member_list_url = "https://www.bungie.net/platform/GroupV2/{}/Members/".format(CONFIG.Bungie.clan_group_id)
+    r = requests.get(member_list_url, headers={'X-API-Key': CONFIG.Bungie.api_key})
     raw_json = r.json()
     bungie_results = raw_json['Response']
     logger.info('BUNGIE MEMBER LIST:\n{}'.format(bungie_results))
@@ -199,8 +198,8 @@ def get_bungie_member_list():
 
 
 def get_bungie_member_type_dict():
-    member_list_url = "https://www.bungie.net/platform/GroupV2/{}/Members/".format(config.Bungie.clan_group_id)
-    r = requests.get(member_list_url, headers={'X-API-Key': config.Bungie.api_key})
+    member_list_url = "https://www.bungie.net/platform/GroupV2/{}/Members/".format(CONFIG.Bungie.clan_group_id)
+    r = requests.get(member_list_url, headers={'X-API-Key': CONFIG.Bungie.api_key})
     raw_json = r.json()
     bungie_results = raw_json['Response']
     logger.info('BUNGIE MEMBER LIST:\n{}'.format(bungie_results))
@@ -247,7 +246,7 @@ def get_members_name_list_by_role(member_dict, role_name):
 
 def bungie_search_users(player_name):
     search_url = "https://www.bungie.net/platform/User/SearchUsers/?q={}".format(player_name)
-    r = requests.get(search_url, headers={'X-API-Key': config.Bungie.api_key})
+    r = requests.get(search_url, headers={'X-API-Key': CONFIG.Bungie.api_key})
     raw_json = r.json()
     bungie_results = raw_json['Response']
     logger.info('Bungie Search response:\n{}'.format(bungie_results))
@@ -255,7 +254,7 @@ def bungie_search_users(player_name):
     if len(bungie_results) == 0:
         endpoint_path = f'/Destiny2/SearchDestinyPlayer/{4}/{player_name}/'
         target_url = f'https://www.bungie.net/platform{endpoint_path}'
-        r = requests.get(target_url, headers={'X-API-Key': config.Bungie.api_key})
+        r = requests.get(target_url, headers={'X-API-Key': CONFIG.Bungie.api_key})
         raw_json = r.json()
         bungie_results = raw_json['Response']
         logger.info(f'Destiny Search response:\n{bungie_results}')
@@ -282,7 +281,7 @@ def bungie_get_profile(player_name=None):
     bungie_account_url = "http://www.bungie.net/platform/User/GetBungieAccount/{}/254/".format(
         1595120
     )
-    r = requests.get(bungie_account_url, headers={'X-API-Key': config.Bungie.api_key})
+    r = requests.get(bungie_account_url, headers={'X-API-Key': CONFIG.Bungie.api_key})
     raw_json = r.json()
     logger.info('RESPONSE ({}):\n{}'.format(bungie_account_url, raw_json))
     # {'Response': {'destinyMemberships': [{'membershipType': 2, 'membershipId': '4611686018428895515',
@@ -302,7 +301,7 @@ def bungie_get_profile(player_name=None):
     bungie_net_user_url = "http://www.bungie.net/platform/User/GetBungieNetUserById/{id}/".format(
         id=1595120
     )
-    r = requests.get(bungie_net_user_url, headers={'X-API-Key': config.Bungie.api_key})
+    r = requests.get(bungie_net_user_url, headers={'X-API-Key': CONFIG.Bungie.api_key})
     raw_json = r.json()
     logger.info('RESPONSE ({}):\n{}'.format(bungie_net_user_url, raw_json))
     # {'ErrorCode': 217, 'ThrottleSeconds': 0, 'ErrorStatus': 'UserCannotResolveCentralAccount',
@@ -313,7 +312,7 @@ def bungie_get_profile(player_name=None):
         membershipType=4,
         membershipId=4611686018467468651
     )
-    r = requests.get(bungie_profile_url, headers={'X-API-Key': config.Bungie.api_key})
+    r = requests.get(bungie_profile_url, headers={'X-API-Key': CONFIG.Bungie.api_key})
     raw_json = r.json()
     logger.info('RESPONSE ({}):\n{}'.format(bungie_profile_url, raw_json))
 
@@ -321,7 +320,7 @@ def bungie_get_profile(player_name=None):
         membershipId=4611686018467468651,
         membershipType=4
     )
-    r = requests.get(destiny_memberships, headers={'X-API-Key': config.Bungie.api_key})
+    r = requests.get(destiny_memberships, headers={'X-API-Key': CONFIG.Bungie.api_key})
     raw_json = r.json()
     logger.info('RESPONSE ({}):\n{}'.format(destiny_memberships, raw_json))
 
@@ -331,7 +330,7 @@ def bungie_get_profile(player_name=None):
         4,  # TigerBlizzard (PC)
         1595120  # ME
     )
-    r = requests.get(profile_url, headers={'X-API-Key': config.Bungie.api_key})
+    r = requests.get(profile_url, headers={'X-API-Key': CONFIG.Bungie.api_key})
     raw_json = r.json()
     logger.info('RESPONSE:\n{}'.format(raw_json))
     #bungie_results = raw_json['Response']

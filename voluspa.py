@@ -2,7 +2,7 @@
 
 """Voluspa Ghost Proxy Discord Bot"""
 
-VOLUSPA_VERSION = 'v0.0.3 build: 2019-01-25'
+VOLUSPA_VERSION = 'v0.0.4 build: 2019-01-26'
 
 # REF:
 # https://gist.github.com/EvieePy/d78c061a4798ae81be9825468fe146be
@@ -18,7 +18,8 @@ import datetime
 # Custom Imports
 from modules.fun import Quotes, RandomQuotes
 from modules.database import Database
-from modules.helpers import read_config
+from modules.config import CONFIG
+from modules.discord_utils import get_prefix, update_status_task
 
 # Third-Party Imports
 import discord
@@ -41,7 +42,6 @@ client = discord.Client()
 quotes = Quotes()
 random_quotes = RandomQuotes()
 db = Database()
-config = read_config()
 
 cog_extensions = [
     'cogs.autorole',
@@ -50,29 +50,8 @@ cog_extensions = [
     'cogs.members'
 ]
 
-
-# https://gist.github.com/EvieePy/d78c061a4798ae81be9825468fe146be
-def get_prefix(bot, message):
-    """A callable Prefix for our bot. This could be edited to allow per server prefixes."""
-    prefixes = ['$']
-
-    # Check to see if we are outside of a guild. e.g DM's etc.
-    if not message.guild:
-        # Only allow ? to be used in DMs
-        return '$'
-
-    # If we are in a guild, we allow for the user to mention us or use any of the prefixes in our list.
-    return commands.when_mentioned_or(*prefixes)(bot, message)
-
-
 # bot = commands.AutoShardedBot()
 bot = commands.Bot(command_prefix=get_prefix, description='Völuspá the Ghost Proxy Proto-Warmind AI')
-
-
-async def update_status_task(_bot):
-    while True:
-        await _bot.change_presence(activity=discord.Game(name=await quotes.pick_quote('status')))
-        await asyncio.sleep(30)
 
 
 @bot.event
@@ -88,7 +67,7 @@ async def on_ready():
         status=discord.Status.online
     )
 
-    bot.loop.create_task(update_status_task(bot))
+    bot.loop.create_task(update_status_task(bot, quotes))
 
     # ' bot.send_message('message.channel')
     # ' general_channel = discord.Object(id='channel_id_here')
@@ -131,7 +110,7 @@ async def on_ready():
 def main():
     for extension in cog_extensions:
         bot.load_extension(extension)
-    bot.run(config.Discord.api_key)
+    bot.run(CONFIG.Discord.api_key)
 
 
 if __name__ == '__main__':

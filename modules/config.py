@@ -31,3 +31,6 @@ def read_config():
     merged_config = merge_dicts(file_config, secrets)
     nested_config = AttrDict.from_nested_dict(merged_config)
     return nested_config
+
+
+CONFIG = read_config()

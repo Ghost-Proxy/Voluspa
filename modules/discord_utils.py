@@ -1,3 +1,27 @@
+import asyncio
+
+import discord
+from discord.ext import commands
+
+
+def get_prefix(bot, message):
+    """A callable Prefix for our bot. This could be edited to allow per server prefixes."""
+    prefixes = ['$']
+
+    # Check to see if we are outside of a guild. e.g DM's etc.
+    if not message.guild:
+        # Only allow ? to be used in DMs
+        return '$'
+
+    # If we are in a guild, we allow for the user to mention us or use any of the prefixes in our list.
+    return commands.when_mentioned_or(*prefixes)(bot, message)
+
+
+async def update_status_task(bot, quotes):
+    while True:
+        await bot.change_presence(activity=discord.Game(name=await quotes.pick_quote('status')))
+        await asyncio.sleep(30)
+
 
 async def send_multipart_msg(ctx, raw_msg):
     msg_len = len(raw_msg)
