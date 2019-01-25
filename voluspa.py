@@ -2,6 +2,8 @@
 
 """Voluspa Ghost Proxy Discord Bot"""
 
+VOLUSPA_VERSION = 'v0.0.3 build: 2019-01-25'
+
 # REF:
 # https://gist.github.com/EvieePy/d78c061a4798ae81be9825468fe146be
 
