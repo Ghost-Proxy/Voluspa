@@ -14,7 +14,7 @@ from discord.ext import commands
 import requests
 import fuzzyset  # TODO: Meh, need to revisit
 
-logger = logging.getLogger('members')
+logger = logging.getLogger('voluspa.cog.members')
 
 
 def filter_character_types(clan_characters, min_level=0):

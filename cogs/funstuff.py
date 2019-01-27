@@ -9,7 +9,7 @@ from discord.ext import commands
 quotes = Quotes()
 random_quotes = RandomQuotes()
 
-logger = logging.getLogger('funstuff')
+logger = logging.getLogger('voluspa.cog.funstuff')
 
 
 class FunStuff:

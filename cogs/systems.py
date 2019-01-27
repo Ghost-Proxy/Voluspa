@@ -8,7 +8,7 @@ from voluspa import VOLUSPA_VERSION
 import discord
 from discord.ext import commands
 
-logger = logging.getLogger('systems')
+logger = logging.getLogger('voluspa.cog.systems')
 
 
 def get_bot_uptime(bot, *, brief=False):

@@ -43,3 +43,4 @@ def read_config():
 
 
 CONFIG = read_config()
+CONFIG['app_cwd'] = os.path.abspath(os.getcwd())
