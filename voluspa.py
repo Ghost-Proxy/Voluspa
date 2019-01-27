@@ -26,28 +26,7 @@ from modules.discord_utils import get_prefix, update_status_task
 import discord
 from discord.ext import commands
 
-
-# Logging
-# TODO: Cleanup and consolidate / move to module...
-logger = logging.getLogger('voluspa')
-logger.setLevel(logging.DEBUG)
-log_formatter = logging.Formatter('%(asctime)s [%(levelname)s] %(name)s:  %(message)s')
-
-file_handler = RotatingFileHandler(
-    filename=os.path.join(CONFIG.app_cwd, 'logs/voluspa.log'),
-    encoding='utf-8',
-    maxBytes=1024*1024*10,
-    backupCount=10
-)
-file_handler.setLevel(logging.DEBUG)
-file_handler.setFormatter(log_formatter)
-
-stream_handler = logging.StreamHandler()
-stream_handler.setLevel(logging.DEBUG)
-stream_handler.setFormatter(log_formatter)
-
-logger.addHandler(file_handler)
-logger.addHandler(stream_handler)
+from modules.logger import LOGGER as logger  # HACK
 
 # Setup Initial Stuff
 client = discord.Client()
