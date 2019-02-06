@@ -1,5 +1,9 @@
+import logging
+
 import discord
 from discord.ext import commands
+
+logger = logging.getLogger('voluspa.cog.autorole')
 
 roles_dicts = {
     'game_modes': {
@@ -11,6 +15,12 @@ roles_dicts = {
     'raid_leads': {
         'sherpa-active': ['on', 'active', 'true', 'enable', 'yes', '1'],
         'sherpa-inactive': ['off', 'inactive', 'false', 'disable', 'no', '0']
+    },
+    'rythm_dj': {
+        'DJ': ['dj', 'rythm', 'rhythm']
+    },
+    'gp_friend': {
+        'ghost-proxy-friend': ['gpf', 'gp-friend', 'ghost-proxy-friend']
     }
 }
 
@@ -59,6 +69,8 @@ async def update_roles(ctx,
 class AutoRole:
     def __init__(self, bot):
         self.bot = bot
+
+    # TODO: Improve this structure, use cog's and command structure/features better
 
     @commands.command(name='lfg-add')  # , aliases=['game-role', 'lfg-role'])
     @commands.guild_only()
@@ -122,6 +134,41 @@ class AutoRole:
 
         await update_roles(ctx, roles_dicts['raid_leads'], 'added', 'add', 'inactive')
         await update_roles(ctx, roles_dicts['raid_leads'], 'removed', 'remove', 'active')
+
+    @commands.command(name='dj')
+    @commands.has_role('ghost-proxy-member')
+    @commands.guild_only()
+    async def set_dj(self, ctx):
+        """Sets DJ role for Rythm
+
+        Can only be used by Members.
+        """
+        # TODO: Improve this, possibly toggle?
+
+        if 'DJ' in [role.name for role in ctx.message.author.roles]:
+            await ctx.send(f'{ctx.message.author.mention} - DJ role is already set :+1:')
+        else:
+            await update_roles(ctx, roles_dicts['rythm_dj'], 'added', 'add', 'dj')
+
+    @commands.command(name='promote-to-friend')
+    @commands.has_role('ghost-proxy-vanguard')
+    @commands.guild_only()
+    async def promote_to_friend(self, ctx):
+        """WIP: Promotes user to Friend
+
+        Can only be used by Vanguard (atm).
+        """
+
+        # TODO: Would be nice to cache this, expire based on timeframes
+        #  ...would be cool to tie cache invalidation to event callbacks...
+        #  e.g. discord member join event clears discord member cache, hmm...
+        discord_members = self.bot.get_all_members()
+
+        logger.info(f'Discord Members:\n{discord_members}')
+        # Args are multiple user names (potentially _n_)
+        # Search member list for each user name provided
+        #  - if more then one user name matches, return a list of matches and ask for a retry
+        #  - if only one match, sets friend role for discord user
 
 
 def setup(bot):
