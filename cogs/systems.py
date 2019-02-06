@@ -67,19 +67,19 @@ class Systems:
     @commands.command()
     @commands.guild_only()
     async def uptime(self, ctx):
-        """Tells you how long the bot has been up for."""
+        """Voluspa's uptime"""
         await ctx.send(f'Uptime: **{get_bot_uptime(self.bot)}**')
 
     @commands.command()
     async def status(self, ctx):
-        """Voluspa's current operational status"""
+        """Voluspa's current status"""
         # await ctx.send("https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif")
         # await ctx.send(bot.uptime)
         await ctx.send("\n// Currently Operational... \n// Rebasing Core Subnets... (WIP)")
 
     @commands.command()
     async def ping(self, ctx):
-        """Returns the latency of Voluspa"""
+        """Voluspa's latency"""
         async with ctx.typing():
         # Get the latency of the bot
         #latency = bot.latency  # Included in the Discord.py library

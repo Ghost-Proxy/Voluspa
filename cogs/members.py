@@ -347,6 +347,7 @@ class Members:
     @commands.guild_only()
     async def members(self, ctx):
         """Returns Discord member information"""
+        # TODO: This is a mess and needs to be unwound
         async with ctx.typing():
         # print(member for member in ctx.message.server.members)
             #dis_client = discord.Client()
