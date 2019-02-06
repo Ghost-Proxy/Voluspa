@@ -5,7 +5,7 @@ import requests
 import random
 import aiohttp
 
-logger = logging.getLogger('discord')
+logger = logging.getLogger('voluspa.modules.fun')
 
 
 async def get_latest_xkcd_comic():
