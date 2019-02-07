@@ -84,7 +84,9 @@ class Quotes(object):
                 '<:awesome_smiley:455152593052762140> SNARF!'
             ],
             'status': [
-                'with fire!',
+                'with solar!',
+                'with void!',
+                'with arc!',
                 'with spoils from the void...',
                 'find the other Warminds...',
                 '\\\\ MIDNIGHT EXIGENT \\',
