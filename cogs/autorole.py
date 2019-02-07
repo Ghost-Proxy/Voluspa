@@ -1,3 +1,4 @@
+import re
 import logging
 
 import discord
@@ -150,25 +151,92 @@ class AutoRole:
         else:
             await update_roles(ctx, roles_dicts['rythm_dj'], 'added', 'add', 'dj')
 
-    @commands.command(name='promote-to-friend')
+    @commands.command(name='set-friend', aliases=['p2f'])
     @commands.has_role('ghost-proxy-vanguard')
     @commands.guild_only()
-    async def promote_to_friend(self, ctx):
-        """WIP: Promotes user to Friend
+    async def promote_to_friend(self, ctx, *users: str):
+        """WIP: Promotes User(s) to Friend(s)
 
         Can only be used by Vanguard (atm).
         """
 
-        # TODO: Would be nice to cache this, expire based on timeframes
-        #  ...would be cool to tie cache invalidation to event callbacks...
-        #  e.g. discord member join event clears discord member cache, hmm...
-        discord_members = self.bot.get_all_members()
-
-        logger.info(f'Discord Members:\n{discord_members}')
         # Args are multiple user names (potentially _n_)
         # Search member list for each user name provided
         #  - if more then one user name matches, return a list of matches and ask for a retry
         #  - if only one match, sets friend role for discord user
+
+        # <Member id=962762036347236771 name='Zed' discriminator='6791' bot=False nick=None
+        # guild=<Guild id=374330517165965313 name='Ghost Proxy' chunked=True>>,
+
+        # RegEx Filter: r'^\S+#\d+$' # TODO...
+
+        if len(users) <= 0:
+            await ctx.send(f'{ctx.message.author.mention} - Please provide User(s) to promote.')
+
+        logger.info(f'Raw Args: {users}')
+        requested_users = [user.casefold().split('#') for user in users]
+
+        logger.info(f'User Args: {requested_users}')
+        discord_members = self.bot.get_all_members()
+        # TODO: Would be nice to cache this, expire based on timeframes
+        #  ...would be cool to tie cache invalidation to event callbacks...
+        #  e.g. discord member join event clears discord member cache, hmm...
+
+        member_list = [
+            {
+                'id': member.id,
+                'name': member.name.casefold(),
+                'salt': member.discriminator,
+                'nick': member.nick.casefold() if member.nick else ''
+            }
+            for member in discord_members if not member.bot
+        ]
+        logger.info(f'Discord Members:\n{member_list}')
+
+        def match_users(user_list, username):
+            print(f'USERNAME REC: {username}')
+            matched_users = [user for user in user_list if username[0] in user['name'] or username[0] in user['nick']]
+            print(f'>>> Match results before salt: {matched_users}')
+            if len(username) >= 2:
+                matched_users = [user for user in matched_users if user['salt'] == username[1]]
+            print(f'>>> Match results AFTER salt: {matched_users}')
+            return matched_users
+
+        user_results = [{req_user[0]: match_users(member_list, req_user)} for req_user in requested_users]
+        logger.info(f'Member Search Results:\n{user_results}\n')
+
+        multiple_users_found = False
+        for user_rec in user_results:
+            print(f'USER REC: {user_rec} | type: {type(user_rec)}')
+            req_user = list(user_rec.keys())[0]
+            user_matches = user_rec[req_user]
+            if len(user_matches) > 1:
+                multiple_users_found = True
+                temp_list = [f'{user["name"]}#{user["salt"]} ({user["nick"]})' for user in user_matches]
+                nl = "\n"
+                await ctx.send(
+                    f'{ctx.message.author.mention} - '
+                    f':warning: Found multiple Users, need more info:```{nl.join(temp_list)}```'
+                )
+            elif len(user_matches) == 1:
+                await ctx.send(
+                    f'{ctx.message.author.mention} - '
+                    f':white_check_mark: Promoting User to Friend: '
+                    f'`{user_matches[0]["name"]}#{user_matches[0]["salt"]} ({user_matches[0]["nick"]})`'
+                )
+            else:
+                await ctx.send(
+                    f'{ctx.message.author.mention} - '
+                    f':no_entry: Sorry, could not find a matching User for `{req_user}`. '
+                    f'Please try again.'
+                )
+
+        if multiple_users_found:
+            await ctx.send(
+                f'_ _\n**NOTE:** _Multiple User results were found for 1 or more requested Users._\n'
+                f'Please review the results above and then try again with a full Username.\n\n'
+                f'_Example:_  `<user>#<id>`  ->  `$p2f guardian#1234`'
+            )
 
 
 def setup(bot):
