@@ -168,8 +168,7 @@ class AutoRole:
                 )
             elif len(user_matches) == 1:
                 # TODO: Do role limit check here... for now!
-                if role_limit and role_limit in user_matches[0]['roles']:
-                    # NOT ALLOWED
+                if role_limit and (role_limit in user_matches[0]['roles'] or role_limit == user_matches[0]['top_role']):
                     await ctx.send(
                         f'{ctx.message.author.mention} - '
                         f':no_entry: Sorry, could not change Roles for:\n'
@@ -179,7 +178,7 @@ class AutoRole:
                 else:
                     await ctx.send(
                         f'{ctx.message.author.mention} - '
-                        f':white_check_mark: Promoting User to Friend:\n'
+                        f':white_check_mark: Promoting User to `{roles}`:\n'
                         f'`{user_matches[0]["name"]}#{user_matches[0]["salt"]} ({user_matches[0]["nick"]})`'
                     )
                     # await self.update_roles(ctx, 'ghost_proxy_roles', ['gpf'])  # TODO: Abstract this to params...
