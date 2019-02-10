@@ -1,39 +1,14 @@
 import re
 import logging
+from typing import List, Dict, Any
 
 import discord
 from discord.ext import commands
 
 logger = logging.getLogger('voluspa.cog.autorole')
 
-roles_dicts = {
-    'game_modes': {
-        'crucible': ['c', 'crucible'],
-        'gambit': ['g', 'gambit'],
-        'raid': ['r', 'raid'],
-        'strike-nf-pve': ['s', 'nf', 'pve', 'strike', 'nightfall', 'strike-nf-pve']
-    },
-    'raid_leads': {
-        'sherpa-active': ['on', 'active', 'true', 'enable', 'yes', '1'],
-        'sherpa-inactive': ['off', 'inactive', 'false', 'disable', 'no', '0']
-    },
-    'rythm_dj': {
-        'DJ': ['dj', 'rythm', 'rhythm']
-    },
-    'gp_friend': {
-        'ghost-proxy-friend': ['gpf', 'gp-friend', 'ghost-proxy-friend']
-    }
-}
 
-
-async def update_roles(ctx,
-                       role_dict: dict,
-                       update_message: str = 'set',
-                       action: str = 'add',
-                       *roles: str
-                       ):
-
-    # Process input and sanitize
+def process_role_inputs(roles, role_dict):
     roles_to_update = set()
     for r in roles:
         for role, allowed_names in role_dict.items():
@@ -41,125 +16,90 @@ async def update_roles(ctx,
                 if r == name:
                     roles_to_update.add(role)
                     break
+    return roles_to_update
 
-    print(f'Roles to Update: {roles_to_update}')
-    print(f'Role Dict: {role_dict}')
 
-    if not list(roles_to_update):
-        return
-
-    # Build list of roles to add
-    updated_roles = [discord.utils.get(ctx.guild.roles, name=role) for role in roles_to_update]
-
-    # Add check if roles are already applied and avoid doing it again
-
-    print(f'"Updating Roles (action: {action}): {updated_roles}')
-    user = ctx.message.author
-
-    if action == 'add':
-        await user.add_roles(*updated_roles)
-    elif action == 'remove':
-        await user.remove_roles(*updated_roles)
-    else:
-        print(f"Unknown Action for Update Roles!")
-        return
-
-    await ctx.send(f'{ctx.message.author.mention} {update_message} role(s):  `{", ".join(roles_to_update)}`')
+def match_users(user_list, username):
+    print(f'USERNAME REC: {username}')
+    matched_users = [user for user in user_list if username[0] in user['name'] or username[0] in user['nick']]
+    print(f'>>> Match results before salt: {matched_users}')
+    if len(username) >= 2:
+        matched_users = [user for user in matched_users if user['salt'] == username[1]]
+    print(f'>>> Match results AFTER salt: {matched_users}')
+    return matched_users
 
 
 class AutoRole:
     def __init__(self, bot):
         self.bot = bot
+        self.roles_dicts = {
+            'game_modes': {
+                'crucible': ['c', 'crucible'],
+                'gambit': ['g', 'gambit'],
+                'raid': ['r', 'raid'],
+                'strike-nf-pve': ['s', 'nf', 'pve', 'strike', 'nightfall', 'strike-nf-pve']
+            },
+            'raid_leads': {
+                'sherpa-active': ['on', 'active', 'true', 'enable', 'yes', '1'],
+                'sherpa-inactive': ['off', 'inactive', 'false', 'disable', 'no', '0']
+            },
+            'rythm_dj': {
+                'DJ': ['dj', 'rythm', 'rhythm']
+            },
+            'ghost_proxy_roles': {
+                'ghost-proxy-friend': ['gpf', 'gp-friend', 'ghost-proxy-friend'],
+                'ghost-proxy-member': ['gpm', 'gp-member', 'ghost-proxy-member']
+            }
+        }
 
-    # TODO: Improve this structure, use cog's and command structure/features better
+    async def update_roles(self,
+                           ctx,
+                           role_class: str,
+                           roles: List[str],
+                           user_id: int = None,
+                           options: Dict = None):
+        # Set options and values
+        update_message = options.get('update_message', 'added')
+        action = options.get('action', 'add')
+        confirm = options.get('confirm', True)
+        role_dict = self.roles_dicts[role_class]
 
-    @commands.command(name='lfg-add')  # , aliases=['game-role', 'lfg-role'])
-    @commands.guild_only()
-    async def lfg_add(self, ctx, *roles: str):
-        """Adds Game Mode roles for @ pings.
+        if len(role_dict) <= 0:
+            logger.info('Invalid role class!')
+            return
 
-        Uses either short names like 'c' for crucible, or full names like 'gambit'.
+        # Process input and sanitize
+        roles_to_update = process_role_inputs(roles, role_dict)
 
-        Multiple roles can be added at once, e.g. `$lfg-add c g` adds @crucible and @gambit.
-        """
+        print(f'Roles to Update: {roles_to_update}')
+        print(f'Role Dict: {role_dict}')
 
-        # $lfg (no param) -- Lists current LFG roles set
-        # $lfg role1 role2 -- adds/removes the roles
-        # $lfg all -- adds/removes all roles
-        # Handle ALL Eventually...
+        if not list(roles_to_update):
+            return
 
-        # TODO: CLEAN UP
-        # Build roles
-        role_list = [
-            'crucible',
-            'gambit',
-            'raid',
-            'strike-nf-pve'
-        ]
-        # role_dict = {role_name: [] for role_name in role_list}
+        # Build list of roles to add
+        updated_roles = [discord.utils.get(ctx.guild.roles, name=role) for role in roles_to_update]
 
-        await update_roles(ctx, roles_dicts['game_modes'], 'added Game Mode', 'add', *roles)
+        # TODO: Add check if roles are already applied and avoid doing it again?
 
-    @commands.command(name='lfg-remove')  # , aliases=['game-role', 'lfg-role'])
-    @commands.guild_only()
-    async def lfg_remove(self, ctx, *roles: str):
-        """Removes Game Mode roles for @ pings.
-
-        Uses either short names like 'c' for crucible, or full names like 'gambit'.
-
-        Multiple roles can be removed at once, e.g. `$lfg-remove c g` removes @crucible and @gambit.
-        """
-
-        await update_roles(ctx, roles_dicts['game_modes'], 'removed Game Mode', 'remove', *roles)
-
-    @commands.command(name='sherpa-on')
-    @commands.has_role('raid-lead')
-    @commands.guild_only()
-    async def sherpa_on(self, ctx):
-        """Sets Sherpa status to Active.
-
-        Can only be used by Raid Leads.
-        """
-
-        await update_roles(ctx, roles_dicts['raid_leads'], 'added', 'add', 'active')
-        await update_roles(ctx, roles_dicts['raid_leads'], 'removed', 'remove', 'inactive')
-
-    @commands.command(name='sherpa-off')
-    @commands.has_role('raid-lead')
-    @commands.guild_only()
-    async def sherpa_off(self, ctx):
-        """Sets Sherpa status to Inactive.
-
-        Can only be used by Raid Leads.
-        """
-
-        await update_roles(ctx, roles_dicts['raid_leads'], 'added', 'add', 'inactive')
-        await update_roles(ctx, roles_dicts['raid_leads'], 'removed', 'remove', 'active')
-
-    @commands.command(name='dj')
-    @commands.has_role('ghost-proxy-member')
-    @commands.guild_only()
-    async def set_dj(self, ctx):
-        """Sets DJ role for Rythm
-
-        Can only be used by Members.
-        """
-        # TODO: Improve this, possibly toggle?
-
-        if 'DJ' in [role.name for role in ctx.message.author.roles]:
-            await ctx.send(f'{ctx.message.author.mention} - DJ role is already set :+1:')
+        print(f'"Updating Roles (action: {action}): {updated_roles}')
+        if user_id:
+            user = self.bot.get_user()
         else:
-            await update_roles(ctx, roles_dicts['rythm_dj'], 'added', 'add', 'dj')
+            user = ctx.message.author
 
-    @commands.command(name='set-friend', aliases=['p2f'])
-    @commands.has_role('ghost-proxy-vanguard')
-    @commands.guild_only()
-    async def promote_to_friend(self, ctx, *users: str):
-        """WIP: Promotes User(s) to Friend(s)
+        if action == 'add':
+            await user.add_roles(*updated_roles)
+        elif action == 'remove':
+            await user.remove_roles(*updated_roles)
+        else:
+            print(f"Unknown Action for Update Roles!")
+            return
 
-        Can only be used by Vanguard (atm).
-        """
+        if confirm:
+            await ctx.send(f'{ctx.message.author.mention} {update_message} role(s):  `{", ".join(roles_to_update)}`')
 
+    async def assign_roles_to_user(self, ctx, role_class: str, roles: List[str], users: List[str]):
         # Args are multiple user names (potentially _n_)
         # Search member list for each user name provided
         #  - if more then one user name matches, return a list of matches and ask for a retry
@@ -169,7 +109,9 @@ class AutoRole:
         # guild=<Guild id=374330517165965313 name='Ghost Proxy' chunked=True>>,
 
         # RegEx Filter: r'^\S+#\d+$' # TODO...
+        # TODO: Check if member is set, and then remove, but prompt?
 
+        # TODO: Add error handling for params...
         if len(users) <= 0:
             await ctx.send(f'{ctx.message.author.mention} - Please provide User(s) to promote.')
 
@@ -182,6 +124,8 @@ class AutoRole:
         #  ...would be cool to tie cache invalidation to event callbacks...
         #  e.g. discord member join event clears discord member cache, hmm...
 
+        # `targetrole = discord.utils.get(myserver.roles, name="MyTargetRole")`
+
         member_list = [
             {
                 'id': member.id,
@@ -192,15 +136,6 @@ class AutoRole:
             for member in discord_members if not member.bot
         ]
         logger.info(f'Discord Members:\n{member_list}')
-
-        def match_users(user_list, username):
-            print(f'USERNAME REC: {username}')
-            matched_users = [user for user in user_list if username[0] in user['name'] or username[0] in user['nick']]
-            print(f'>>> Match results before salt: {matched_users}')
-            if len(username) >= 2:
-                matched_users = [user for user in matched_users if user['salt'] == username[1]]
-            print(f'>>> Match results AFTER salt: {matched_users}')
-            return matched_users
 
         user_results = [{req_user[0]: match_users(member_list, req_user)} for req_user in requested_users]
         logger.info(f'Member Search Results:\n{user_results}\n')
@@ -224,6 +159,8 @@ class AutoRole:
                     f':white_check_mark: Promoting User to Friend: '
                     f'`{user_matches[0]["name"]}#{user_matches[0]["salt"]} ({user_matches[0]["nick"]})`'
                 )
+                # await self.update_roles(ctx, 'ghost_proxy_roles', ['gpf'])  # TODO: Abstract this to params...
+                await self.update_roles(ctx, role_class, roles, user_id=user_matches[0]['id'])
             else:
                 await ctx.send(
                     f'{ctx.message.author.mention} - '
@@ -237,6 +174,138 @@ class AutoRole:
                 f'Please review the results above and then try again with a full Username.\n\n'
                 f'_Example:_  `<user>#<id>`  ->  `$p2f guardian#1234`'
             )
+
+    # TODO: Improve this structure, use cog's and command structure/features better
+
+    @commands.command(name='lfg-add')  # , aliases=['game-role', 'lfg-role'])
+    @commands.guild_only()
+    async def lfg_add(self, ctx, *roles: str):
+        """Adds Game Mode roles for @ pings.
+
+        Uses either short names like 'c' for crucible, or full names like 'gambit'.
+
+        Multiple roles can be added at once, e.g. `$lfg-add c g` adds @crucible and @gambit.
+        """
+
+        # $lfg (no param) -- Lists current LFG roles set
+        # $lfg role1 role2 -- adds/removes the roles
+        # $lfg all -- adds/removes all roles
+        # Handle ALL Eventually...
+
+        await self.update_roles(
+            ctx,
+            'game_modes',
+            *roles,
+            options={'update_message': 'added Game Mode'}
+        )
+
+    @commands.command(name='lfg-remove')  # , aliases=['game-role', 'lfg-role'])
+    @commands.guild_only()
+    async def lfg_remove(self, ctx, *roles: str):
+        """Removes Game Mode roles for @ pings.
+
+        Uses either short names like 'c' for crucible, or full names like 'gambit'.
+
+        Multiple roles can be removed at once, e.g. `$lfg-remove c g` removes @crucible and @gambit.
+        """
+
+        await self.update_roles(
+            ctx,
+            'game_modes',
+            *roles,
+            options={
+                'update_message': 'removed Game Mode',
+                'action': 'remove'
+            }
+        )
+
+    @commands.command(name='sherpa-on')
+    @commands.has_role('raid-lead')
+    @commands.guild_only()
+    async def sherpa_on(self, ctx):
+        """Sets Sherpa status to Active.
+
+        Can only be used by Raid Leads.
+        """
+
+        await self.update_roles(ctx, 'raid_leads', ['active'])
+        await self.update_roles(
+            ctx,
+            'raid_leads',
+            ['inactive'],
+            options={
+                'update_message': 'removed',
+                'action': 'remove',
+                'confirm': False
+            })
+
+    @commands.command(name='sherpa-off')
+    @commands.has_role('raid-lead')
+    @commands.guild_only()
+    async def sherpa_off(self, ctx):
+        """Sets Sherpa status to Inactive.
+
+        Can only be used by Raid Leads.
+        """
+
+        await self.update_roles(ctx, 'raid_leads', ['inactive'])
+        await self.update_roles(
+            ctx,
+            'raid_leads',
+            ['active'],
+            options={
+                'update_message': 'removed',
+                'action': 'remove',
+                'confirm': False
+            }
+        )
+
+    @commands.command(name='dj')
+    @commands.has_role('ghost-proxy-member')
+    @commands.guild_only()
+    async def set_dj(self, ctx):
+        """Sets DJ role for Rythm
+
+        Can only be used by Members.
+        """
+        # TODO: Improve this, possibly toggle?
+
+        if 'DJ' in [role.name for role in ctx.message.author.roles]:
+            await ctx.send(f'{ctx.message.author.mention} - DJ role is already set :+1:')
+        else:
+            await self.update_roles(ctx, 'rythm_dj', ['dj'])
+
+    # TODO: STUB
+    # @commands.command(name='set-member', aliases=['p2m'])
+    # @commands.has_role('ghost-proxy-vanguard')
+    # @commands.guild_only()
+    # async def promote_to_member(self, ctx, *users: str):
+    #     pass
+
+    @commands.command(name='set-friend', aliases=['p2f'])
+    @commands.has_role('ghost-proxy-vanguard')
+    @commands.guild_only()
+    async def promote_to_friend(self, ctx, *users: str):
+        """WIP: Promotes User(s) to Friend(s)
+
+        Can only be used by Vanguard (atm).
+        """
+        await self.assign_roles_to_user(ctx, '', [''], users)
+
+    # async def get_members_by_roles(self, roles: List[str], include_bots=False):
+    #     # TODO: WIP
+    #     discord_members = self.bot.get_all_members()
+    #     member_list = [
+    #         {
+    #             'id': member.id,
+    #             'name': member.name,
+    #             'salt': member.discriminator,
+    #             'nick': member.nick if member.nick else '',
+    #             'bot': member.bot
+    #         }
+    #         for member in discord_members if member.roles
+    #     ]
+    #     return member_list
 
 
 def setup(bot):
