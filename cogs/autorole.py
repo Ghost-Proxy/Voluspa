@@ -178,9 +178,10 @@ class AutoRole:
                 else:
                     await ctx.send(
                         f'{ctx.message.author.mention} - '
-                        f':white_check_mark: Promoting User to Role(s):\n'
-                        f'`{", ".join(roles)}`\n'
-                        f'`{user_matches[0]["name"]}#{user_matches[0]["salt"]} ({user_matches[0]["nick"]})`'
+                        f':white_check_mark: Promoting User:\n'
+                        f'`{user_matches[0]["name"]}#{user_matches[0]["salt"]} ({user_matches[0]["nick"]})`\n'
+                        f'to Role(s):\n'
+                        f'`{", ".join(roles)}`'
                     )
                     # await self.update_roles(ctx, 'ghost_proxy_roles', ['gpf'])  # TODO: Abstract this to params...
                     await self.update_roles(
@@ -332,7 +333,7 @@ class AutoRole:
         """
         await self.assign_roles_to_user(
             ctx,
-            'ghost_proxy_roles', 
+            'ghost_proxy_roles',
             ['ghost-proxy-friend'],
             users,
             role_limit='ghost-proxy-friend'
