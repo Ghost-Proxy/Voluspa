@@ -306,11 +306,15 @@ class AutoRole:
             await self.update_roles(ctx, 'rythm_dj', ['dj'])
 
     # TODO: STUB
-    # @commands.command(name='set-member', aliases=['p2m'])
-    # @commands.has_role('ghost-proxy-vanguard')
-    # @commands.guild_only()
-    # async def promote_to_member(self, ctx, *users: str):
-    #     pass
+    @commands.command(name='set-member', aliases=['p2m'])
+    @commands.has_role('ghost-proxy-vanguard')
+    @commands.guild_only()
+    async def promote_to_member(self, ctx, *users: str):
+        """WIP: Promotes User(s) to Members(s)
+
+        Can only be used by Vanguard (atm).
+        """
+        await self.assign_roles_to_user(ctx, 'ghost_proxy_roles', ['gpm'], users, role_limit='ghost-proxy-member')
 
     @commands.command(name='set-friend', aliases=['p2f'])
     @commands.has_role('ghost-proxy-vanguard')
@@ -320,7 +324,7 @@ class AutoRole:
 
         Can only be used by Vanguard (atm).
         """
-        await self.assign_roles_to_user(ctx, 'ghost_proxy_roles', ['gpf'], users, role_limit='ghost-proxy-member')
+        await self.assign_roles_to_user(ctx, 'ghost_proxy_roles', ['gpf'], users, role_limit='ghost-proxy-friend')
 
     # async def get_members_by_roles(self, roles: List[str], include_bots=False):
     #     # TODO: WIP
