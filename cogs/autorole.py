@@ -1,6 +1,6 @@
 import re
 import logging
-from typing import List, Dict, Any
+from typing import List, Dict, Tuple
 
 import discord
 from discord.ext import commands
@@ -59,6 +59,8 @@ class AutoRole:
                            user_id: int = None,
                            options: Dict = None):
         # Set options and values
+        if not options:
+            options = {}
         update_message = options.get('update_message', 'added')
         action = options.get('action', 'add')
         confirm = options.get('confirm', True)
@@ -80,11 +82,14 @@ class AutoRole:
         # Build list of roles to add
         updated_roles = [discord.utils.get(ctx.guild.roles, name=role) for role in roles_to_update]
 
+        # elif:  # if 'DJ' in [role.name for role in ctx.message.author.roles]:
+        # pass
+
         # TODO: Add check if roles are already applied and avoid doing it again?
 
         print(f'"Updating Roles (action: {action}): {updated_roles}')
         if user_id:
-            user = self.bot.get_user()
+            user = ctx.guild.get_member(user_id)
         else:
             user = ctx.message.author
 
@@ -99,7 +104,12 @@ class AutoRole:
         if confirm:
             await ctx.send(f'{ctx.message.author.mention} {update_message} role(s):  `{", ".join(roles_to_update)}`')
 
-    async def assign_roles_to_user(self, ctx, role_class: str, roles: List[str], users: List[str]):
+    async def assign_roles_to_user(self,
+                                   ctx,
+                                   role_class: str,
+                                   roles: List[str],
+                                   users: Tuple[str],
+                                   role_limit: str = None):
         # Args are multiple user names (potentially _n_)
         # Search member list for each user name provided
         #  - if more then one user name matches, return a list of matches and ask for a retry
@@ -110,6 +120,7 @@ class AutoRole:
 
         # RegEx Filter: r'^\S+#\d+$' # TODO...
         # TODO: Check if member is set, and then remove, but prompt?
+        # TODO: Add verification of role before message
 
         # TODO: Add error handling for params...
         if len(users) <= 0:
@@ -131,7 +142,9 @@ class AutoRole:
                 'id': member.id,
                 'name': member.name.casefold(),
                 'salt': member.discriminator,
-                'nick': member.nick.casefold() if member.nick else ''
+                'nick': member.nick.casefold() if member.nick else '',
+                'roles': [role.name for role in member.roles],  # member.roles,
+                'top_role': member.top_role.name  # member.top_role
             }
             for member in discord_members if not member.bot
         ]
@@ -154,18 +167,35 @@ class AutoRole:
                     f':warning: Found multiple Users, need more info:```{nl.join(temp_list)}```'
                 )
             elif len(user_matches) == 1:
-                await ctx.send(
-                    f'{ctx.message.author.mention} - '
-                    f':white_check_mark: Promoting User to Friend: '
-                    f'`{user_matches[0]["name"]}#{user_matches[0]["salt"]} ({user_matches[0]["nick"]})`'
-                )
-                # await self.update_roles(ctx, 'ghost_proxy_roles', ['gpf'])  # TODO: Abstract this to params...
-                await self.update_roles(ctx, role_class, roles, user_id=user_matches[0]['id'])
+                # TODO: Do role limit check here... for now!
+                if role_limit and role_limit in user_matches[0]['roles']:
+                    # NOT ALLOWED
+                    await ctx.send(
+                        f'{ctx.message.author.mention} - '
+                        f':no_entry: Sorry, could not change Roles for:\n'
+                        f'`{user_matches[0]["name"]}#{user_matches[0]["salt"]} ({user_matches[0]["nick"]})`'
+                        f'\n\nUser has the following conflicting Role(s): `{role_limit}`'
+                    )
+                else:
+                    await ctx.send(
+                        f'{ctx.message.author.mention} - '
+                        f':white_check_mark: Promoting User to Friend:\n'
+                        f'`{user_matches[0]["name"]}#{user_matches[0]["salt"]} ({user_matches[0]["nick"]})`'
+                    )
+                    # await self.update_roles(ctx, 'ghost_proxy_roles', ['gpf'])  # TODO: Abstract this to params...
+                    await self.update_roles(
+                        ctx,
+                        role_class,
+                        roles,
+                        user_id=user_matches[0]['id'],
+                        options={'confirm': False}
+                    )
             else:
                 await ctx.send(
                     f'{ctx.message.author.mention} - '
-                    f':no_entry: Sorry, could not find a matching User for `{req_user}`. '
-                    f'Please try again.'
+                    f':no_entry: Sorry, could not find a matching User for:'
+                    f'\n`{req_user}`'
+                    f'\n\nPlease try again.'
                 )
 
         if multiple_users_found:
@@ -290,7 +320,7 @@ class AutoRole:
 
         Can only be used by Vanguard (atm).
         """
-        await self.assign_roles_to_user(ctx, '', [''], users)
+        await self.assign_roles_to_user(ctx, 'ghost_proxy_roles', ['gpf'], users, role_limit='ghost-proxy-member')
 
     # async def get_members_by_roles(self, roles: List[str], include_bots=False):
     #     # TODO: WIP
