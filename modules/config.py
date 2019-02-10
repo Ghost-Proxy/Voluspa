@@ -35,7 +35,12 @@ def read_config():
             },
             'Discord': {
                 'api_key': os.environ['DISCORD_API_KEY']
-            }}
+            },
+            'Voluspa': {
+                'sha': os.getenv('SOURCE_VERSION', 'Unknown'),
+                'app_cwd': os.path.abspath(os.getcwd())
+            }
+        }
 
     merged_config = merge_dicts(file_config, secrets)
     nested_config = AttrDict.from_nested_dict(merged_config)
@@ -43,4 +48,3 @@ def read_config():
 
 
 CONFIG = read_config()
-CONFIG['app_cwd'] = os.path.abspath(os.getcwd())

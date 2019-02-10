@@ -11,7 +11,7 @@ root_logger.setLevel(logging.DEBUG)
 log_formatter = logging.Formatter('%(asctime)s [%(levelname)s] %(name)s:  %(message)s')
 
 file_handler = RotatingFileHandler(
-    filename=os.path.join(CONFIG.app_cwd, 'logs/voluspa.log'),
+    filename=os.path.join(CONFIG.Voluspa.app_cwd, 'logs/voluspa.log'),
     encoding='utf-8',
     maxBytes=1024*1024*10,
     backupCount=10

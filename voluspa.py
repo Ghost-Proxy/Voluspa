@@ -29,6 +29,7 @@ from discord.ext import commands
 from modules.logger import LOGGER as logger  # HACK
 
 # Setup Initial Stuff
+VOLUSPA_SHA = CONFIG.Voluspa.sha[:10]
 client = discord.Client()
 quotes = Quotes()
 random_quotes = RandomQuotes()

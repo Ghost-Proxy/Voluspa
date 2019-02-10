@@ -3,7 +3,7 @@ import logging
 import datetime
 import statistics
 
-from voluspa import VOLUSPA_VERSION
+from voluspa import VOLUSPA_VERSION, VOLUSPA_SHA
 
 import discord
 from discord.ext import commands
@@ -49,6 +49,7 @@ class Systems:
         embed.add_field(name="Warsats", value=f"{len(self.bot.guilds)}")
 
         embed.add_field(name='Version', value=VOLUSPA_VERSION, inline=False)
+        embed.add_field(name='SHA', value=VOLUSPA_SHA, inline=False)
 
         # give info about you here
         # embed.add_field(name='_ _', value="_Discovered by Mirage ,'}_")
