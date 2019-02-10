@@ -178,7 +178,8 @@ class AutoRole:
                 else:
                     await ctx.send(
                         f'{ctx.message.author.mention} - '
-                        f':white_check_mark: Promoting User to `{roles}`:\n'
+                        f':white_check_mark: Promoting User to Role(s):\n'
+                        f'`{", ".join(roles)}`\n'
                         f'`{user_matches[0]["name"]}#{user_matches[0]["salt"]} ({user_matches[0]["nick"]})`'
                     )
                     # await self.update_roles(ctx, 'ghost_proxy_roles', ['gpf'])  # TODO: Abstract this to params...
@@ -199,7 +200,7 @@ class AutoRole:
 
         if multiple_users_found:
             await ctx.send(
-                f'_ _\n**NOTE:** _Multiple User results were found for 1 or more requested Users._\n'
+                f'_ _\n**NOTE:** _Multiple User results were found for 1 or more requested Users._\n\n'
                 f'Please review the results above and then try again with a full Username.\n\n'
                 f'_Example:_  `<user>#<id>`  ->  `$p2f guardian#1234`'
             )
@@ -313,7 +314,13 @@ class AutoRole:
 
         Can only be used by Vanguard (atm).
         """
-        await self.assign_roles_to_user(ctx, 'ghost_proxy_roles', ['gpm'], users, role_limit='ghost-proxy-member')
+        await self.assign_roles_to_user(
+            ctx,
+            'ghost_proxy_roles',
+            ['ghost-proxy-member'],
+            users,
+            role_limit='ghost-proxy-friend'
+        )
 
     @commands.command(name='set-friend', aliases=['p2f'])
     @commands.has_role('ghost-proxy-vanguard')
@@ -323,7 +330,13 @@ class AutoRole:
 
         Can only be used by Vanguard (atm).
         """
-        await self.assign_roles_to_user(ctx, 'ghost_proxy_roles', ['gpf'], users, role_limit='ghost-proxy-friend')
+        await self.assign_roles_to_user(
+            ctx,
+            'ghost_proxy_roles', 
+            ['ghost-proxy-friend'],
+            users,
+            role_limit='ghost-proxy-friend'
+        )
 
     # async def get_members_by_roles(self, roles: List[str], include_bots=False):
     #     # TODO: WIP
