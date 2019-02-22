@@ -226,7 +226,7 @@ class AutoRole:
         await self.update_roles(
             ctx,
             'game_modes',
-            *roles,
+            roles,
             options={'update_message': 'added Game Mode'}
         )
 
@@ -243,7 +243,7 @@ class AutoRole:
         await self.update_roles(
             ctx,
             'game_modes',
-            *roles,
+            roles,
             options={
                 'update_message': 'removed Game Mode',
                 'action': 'remove'
