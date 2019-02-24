@@ -13,7 +13,7 @@ def process_role_inputs(roles, role_dict):
     for r in roles:
         for role, allowed_names in role_dict.items():
             for name in allowed_names:
-                if r == name:
+                if r.lower() == name.lower():
                     roles_to_update.add(role)
                     break
     return roles_to_update
