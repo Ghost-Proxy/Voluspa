@@ -3,7 +3,7 @@ import logging
 import datetime
 import statistics
 
-from voluspa import VOLUSPA_VERSION, VOLUSPA_SHA
+from voluspa import CONFIG, VOLUSPA_VERSION, VOLUSPA_SHA
 
 import discord
 from discord.ext import commands
@@ -49,7 +49,8 @@ class Systems:
         embed.add_field(name="Warsats", value=f"{len(self.bot.guilds)}")
 
         embed.add_field(name='Version', value=VOLUSPA_VERSION, inline=False)
-        embed.add_field(name='SHA', value=VOLUSPA_SHA, inline=False)
+        # embed.add_field(name='SHA', value=VOLUSPA_SHA, inline=False)
+        embed.add_field(name='Boot Time', value=CONFIG.Voluspa.boot_time)
 
         # give info about you here
         # embed.add_field(name='_ _', value="_Discovered by Mirage ,'}_")
@@ -57,12 +58,10 @@ class Systems:
         embed.add_field(name='Uptime', value=f'{get_bot_uptime(self.bot)}', inline=False)
 
         # Logo
-        embed.set_image(
-            url="https://raw.githubusercontent.com/RecursiveHook/voluspa-public/master/images/voluspa_white_icon_65.png")
+        embed.set_image(url=f"{CONFIG.Resources.image_bucket_root_url}/voluspa/voluspa_white_icon_65.png")
 
         # give users a link to invite this bot to their server
         # embed.add_field(name="Invite", value="[Invite link](<insert your OAuth invitation link here>)")
-
         await ctx.send(embed=embed)
 
     @commands.command()
@@ -83,14 +82,14 @@ class Systems:
         """Voluspa's latency"""
         async with ctx.typing():
         # Get the latency of the bot
-        #latency = bot.latency  # Included in the Discord.py library
+        # latency = bot.latency  # Included in the Discord.py library
 
-            async def get_latency():
-                d_client = discord.Client()
-                time.sleep(5)
-                lat = d_client.latency
-                await d_client.close()
-                return lat
+            # async def get_latency():
+            #     d_client = discord.Client()
+            #     time.sleep(5)
+            #     lat = d_client.latency
+            #     await d_client.close()
+            #     return lat
             # TODO: Fix?
             # latencies = [await get_latency() for _ in range(0, 1)]
             latencies = [self.bot.latency for _ in range(0, 1)]
