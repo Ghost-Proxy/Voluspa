@@ -40,9 +40,9 @@ class FunStuff:
         await asyncio.sleep(5)
         await ctx.send("https://media.giphy.com/media/EbYjYQ1i7EHBK/giphy.gif")
 
-    @commands.command()
-    async def dance(self, ctx):
-        await ctx.send("Not quite yet...")
+    # @commands.command()
+    # async def dance(self, ctx):
+    #     await ctx.send("Not quite yet...")
 
     @commands.command()
     async def hello(self, ctx):
