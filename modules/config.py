@@ -50,7 +50,7 @@ def read_config():
         }
     }
 
-    merged_config = merge_dicts(file_config, voluspa_info)
+    merged_config = merge_dicts(merged_config, voluspa_info)
 
     nested_config = AttrDict.from_nested_dict(merged_config)
     # Add resources from env
