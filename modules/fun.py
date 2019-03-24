@@ -99,7 +99,30 @@ class Quotes(object):
                 'chat with Calus',
                 'find Cayde-6.NNimg.bak',
                 'ping the Warsats...',
-                'ignite the Forges!'
+                'ignite the Forges!',
+                'trade with Spider.',
+                'fight the curse!',
+                'search for the Nine.',
+                'with the shadows.',
+                'consult with the Queen.',
+                'find Pulled Pork!',
+                'with Ghost Proxy!!',
+                'poker with the Drifter.',
+                'chess with Zavala.',
+                'with the Colonel!',
+                'MTG with Ikora...',
+                'make Vex milkshakes.',
+                'paradoxes with Saint-14',
+                'with Braytech Databases...',
+                "Char's Firewall",
+                'neural net inhibitors...',
+                'checkers with the Nine.',
+                'find the Dredgen.',
+                'with light and darkness.',
+                '\\\\ Optimize Protocols \\',
+                'gradient descent...',
+                'distributed network training',
+
             ]
         }
 
