@@ -58,7 +58,7 @@ class Systems:
         embed.add_field(name='Uptime', value=f'{get_bot_uptime(self.bot)}', inline=False)
 
         # Logo
-        embed.set_image(url=f"{CONFIG.Resources.image_bucket_root_url}/voluspa/voluspa_white_icon_65.png")
+        embed.set_image(url=f"{CONFIG.Resources.image_bucket_root_url}/voluspa/Voluspa_icon_64x48.png")
 
         # give users a link to invite this bot to their server
         # embed.add_field(name="Invite", value="[Invite link](<insert your OAuth invitation link here>)")
