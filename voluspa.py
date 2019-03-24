@@ -2,7 +2,7 @@
 
 """Voluspa Ghost Proxy Discord Bot"""
 
-VOLUSPA_VERSION = 'v0.0.6'
+VOLUSPA_VERSION = 'v0.0.6a'
 
 # REF:
 # https://gist.github.com/EvieePy/d78c061a4798ae81be9825468fe146be
@@ -39,7 +39,8 @@ cog_extensions = [
     'cogs.autorole',
     'cogs.systems',
     'cogs.funstuff',
-    'cogs.members'
+    'cogs.members',
+    'cogs.destinyart'
 ]
 
 # bot = commands.AutoShardedBot()
