@@ -12,7 +12,8 @@ import aiohttp
 import discord
 from discord.ext import commands
 import requests
-import fuzzyset  # TODO: Meh, need to revisit
+# import fuzzyset  # TODO: Meh, need to revisit
+# https://github.com/seatgeek/fuzzywuzzy <- instead
 
 logger = logging.getLogger('voluspa.cog.members')
 
@@ -344,6 +345,7 @@ class Members:
         self.bot = bot
 
     @commands.command()
+    @commands.cooldown(1, 600, commands.BucketType.server)
     @commands.guild_only()
     async def members(self, ctx):
         """Returns Discord member information"""
@@ -353,7 +355,7 @@ class Members:
             #dis_client = discord.Client()
             #member_list = [member for member in dis_client.get_all_members()]
             regex_alphanumeric = re.compile('[\W_]+', re.UNICODE)
-            member_list = [member for member in self.bot.get_all_members()]
+            member_list = [member for member in self.bot.get_all_members()]  # TODO: dangerous
             member_dict = {}
             for member in member_list:
                 member_dict[member.id] = {
@@ -362,7 +364,6 @@ class Members:
                     'nick': member.nick,
                     'roles': member.roles,
                     'top_role': member.top_role
-
                 }
             # member_info = ["ID: {}\n\tName: {}\n\tDisplayName: {}\n\tNickname: {}\n\tRoles: {}\n\t"]
             #await dis_client.close()
@@ -418,43 +419,43 @@ class Members:
                 # return re.sub(r'([^\s\w]|_)+', '', _string)
                 # return re.sub(r'\W+', '', _string)
 
-            bungie_member_fuzzyset = fuzzyset.FuzzySet()
-            for member in bungie_member_list_alpha_sorted:
-                bungie_member_fuzzyset.add(sanitize_string(member.lower()))
-
-            discord_member_fuzzyset = fuzzyset.FuzzySet() #gram_size_lower=2, gram_size_upper=6)
-            for member in alpha_sorted_gp_members:
-                discord_member_fuzzyset.add(sanitize_string(member.lower()))
+            # bungie_member_fuzzyset = fuzzyset.FuzzySet()
+            # for member in bungie_member_list_alpha_sorted:
+            #     bungie_member_fuzzyset.add(sanitize_string(member.lower()))
+            #
+            # discord_member_fuzzyset = fuzzyset.FuzzySet() #gram_size_lower=2, gram_size_upper=6)
+            # for member in alpha_sorted_gp_members:
+            #     discord_member_fuzzyset.add(sanitize_string(member.lower()))
 
             missing_discord_members = []
             missing_discord_admins = []
             fuzzy_missing_members = []
 
             for bungie_member in bungie_member_list_alpha_sorted:
-                fuzzy_results = discord_member_fuzzyset.get(bungie_member.lower())
+                # fuzzy_results = discord_member_fuzzyset.get(bungie_member.lower())
                 # logger.info('--> Fuzzy results for [{}]: {}'.format(
                 #     bungie_member,
                 #     fuzzy_results
                 # ))
-                fuzz_member_missing = True
-                if fuzzy_results:
-                    for fuzz_res in fuzzy_results:
-                        fuzz_confidence = fuzz_res[0]
-                        fuzz_name = fuzz_res[1]
-                        if fuzz_confidence > 0.5:
-                            logger.info('Fuzz Result -- FOUND -- for [{}]: {} (conf:{})'.format(
-                                bungie_member,
-                                fuzz_name,
-                                fuzz_confidence
-                            ))
-                            fuzz_member_missing = False
-                            break
-                if fuzz_member_missing:
-                    logger.info('Fuzz Result -- MISSING -- for [{}] - Fuzzy results: {}'.format(
-                        bungie_member,
-                        fuzzy_results
-                    ))
-                    fuzzy_missing_members.append(bungie_member)
+                # fuzz_member_missing = True
+                # if fuzzy_results:
+                #     for fuzz_res in fuzzy_results:
+                #         fuzz_confidence = fuzz_res[0]
+                #         fuzz_name = fuzz_res[1]
+                #         if fuzz_confidence > 0.5:
+                #             logger.info('Fuzz Result -- FOUND -- for [{}]: {} (conf:{})'.format(
+                #                 bungie_member,
+                #                 fuzz_name,
+                #                 fuzz_confidence
+                #             ))
+                #             fuzz_member_missing = False
+                #             break
+                # if fuzz_member_missing:
+                #     logger.info('Fuzz Result -- MISSING -- for [{}] - Fuzzy results: {}'.format(
+                #         bungie_member,
+                #         fuzzy_results
+                #     ))
+                #     fuzzy_missing_members.append(bungie_member)
 
                 member_missing = True
                 for discord_member in alpha_sorted_gp_members:
@@ -587,7 +588,6 @@ class Members:
         await ctx.send(result_msg)
 
     @commands.command(name='members-online')
-    @commands.guild_only()
     async def members_online(self, ctx):
         async with ctx.typing():
             logger.info('Looking up currently online Ghost Proxy members...')
