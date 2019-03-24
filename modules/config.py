@@ -41,13 +41,18 @@ def read_config():
         }
 
     merged_config = merge_dicts(file_config, secrets)
-    nested_config = AttrDict.from_nested_dict(merged_config)
-    nested_config['Voluspa'] = {
-        'sha': os.getenv('SOURCE_VERSION', 'Unknown'),
-        'app_cwd': os.path.abspath(os.getcwd()),
-        'boot_time': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    voluspa_info = {
+        'Voluspa': {
+            'sha': os.getenv('SOURCE_VERSION', 'Unknown'),
+            'app_cwd': os.path.abspath(os.getcwd()),
+            'boot_time': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        }
     }
 
+    merged_config = merge_dicts(file_config, voluspa_info)
+
+    nested_config = AttrDict.from_nested_dict(merged_config)
     # Add resources from env
     # TODO Redo this flow...
     if not nested_config.Resources.image_bucket_root_url:
