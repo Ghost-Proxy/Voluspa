@@ -31,7 +31,7 @@ def get_bot_uptime(bot, *, brief=False):
     return fmt.format(d=days, h=hours, m=minutes, s=seconds)
 
 
-class Systems:
+class Systems(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 

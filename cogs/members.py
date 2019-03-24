@@ -340,7 +340,7 @@ def bungie_get_profile(player_name=None):
     return
 
 
-class Members:
+class Members(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 

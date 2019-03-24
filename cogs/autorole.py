@@ -29,7 +29,7 @@ def match_users(user_list, username):
     return matched_users
 
 
-class AutoRole:
+class AutoRole(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.roles_dicts = {

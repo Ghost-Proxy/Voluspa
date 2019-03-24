@@ -12,7 +12,7 @@ random_quotes = RandomQuotes()
 logger = logging.getLogger('voluspa.cog.funstuff')
 
 
-class FunStuff:
+class FunStuff(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 

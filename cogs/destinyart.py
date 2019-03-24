@@ -24,7 +24,7 @@ logger = logging.getLogger('voluspa.cog.DestinyArt')
 #     return art_embed
 
 
-class DestinyArt:
+class DestinyArt(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.base_image_url = f'{CONFIG.Resources.image_bucket_root_url}/destiny-art/'
