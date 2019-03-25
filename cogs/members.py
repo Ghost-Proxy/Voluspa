@@ -589,6 +589,7 @@ class Members(commands.Cog):
 
     @commands.command(name='members-online')
     async def members_online(self, ctx):
+        """Lists Ghost Proxy Members currently playing."""
         async with ctx.typing():
             logger.info('Looking up currently online Ghost Proxy members...')
             num_members, member_list = await async_get_clan_members()
@@ -613,6 +614,7 @@ class Members(commands.Cog):
     @commands.command(name='find-player')
     @commands.guild_only()
     async def find_player(self, ctx, *, player_name):
+        """Simple Bungie PC player search."""
         #num_players, results = bungie_search_users(player_name)
         results = bungie_search_users(player_name)
         logger.info('>> Bungie Player Search Results: {}'.format(results))
