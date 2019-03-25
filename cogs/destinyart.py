@@ -66,7 +66,7 @@ class DestinyArt(commands.Cog):
     #     xkcd_embed.set_footer(text=xkcd_comic['alt'])
     #     await ctx.send(embed=xkcd_embed)
 
-    async def create_destiny_art_embed(self, num_images, art_type_prefix, title):
+    def create_destiny_art_embed(self, num_images, art_type_prefix, title):
         rand_idx = random.randint(1, num_images)
         art_url = f'{art_type_prefix}_{rand_idx}_small_opt.gif'
         logger.info(f'Sending Voluspa DestinyArt: [{art_url}]')
@@ -87,7 +87,7 @@ class DestinyArt(commands.Cog):
         #     f'{self.base_image_url}{pose_url}'
         # )
         # await ctx.send(embed=pose_embed)
-        await ctx.send(embed=await self.create_destiny_art_embed(*self.poses_info))
+        await ctx.send(embed=self.create_destiny_art_embed(*self.poses_info))
 
     @commands.command()
     async def dance(self, ctx):
@@ -99,7 +99,7 @@ class DestinyArt(commands.Cog):
         #     f'{self.base_image_url}{dance_url}'
         # )
         # await ctx.send(embed=dance_embed)
-        await ctx.send(embed=await self.create_destiny_art_embed(*self.dances_info))
+        await ctx.send(embed=self.create_destiny_art_embed(*self.dances_info))
 
     @commands.command()
     async def emote(self, ctx):
@@ -111,7 +111,7 @@ class DestinyArt(commands.Cog):
         #     f'{self.base_image_url}{emote_url}'
         # )
         # await ctx.send(embed=emote_embed)
-        await ctx.send(embed=await self.create_destiny_art_embed(*self.emotes_info))
+        await ctx.send(embed=self.create_destiny_art_embed(*self.emotes_info))
 
 
 def setup(bot):
