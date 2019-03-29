@@ -68,7 +68,7 @@ class DestinyArt(commands.Cog):
 
     def create_destiny_art_embed(self, num_images, art_type_prefix, title):
         rand_idx = random.randint(1, num_images)
-        art_url = f'{art_type_prefix}_{rand_idx}_small_opt.gif'
+        art_url = f'{art_type_prefix}_{rand_idx}_xxsm_opt_fit.gif'
         logger.info(f'Sending Voluspa DestinyArt: [{art_url}]')
         art_embed = discord.Embed(
             title=title,
