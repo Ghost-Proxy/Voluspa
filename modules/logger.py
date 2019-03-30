@@ -8,6 +8,8 @@ from modules.config import CONFIG
 class Archivist(object):
     def __init__(self):
         self.logger = None
+        if self.logger is None:
+            self.logger = _setup_logging()
 
     def get_logger(self):
         if self.logger is None:
@@ -16,6 +18,7 @@ class Archivist(object):
 
 
 def _setup_logging():
+    logging.getLogger().handlers.clear()
     root_logger = logging.getLogger()
     root_logger.setLevel(logging.DEBUG)
     log_formatter = logging.Formatter('%(asctime)s [%(levelname)s] %(name)s:  %(message)s')
@@ -33,7 +36,7 @@ def _setup_logging():
     file_handler.setFormatter(log_formatter)
 
     stream_handler = logging.StreamHandler()
-    stream_handler.setLevel(logging.DEBUG)
+    stream_handler.setLevel(logging.INFO)
     stream_handler.setFormatter(log_formatter)
 
     root_logger.addHandler(file_handler)

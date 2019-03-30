@@ -16,18 +16,20 @@ VOLUSPA_VERSION = 'v0.0.6a'
 # import traceback
 import datetime
 
+from modules.config import CONFIG
+
 # Custom Imports
+from modules.logger import Archivist
+archivist = Archivist()
+logger = archivist.get_logger()
+
 from modules.fun import Quotes
 from modules.database import Database
-from modules.config import CONFIG
 from modules.discord_utils import get_prefix, update_status_task
 
 # Third-Party Imports
 import discord
 from discord.ext import commands
-
-from modules.logger import Archivist
-logger = Archivist().get_logger()
 
 # Setup Initial Stuff
 VOLUSPA_SHA = CONFIG.Voluspa.sha[:10]
