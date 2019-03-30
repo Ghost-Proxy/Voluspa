@@ -261,7 +261,7 @@ class AutoRole(commands.Cog):
         """Lists available Other Game roles/channels."""
         og_list = ''
         for og_role, og_names in self.roles_dicts['other_games'].items():
-            og_list += f'{og_role}: {og_names[0].capitalize()}\n'
+            og_list += f'@{og_role}: {og_names[0].title()}\n'
 
         await ctx.send(
             f'_ _\nCurrent available roles for Other Games:\n'
@@ -271,7 +271,7 @@ class AutoRole(commands.Cog):
     @commands.command(name='og-add', aliases=['other-game-add'])
     @commands.guild_only()
     async def other_game_add(self, ctx, *roles: str):
-        """Adds Other Game roles for @ pings and channels.
+        """Adds Other Game roles for pings/channels.
 
         Uses either short names like 'div2' for Division 2, or full names like 'Division2'.
 
@@ -299,7 +299,7 @@ class AutoRole(commands.Cog):
     @commands.command(name='og-remove', aliases=['other-game-remove'])
     @commands.guild_only()
     async def other_game_remove(self, ctx, *roles: str):
-        """Removes Other Game roles for @ pings and channels.
+        """Removes Other Game roles for pings/channels.
 
         Uses either short names like 'div2' for Division 2, or full names like 'Division2'.
 
