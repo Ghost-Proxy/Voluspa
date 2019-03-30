@@ -1,6 +1,6 @@
-import re
+# import re
 import logging
-from typing import List, Dict, Tuple
+from typing import Any, List, Dict, Tuple, Sequence
 
 import discord
 from discord.ext import commands
@@ -8,12 +8,12 @@ from discord.ext import commands
 logger = logging.getLogger('voluspa.cog.autorole')
 
 
-def process_role_inputs(roles, role_dict):
+def process_role_inputs(role_inputs, role_dict):
     roles_to_update = set()
-    for r in roles:
+    for ri in role_inputs:
         for role, allowed_names in role_dict.items():
             for name in allowed_names:
-                if r.lower() == name.lower():
+                if ri.lower() == name.lower():  # or ri.lower() == 'all':
                     roles_to_update.add(role)
                     break
     return roles_to_update
@@ -34,15 +34,16 @@ class AutoRole(commands.Cog):
         self.bot = bot
         self.roles_dicts = {
             'game_modes': {
-                'crucible': ['c', 'crucible'],
-                'gambit': ['g', 'gambit'],
-                'raid': ['r', 'raid'],
-                'strike-nf-pve': ['s', 'nf', 'pve', 'strike', 'nightfall', 'strike-nf-pve']
+                'crucible': ['c', 'crucible', 'all'],
+                'gambit': ['g', 'gambit', 'all'],
+                'raid': ['r', 'raid', 'all'],
+                'strike-nf-pve': ['s', 'nf', 'pve', 'strike', 'nightfall', 'strike-nf-pve', 'all']
             },
             'other_games': {
                 'og-td2': ['the division 2', 'div2', 'division2', 'td2', 'division', 'division 2', 'all'],
-                'og-mhw': ['monster hunter world', 'mhw', 'monster hunter', 'monster', 'monsterhunter', 'all'],
-                'og-osu': ['osu', 'all']
+                'og-mhw': ['monster hunter world', 'mh', 'mhw', 'monster', 'monster hunter',
+                           'monsterhunter', 'monsterhunterworld', 'all'],
+                'og-osu': ['osu', 'clicky circles', 'all']
             },
             'raid_leads': {
                 'sherpa-active': ['on', 'active', 'true', 'enable', 'yes', '1'],
@@ -60,7 +61,7 @@ class AutoRole(commands.Cog):
     async def update_roles(self,
                            ctx,
                            role_class: str,
-                           roles: List[str],
+                           roles: Sequence[str],
                            user_id: int = None,
                            options: Dict = None):
         # Set options and values
@@ -112,7 +113,7 @@ class AutoRole(commands.Cog):
     async def assign_roles_to_user(self,
                                    ctx,
                                    role_class: str,
-                                   roles: List[str],
+                                   roles: Sequence[str],
                                    users: Tuple[str],
                                    role_limit: str = None):
         # Args are multiple user names (potentially _n_)
@@ -212,6 +213,7 @@ class AutoRole(commands.Cog):
             )
 
     # TODO: Improve this structure, use cog's and command structure/features better
+    # TODO: Break it down into a simple set of funcs/rules
 
     @commands.command(name='lfg-add')  # , aliases=['game-role', 'lfg-role'])
     @commands.guild_only()
@@ -258,26 +260,30 @@ class AutoRole(commands.Cog):
     @commands.command(name='og-list', aliases=['other-game-list'])
     @commands.guild_only()
     async def other_game_list(self, ctx):
-        """Lists available Other Game roles/channels."""
+        """Lists available Other-Game roles/channels."""
         og_list = ''
+        if self.roles_dicts['other_games']:
+            og_list += f'ROLE\tGAME\n---------------\n'
         for og_role, og_names in self.roles_dicts['other_games'].items():
-            og_list += f'@{og_role}: {og_names[0].title()}\n'
+            og_list += f'@{og_role}:\t{og_names[0].title()}\n'
 
         await ctx.send(
-            f'_ _\nCurrent available roles for Other Games:\n'
+            f'_ _\nCurrent available roles/channels for Other Games:\n'
             f'```{og_list if og_list else "None"}```'
         )
 
     @commands.command(name='og-add', aliases=['other-game-add'])
     @commands.guild_only()
-    async def other_game_add(self, ctx, *roles: str):
-        """Adds Other Game roles for pings/channels.
+    async def other_game_add(self, ctx, *games: str):
+        """Adds Other-Game roles for pings/channels.
 
-        Uses either short names like 'div2' for Division 2, or full names like 'Division2'.
+        Uses either short names like 'div2' or full names like 'Division2'.
 
-        Note: No spaces or surround names with spaces in quotes! e.g. `$og-add "Monster Hunter World"`
+        Note: No spaces or surround names with spaces in quotes!
+        Example: $og-add "Monster Hunter World"  -->  adds @og-mhw
 
-        Multiple other games can be added at once, e.g. `$og-add div2 mhw` adds @gp-div2 and @gp-mhw.
+        Multiple other games can be added at once.
+        Example: `$og-add div2 mhw`  -->  adds @gp-div2 and @gp-mhw
 
         All other games can be added by using `$og-add all`.
         """
@@ -287,33 +293,35 @@ class AutoRole(commands.Cog):
         # $lfg all -- adds/removes all roles
         # Handle ALL Eventually...
 
-        logger.info(f'roles input: {roles}')
-
+        logger.info(f'game input: {games}')
         await self.update_roles(
             ctx,
             'other_games',
-            roles,
+            games,
             options={'update_message': 'added Other Game(s)'}
         )
 
     @commands.command(name='og-remove', aliases=['other-game-remove'])
     @commands.guild_only()
-    async def other_game_remove(self, ctx, *roles: str):
-        """Removes Other Game roles for pings/channels.
+    async def other_game_remove(self, ctx, *games: str):
+        """Removes Other-Game roles for pings/channels.
 
-        Uses either short names like 'div2' for Division 2, or full names like 'Division2'.
+        Uses either short names like 'div2' or full names like 'Division2'.
 
-        Note: No spaces or surround names with spaces in quotes! e.g. `$og-remove "Monster Hunter World"`
+        Note: No spaces or surround names with spaces in quotes!
+        Example: $og-remove "Monster Hunter World"  -->  removes @og-mhw
 
-        Multiple other games can be removed at once, e.g. `$og-add div2 mhw` removes @gp-div2 and @gp-mhw.
+        Multiple other-games can be removed at once.
+        Example: `$og-remove div2 mhw`  -->  removes @gp-div2 and @gp-mhw
 
-        All other games can be removed by using `$og-remove all`.
+        All other-games can be remove by using `$og-add all`.
         """
 
+        logger.info(f'game input: {games}')
         await self.update_roles(
             ctx,
             'other_games',
-            roles,
+            games,
             options={
                 'update_message': 'removed Other Game(s)',
                 'action': 'remove'
