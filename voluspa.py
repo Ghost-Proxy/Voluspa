@@ -8,12 +8,12 @@ VOLUSPA_VERSION = 'v0.0.6a'
 # https://gist.github.com/EvieePy/d78c061a4798ae81be9825468fe146be
 
 # Built-in Imports
-import os
-import sys
-import asyncio
-import logging
-from logging.handlers import RotatingFileHandler
-import traceback
+# import os
+# import sys
+# import asyncio
+# import logging
+# from logging.handlers import RotatingFileHandler
+# import traceback
 import datetime
 
 # Custom Imports
@@ -26,8 +26,8 @@ from modules.discord_utils import get_prefix, update_status_task
 import discord
 from discord.ext import commands
 
-from modules.logger import setup_logging
-logger = setup_logging()
+from modules.logger import Archivist
+logger = Archivist().get_logger()
 
 # Setup Initial Stuff
 VOLUSPA_SHA = CONFIG.Voluspa.sha[:10]

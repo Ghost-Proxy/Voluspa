@@ -5,7 +5,17 @@ from logging.handlers import RotatingFileHandler
 from modules.config import CONFIG
 
 
-def setup_logging():
+class Archivist(object):
+    def __init__(self):
+        self.logger = None
+
+    def get_logger(self):
+        if self.logger is None:
+            self.logger = _setup_logging()
+        return self.logger
+
+
+def _setup_logging():
     root_logger = logging.getLogger()
     root_logger.setLevel(logging.DEBUG)
     log_formatter = logging.Formatter('%(asctime)s [%(levelname)s] %(name)s:  %(message)s')
