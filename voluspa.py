@@ -17,7 +17,7 @@ import traceback
 import datetime
 
 # Custom Imports
-from modules.fun import Quotes, RandomQuotes
+from modules.fun import Quotes
 from modules.database import Database
 from modules.config import CONFIG
 from modules.discord_utils import get_prefix, update_status_task
@@ -26,13 +26,15 @@ from modules.discord_utils import get_prefix, update_status_task
 import discord
 from discord.ext import commands
 
-from modules.logger import LOGGER as logger  # HACK
+from modules.logger import setup_logging
+logger = setup_logging()
 
 # Setup Initial Stuff
 VOLUSPA_SHA = CONFIG.Voluspa.sha[:10]
 client = discord.Client()
+
+# These should perhaps be cogs..?
 quotes = Quotes()
-random_quotes = RandomQuotes()
 db = Database()
 
 cog_extensions = [
