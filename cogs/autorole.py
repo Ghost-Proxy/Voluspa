@@ -39,6 +39,11 @@ class AutoRole(commands.Cog):
                 'raid': ['r', 'raid'],
                 'strike-nf-pve': ['s', 'nf', 'pve', 'strike', 'nightfall', 'strike-nf-pve']
             },
+            'other_games': {
+                'og-td2': ['the division 2', 'div2', 'division2', 'td2', 'division', 'division 2', 'all'],
+                'og-mhw': ['monster hunter world', 'mhw', 'monster hunter', 'monster', 'monsterhunter', 'all'],
+                'og-osu': ['osu', 'all']
+            },
             'raid_leads': {
                 'sherpa-active': ['on', 'active', 'true', 'enable', 'yes', '1'],
                 'sherpa-inactive': ['off', 'inactive', 'false', 'disable', 'no', '0']
@@ -246,6 +251,71 @@ class AutoRole(commands.Cog):
             roles,
             options={
                 'update_message': 'removed Game Mode',
+                'action': 'remove'
+            }
+        )
+
+    @commands.command(name='og-list', aliases=['other-game-list'])
+    @commands.guild_only()
+    async def other_game_list(self, ctx):
+        """Lists available Other Game roles/channels."""
+        og_list = ''
+        for og_role, og_names in self.roles_dicts['other_games'].items():
+            og_list += f'{og_role}: {og_names[0].capitalize()}\n'
+
+        await ctx.send(
+            f'_ _\nCurrent available roles for Other Games:\n'
+            f'```{og_list if og_list else "None"}```'
+        )
+
+    @commands.command(name='og-add', aliases=['other-game-add'])
+    @commands.guild_only()
+    async def other_game_add(self, ctx, *roles: str):
+        """Adds Other Game roles for @ pings and channels.
+
+        Uses either short names like 'div2' for Division 2, or full names like 'Division2'.
+
+        Note: No spaces or surround names with spaces in quotes! e.g. `$og-add "Monster Hunter World"`
+
+        Multiple other games can be added at once, e.g. `$og-add div2 mhw` adds @gp-div2 and @gp-mhw.
+
+        All other games can be added by using `$og-add all`.
+        """
+
+        # $lfg (no param) -- Lists current LFG roles set
+        # $lfg role1 role2 -- adds/removes the roles
+        # $lfg all -- adds/removes all roles
+        # Handle ALL Eventually...
+
+        logger.info(f'roles input: {roles}')
+
+        await self.update_roles(
+            ctx,
+            'other_games',
+            roles,
+            options={'update_message': 'added Other Game(s)'}
+        )
+
+    @commands.command(name='og-remove', aliases=['other-game-remove'])
+    @commands.guild_only()
+    async def other_game_remove(self, ctx, *roles: str):
+        """Removes Other Game roles for @ pings and channels.
+
+        Uses either short names like 'div2' for Division 2, or full names like 'Division2'.
+
+        Note: No spaces or surround names with spaces in quotes! e.g. `$og-remove "Monster Hunter World"`
+
+        Multiple other games can be removed at once, e.g. `$og-add div2 mhw` removes @gp-div2 and @gp-mhw.
+
+        All other games can be removed by using `$og-remove all`.
+        """
+
+        await self.update_roles(
+            ctx,
+            'other_games',
+            roles,
+            options={
+                'update_message': 'removed Other Game(s)',
                 'action': 'remove'
             }
         )
