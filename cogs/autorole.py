@@ -51,6 +51,7 @@ class AutoRole(commands.Cog):
                 'og-mhw': ['monster hunter world', 'mh', 'mhw', 'monster', 'monster hunter'],
                 'og-osu': ['osu'],
                 'og-ow': ['overwatch', 'ow'],
+                'og-r6s': ['rainbow six siege', 'r6s', 'rss', 'rainbow', 'siege', 'rainbow six', 'rainbow six: siege'],
                 'og-wow': ['world of warcraft', 'wow', 'warcraft'],
             },
             'raid_leads': {
