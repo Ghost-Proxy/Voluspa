@@ -43,9 +43,9 @@ class AutoRole(commands.Cog):
                 'strike-nf-pve': ['s', 'nf', 'pve', 'strike', 'nightfall', 'strike-nf-pve']
             },
             'other_games': {
-                'og-anthem': ['anthem'],
+                'og-ant': ['anthem', 'ant'],
                 'og-apex': ['apex legends', 'apex', 'apex: legends'],
-                'og-div2': ['the division 2', 'div2', 'division 2', 'td2', 'division'],
+                'og-div2': ['division 2', 'div2', 'td2', 'division', 'the division 2'],
                 'og-lol': ['league of legends', 'lol', 'league'],
                 'og-mc': ['minecraft', 'mc'],
                 'og-mhw': ['monster hunter world', 'mh', 'mhw', 'monster', 'monster hunter'],
@@ -280,9 +280,9 @@ class AutoRole(commands.Cog):
         """Lists available Other-Game roles/channels."""
         og_list = ''
         if self.roles_dicts['other_games']:
-            og_list += 'OG-ROLE:\t\tGAME\n-------------------------\n'
+            og_list += 'ROLE    GAME\n-------------------------\n'
         for og_role, og_names in self.roles_dicts['other_games'].items():
-            og_list += f'@{og_role.replace("@og-", "")}:\t\t{og_names[0].title()}\n'
+            og_list += f'{og_role.replace("og-", "") + "":<8}{og_names[0].title()}\n'
 
         await ctx.send(
             f'_ _\nCurrent available roles and channels for Other Games:\n'
