@@ -49,7 +49,7 @@ class AutoRole(commands.Cog):
                 'og-lol': ['league of legends', 'lol', 'league'],
                 'og-mc': ['minecraft', 'mc'],
                 'og-mhw': ['monster hunter world', 'mh', 'mhw', 'monster', 'monster hunter'],
-                'og-osu': ['osu', 'clicky circles'],
+                'og-osu': ['osu'],
                 'og-ow': ['overwatch', 'ow'],
                 'og-wow': ['world of warcraft', 'wow', 'warcraft'],
             },
@@ -280,12 +280,12 @@ class AutoRole(commands.Cog):
         """Lists available Other-Game roles/channels."""
         og_list = ''
         if self.roles_dicts['other_games']:
-            og_list += f'ROLE\tGAME\n---------------\n'
+            og_list += 'OG-ROLE:\t\tGAME\n-------------------------\n'
         for og_role, og_names in self.roles_dicts['other_games'].items():
-            og_list += f'@{og_role}:\t{og_names[0].title()}\n'
+            og_list += f'@{og_role.replace("@og-", "")}:\t\t{og_names[0].title()}\n'
 
         await ctx.send(
-            f'_ _\nCurrent available roles/channels for Other Games:\n'
+            f'_ _\nCurrent available roles and channels for Other Games:\n'
             f'```{og_list if og_list else "None"}```'
         )
 
