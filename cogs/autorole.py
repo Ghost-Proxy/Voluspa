@@ -45,6 +45,7 @@ class AutoRole(commands.Cog):
             'other_games': {
                 'og-ant': ['anthem', 'ant'],
                 'og-apex': ['apex legends', 'apex', 'apex: legends'],
+                'og-bl': ['borderlands', 'bl', 'borderlands 2', 'borderlands 3'],
                 'og-div2': ['division 2', 'div2', 'td2', 'division', 'the division 2'],
                 'og-lol': ['league of legends', 'lol', 'league'],
                 'og-mc': ['minecraft', 'mc'],
