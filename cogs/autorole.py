@@ -8,12 +8,15 @@ from discord.ext import commands
 logger = logging.getLogger('voluspa.cog.autorole')
 
 
-def process_role_inputs(role_inputs, role_dict):
+# TODO: Configurable matching rules?
+def process_role_inputs(role_inputs, role_dict, allow_all=False):
     roles_to_update = set()
     for ri in role_inputs:
         for role, allowed_names in role_dict.items():
             for name in allowed_names:
-                if ri.lower() == name.lower():  # or ri.lower() == 'all':
+                if ((allow_all and ri.lower() == 'all') or
+                        ri.lower() == name.lower() or
+                        ri.replace(' ', '') == name.lower()):
                     roles_to_update.add(role)
                     break
     return roles_to_update
@@ -34,16 +37,21 @@ class AutoRole(commands.Cog):
         self.bot = bot
         self.roles_dicts = {
             'game_modes': {
-                'crucible': ['c', 'crucible', 'all'],
-                'gambit': ['g', 'gambit', 'all'],
-                'raid': ['r', 'raid', 'all'],
-                'strike-nf-pve': ['s', 'nf', 'pve', 'strike', 'nightfall', 'strike-nf-pve', 'all']
+                'crucible': ['c', 'crucible'],
+                'gambit': ['g', 'gambit'],
+                'raid': ['r', 'raid'],
+                'strike-nf-pve': ['s', 'nf', 'pve', 'strike', 'nightfall', 'strike-nf-pve']
             },
             'other_games': {
-                'og-td2': ['the division 2', 'div2', 'division2', 'td2', 'division', 'division 2', 'all'],
-                'og-mhw': ['monster hunter world', 'mh', 'mhw', 'monster', 'monster hunter',
-                           'monsterhunter', 'monsterhunterworld', 'all'],
-                'og-osu': ['osu', 'clicky circles', 'all']
+                'og-anthem': ['anthem'],
+                'og-apex': ['apex legends', 'apex', 'apex: legends'],
+                'og-div2': ['the division 2', 'div2', 'division 2', 'td2', 'division'],
+                'og-lol': ['league of legends', 'lol', 'league'],
+                'og-mc': ['minecraft', 'mc'],
+                'og-mhw': ['monster hunter world', 'mh', 'mhw', 'monster', 'monster hunter'],
+                'og-osu': ['osu', 'clicky circles'],
+                'og-ow': ['overwatch', 'ow'],
+                'og-wow': ['world of warcraft', 'wow', 'warcraft'],
             },
             'raid_leads': {
                 'sherpa-active': ['on', 'active', 'true', 'enable', 'yes', '1'],
@@ -54,7 +62,17 @@ class AutoRole(commands.Cog):
             },
             'ghost_proxy_roles': {
                 'ghost-proxy-friend': ['gpf', 'gp-friend', 'ghost-proxy-friend'],
-                'ghost-proxy-member': ['gpm', 'gp-member', 'ghost-proxy-member']
+                'ghost-proxy-member': ['gpm', 'gp-member', 'ghost-proxy-member'],
+                'ghost-proxy-legacy': ['gpl', 'gp-legacy', 'ghost-proxy-legacy'],
+                'ghost-proxy-envoy': ['gpe', 'gp-envoy', 'ghost-proxy-envoy'],
+            },
+            'ghost_proxy_elevated_roles': {
+                'ghost-proxy-vanguard': ['vanguard', 'gp-vanguard', 'ghost-proxy-vanguard'],
+                'ghost-proxy-admin': ['admin', 'gp-admin', 'ghost-proxy-admin']
+            },
+            'ghost_proxy_protected_roles': {
+                'ghost-proxy-founder': ['founder', 'gp-founder', 'ghost-proxy-founder'],
+                'ghost-proxy-gatekeeper': ['gatekeeper', 'gp-gatekeeper', 'ghost-proxy-gatekeeper']
             }
         }
 
@@ -63,7 +81,8 @@ class AutoRole(commands.Cog):
                            role_class: str,
                            roles: Sequence[str],
                            user_id: int = None,
-                           options: Dict = None):
+                           options: Dict = None,
+                           allow_all=False):
         # Set options and values
         if not options:
             options = {}
@@ -77,7 +96,8 @@ class AutoRole(commands.Cog):
             return
 
         # Process input and sanitize
-        roles_to_update = process_role_inputs(roles, role_dict)
+        logger.info(f'update_roles - roles_input: {roles}')
+        roles_to_update = process_role_inputs(roles, role_dict, allow_all=allow_all)
 
         print(f'Roles to Update: {roles_to_update}')
         print(f'Role Dict: {role_dict}')
@@ -224,17 +244,14 @@ class AutoRole(commands.Cog):
 
         Multiple roles can be added at once, e.g. `$lfg-add c g` adds @crucible and @gambit.
         """
-
         # $lfg (no param) -- Lists current LFG roles set
-        # $lfg role1 role2 -- adds/removes the roles
-        # $lfg all -- adds/removes all roles
-        # Handle ALL Eventually...
-
+        logger.info(f'roles input: {roles}')
         await self.update_roles(
             ctx,
             'game_modes',
             roles,
-            options={'update_message': 'added Game Mode'}
+            options={'update_message': 'added Game Mode'},
+            allow_all=True
         )
 
     @commands.command(name='lfg-remove')  # , aliases=['game-role', 'lfg-role'])
@@ -246,7 +263,6 @@ class AutoRole(commands.Cog):
 
         Multiple roles can be removed at once, e.g. `$lfg-remove c g` removes @crucible and @gambit.
         """
-
         await self.update_roles(
             ctx,
             'game_modes',
@@ -254,7 +270,8 @@ class AutoRole(commands.Cog):
             options={
                 'update_message': 'removed Game Mode',
                 'action': 'remove'
-            }
+            },
+            allow_all=True
         )
 
     @commands.command(name='og-list', aliases=['other-game-list'])
@@ -287,18 +304,14 @@ class AutoRole(commands.Cog):
 
         All other games can be added by using `$og-add all`.
         """
-
         # $lfg (no param) -- Lists current LFG roles set
-        # $lfg role1 role2 -- adds/removes the roles
-        # $lfg all -- adds/removes all roles
-        # Handle ALL Eventually...
-
         logger.info(f'game input: {games}')
         await self.update_roles(
             ctx,
             'other_games',
             games,
-            options={'update_message': 'added Other Game(s)'}
+            options={'update_message': 'added Other Game(s)'},
+            allow_all=True
         )
 
     @commands.command(name='og-remove', aliases=['other-game-remove'])
@@ -316,7 +329,6 @@ class AutoRole(commands.Cog):
 
         All other-games can be remove by using `$og-add all`.
         """
-
         logger.info(f'game input: {games}')
         await self.update_roles(
             ctx,
@@ -325,7 +337,8 @@ class AutoRole(commands.Cog):
             options={
                 'update_message': 'removed Other Game(s)',
                 'action': 'remove'
-            }
+            },
+            allow_all=True
         )
 
     @commands.command(name='sherpa-on')
@@ -336,7 +349,6 @@ class AutoRole(commands.Cog):
 
         Can only be used by Raid Leads.
         """
-
         await self.update_roles(ctx, 'raid_leads', ['active'])
         await self.update_roles(
             ctx,
@@ -356,7 +368,6 @@ class AutoRole(commands.Cog):
 
         Can only be used by Raid Leads.
         """
-
         await self.update_roles(ctx, 'raid_leads', ['inactive'])
         await self.update_roles(
             ctx,
