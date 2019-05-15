@@ -219,11 +219,11 @@ class Autorole(commands.Cog):
                             f'{ctx.message.author.mention} - '
                             f':no_entry: Sorry, could not immediately change Roles for:\n'
                             f'`{user_matches[0]["name"]}#{user_matches[0]["salt"]} ({user_matches[0]["nick"]})`'
-                            f'\n\nUser has the following conflicting Role(s): \n ```{nl.join(conflicting_roles)}```'
+                            f'\n\nUser has the following conflicting Role(s):```{nl.join(conflicting_roles)}```'
                         )
                         role_conflict_msg = await ctx.send(
-                            f'Would you like to remove the conflicting role and continue with role updates?\n'
-                            f'  To remove the role and continue select :white_check_mark\n'
+                            f'Would you like to remove the conflicting role(s) and continue with role updates?\n'
+                            f'  To remove the role and continue select :white_check_mark:\n'
                             f'  To cancel the role change command select :no_entry:'
                         )
                         # TODO: Ask for a reset of conflicting role here :check
@@ -285,8 +285,9 @@ class Autorole(commands.Cog):
     # TODO: Break it down into a simple set of funcs/rules
 
     async def handle_role_conflict(self, ctx, confirm_msg):  # TODO: Make static
-        reaction_emoji = {'yes': ':white_check_mark:', 'no': ':no_entry:'}
-        for emoji in reaction_emoji.values():
+        #reaction_emoji = {'yes': ':white_check_mark:', 'no': ':no_entry:'}
+        react_unicode = {'yes': '\u2714', 'no': '\u26D4'}
+        for emoji in react_unicode.values():
             await confirm_msg.add_reaction(emoji)
 
         def check(reaction: discord.Reaction, user: discord.User) -> bool:
