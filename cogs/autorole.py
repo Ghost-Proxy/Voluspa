@@ -1,4 +1,5 @@
 # import re
+import asyncio
 import logging
 from typing import Any, List, Dict, Tuple, Sequence
 
@@ -32,7 +33,9 @@ def match_users(user_list, username):
     return matched_users
 
 
-class AutoRole(commands.Cog):
+class Autorole(commands.Cog):
+    """Automatic Role Management System (ARMS)"""
+    # OR Discord Role Management heh DRM...
     def __init__(self, bot):
         self.bot = bot
         self.roles_dicts = {
@@ -43,17 +46,20 @@ class AutoRole(commands.Cog):
                 'strike-nf-pve': ['s', 'nf', 'pve', 'strike', 'nightfall', 'strike-nf-pve']
             },
             'other_games': {
-                'og-ant': ['anthem', 'ant'],
-                'og-apex': ['apex legends', 'apex', 'apex: legends'],
+                # 'og-ant': ['anthem', 'ant'],
+                # 'og-apex': ['apex legends', 'apex', 'apex: legends'],
                 'og-bl': ['borderlands', 'bl', 'borderlands 2', 'borderlands 3'],
                 'og-div2': ['division 2', 'div2', 'td2', 'division', 'the division 2'],
+                'og-dota': ['dota 2', 'dota', 'defense of the ancients 2'],
+                'og-gr': ['ghost recon', 'gr', 'grw', 'grb', 'ghost recon wildlands', 'ghost recon breakpoint'],
                 'og-lol': ['league of legends', 'lol', 'league'],
                 'og-mc': ['minecraft', 'mc'],
                 'og-mhw': ['monster hunter world', 'mh', 'mhw', 'monster', 'monster hunter'],
                 'og-osu': ['osu'],
                 'og-ow': ['overwatch', 'ow'],
-                'og-r6s': ['rainbow six siege', 'r6s', 'rss', 'rainbow', 'siege', 'rainbow six', 'rainbow six: siege'],
-                'og-wow': ['world of warcraft', 'wow', 'warcraft'],
+                # 'og-rage': ['rage 2', 'rage'],
+                # 'og-r6s': ['rainbow six siege', 'r6s', 'rss', 'rainbow', 'siege', 'rainbow six', 'rainbow six: siege'],
+                # 'og-wow': ['world of warcraft', 'wow', 'warcraft'],
             },
             'raid_leads': {
                 'sherpa-active': ['on', 'active', 'true', 'enable', 'yes', '1'],
@@ -137,7 +143,9 @@ class AutoRole(commands.Cog):
                                    role_class: str,
                                    roles: Sequence[str],
                                    users: Tuple[str],
-                                   role_limit: str = None):
+                                   # role_limit: str = None,
+                                   role_limits: Sequence[str] = None,
+                                   action: str = 'add'):
         # Args are multiple user names (potentially _n_)
         # Search member list for each user name provided
         #  - if more then one user name matches, return a list of matches and ask for a retry
@@ -149,6 +157,10 @@ class AutoRole(commands.Cog):
         # RegEx Filter: r'^\S+#\d+$' # TODO...
         # TODO: Check if member is set, and then remove, but prompt?
         # TODO: Add verification of role before message
+
+        # TODO: Ugh... this is a mess and should be redone from scratch...
+        if action not in ['add', 'remove']:
+            return
 
         # TODO: Add error handling for params...
         if len(users) <= 0:
@@ -196,14 +208,46 @@ class AutoRole(commands.Cog):
                 )
             elif len(user_matches) == 1:
                 # TODO: Do role limit check here... for now!
-                if role_limit and (role_limit in user_matches[0]['roles'] or role_limit == user_matches[0]['top_role']):
-                    await ctx.send(
-                        f'{ctx.message.author.mention} - '
-                        f':no_entry: Sorry, could not change Roles for:\n'
-                        f'`{user_matches[0]["name"]}#{user_matches[0]["salt"]} ({user_matches[0]["nick"]})`'
-                        f'\n\nUser has the following conflicting Role(s): `{role_limit}`'
-                    )
-                else:
+                # TODO: Support multiple role limits -- list: [role, role]
+                ok_to_update_roles = True
+                if role_limits:
+                    conflicting_roles = [role for role in role_limits if role in user_matches[0]['roles']]
+                    if conflicting_roles:
+                        ok_to_update_roles = False
+                        nl = "\n"
+                        await ctx.send(
+                            f'{ctx.message.author.mention} - '
+                            f':no_entry: Sorry, could not immediately change Roles for:\n'
+                            f'`{user_matches[0]["name"]}#{user_matches[0]["salt"]} ({user_matches[0]["nick"]})`'
+                            f'\n\nUser has the following conflicting Role(s): \n ```{nl.join(conflicting_roles)}```'
+                        )
+                        role_conflict_msg = await ctx.send(
+                            f'Would you like to remove the conflicting role and continue with role updates?\n'
+                            f'  To remove the role and continue select :white_check_mark\n'
+                            f'  To cancel the role change command select :no_entry:'
+                        )
+                        # TODO: Ask for a reset of conflicting role here :check
+                        await self.handle_role_conflict(ctx, role_conflict_msg)
+                # for role_limit in role_limits:
+                #     # First, check all the users roles against all the roles in the conflict list
+                #     # Then gather a list of conflicting_roles...
+                #     # display all at once, and prompt for single removal to continue
+                #     if role_limit and (role_limit in user_matches[0]['roles'] or role_limit == user_matches[0]['top_role']):
+                #         ok_to_update_roles = False
+                #         await ctx.send(
+                #             f'{ctx.message.author.mention} - '
+                #             f':no_entry: Sorry, could not change Roles for:\n'
+                #             f'`{user_matches[0]["name"]}#{user_matches[0]["salt"]} ({user_matches[0]["nick"]})`'
+                #             f'\n\nUser has the following conflicting Role(s): `{role_limit}`'
+                #         )
+                #         handle_conflict_msg = await ctx.send(
+                #             f'Would you like to remove the conflicting role and continue with role updates?\n'
+                #             f'To remove the role and continue select :white_check_mark\n'
+                #             f'To cancel the role change command select :no_entry:'
+                #         )
+                #         # TODO: Ask for a reset of conflicting role here :check
+
+                if ok_to_update_roles:
                     await ctx.send(
                         f'{ctx.message.author.mention} - '
                         f':white_check_mark: Promoting User:\n'
@@ -217,7 +261,10 @@ class AutoRole(commands.Cog):
                         role_class,
                         roles,
                         user_id=user_matches[0]['id'],
-                        options={'confirm': False}
+                        options={
+                            'confirm': False,
+                            'action': action
+                        }
                     )
             else:
                 await ctx.send(
@@ -236,6 +283,22 @@ class AutoRole(commands.Cog):
 
     # TODO: Improve this structure, use cog's and command structure/features better
     # TODO: Break it down into a simple set of funcs/rules
+
+    async def handle_role_conflict(self, ctx, confirm_msg):  # TODO: Make static
+        reaction_emoji = {'yes': ':white_check_mark:', 'no': ':no_entry:'}
+        for emoji in reaction_emoji.values():
+            await confirm_msg.add_reaction(emoji)
+
+        def check(reaction: discord.Reaction, user: discord.User) -> bool:
+            return user == ctx.message.author and reaction.message.id == confirm_msg.id
+
+        try:
+            reaction, user = await self.bot.wait_for('reaction_add', check=check, timeout=60)
+        except asyncio.TimeoutError:
+            await ctx.send(f'Request timed out :(')
+        else:
+            print(f'reaction_emoji: {reaction.emoji}')
+            await ctx.send(f'Received reaction: {reaction.emoji} from user: {user}')
 
     @commands.command(name='lfg-add')  # , aliases=['game-role', 'lfg-role'])
     @commands.guild_only()
@@ -383,7 +446,7 @@ class AutoRole(commands.Cog):
         )
 
     @commands.command(name='dj')
-    @commands.has_role('ghost-proxy-member')
+    @commands.has_any_role('ghost-proxy-member', 'ghost-proxy-envoy')
     @commands.guild_only()
     async def set_dj(self, ctx):
         """Sets DJ role for Rythm
@@ -398,7 +461,7 @@ class AutoRole(commands.Cog):
             await self.update_roles(ctx, 'rythm_dj', ['dj'])
 
     # TODO: STUB
-    @commands.command(name='set-member', aliases=['p2m'])
+    @commands.command(name='set-member', aliases=['p2m', 'arm'])
     @commands.has_role('ghost-proxy-vanguard')
     @commands.guild_only()
     async def promote_to_member(self, ctx, *users: str):
@@ -411,10 +474,10 @@ class AutoRole(commands.Cog):
             'ghost_proxy_roles',
             ['ghost-proxy-member'],
             users,
-            role_limit='ghost-proxy-friend'
+            role_limits=['ghost-proxy-friend']
         )
 
-    @commands.command(name='set-friend', aliases=['p2f'])
+    @commands.command(name='set-friend', aliases=['p2f', 'arf'])
     @commands.has_role('ghost-proxy-vanguard')
     @commands.guild_only()
     async def promote_to_friend(self, ctx, *users: str):
@@ -427,8 +490,72 @@ class AutoRole(commands.Cog):
             'ghost_proxy_roles',
             ['ghost-proxy-friend'],
             users,
-            role_limit='ghost-proxy-friend'
+            role_limits=['ghost-proxy-member']
         )
+
+    @commands.command(name='set-envoy', aliases=['p2e', 'are'])
+    @commands.has_role('ghost-proxy-gatekeeper')
+    @commands.guild_only()
+    async def set_to_envoy(self, ctx, *users: str):
+        """WIP: Sets User(s) to Envoy(s)
+
+        Can only be used by Gatekeepers (atm).
+        """
+        await self.assign_roles_to_user(
+            ctx,
+            'ghost_proxy_roles',
+            ['ghost-proxy-envoy'],  # ['ghost-proxy-friend', 'ghost-proxy-envoy'],
+            users,
+            #role_limits=['ghost-proxy-friend']
+        )
+
+    @commands.command(name='set-legacy', aliases=['p2l', 'arl'])
+    @commands.has_role('ghost-proxy-vanguard')
+    @commands.guild_only()
+    async def set_to_legacy(self, ctx, *users: str):
+        """WIP: Sets User(s) to Legacy Friend(s)
+
+        Can only be used by Vanguard (atm).
+        """
+        await self.assign_roles_to_user(
+            ctx,
+            'ghost_proxy_roles',
+            ['ghost-proxy-friend', 'ghost-proxy-legacy'],
+            users,
+            role_limits=['ghost-proxy-member']
+        )
+
+    # TODO: RESET MEMBER
+    # TODO: ADD EXCEPTION/BLOCK LIST (anyone below Gatekeeper)
+    @commands.command(name='autorole-reset', aliases=['ar-reset'])
+    @commands.has_role('ghost-proxy-gatekeeper')
+    @commands.guild_only()
+    async def reset_user(self, ctx, *users: str):
+        """WIP: Sets User(s) to Legacy Friend(s)
+
+        Can only be used by Gatekeeper (atm).
+        """
+        await self.assign_roles_to_user(
+            ctx,
+            'ghost_proxy_roles',
+            ['ghost-proxy-friend', 'ghost-proxy-legacy', 'ghost-proxy-member', 'ghost-proxy-admin'],
+            users,
+            #role_limits=['ghost-proxy-friend'],
+            action='remove'
+        )
+
+    @commands.command(name='role-stats', aliases=['rs'])
+    @commands.has_role('ghost-proxy-admin')
+    @commands.guild_only()
+    async def role_stats(self, ctx):
+        """WIP: Displays stats for Roles
+
+        Can only be used by Admins (atm).
+        """
+        roles = ctx.guild.roles
+        #pass
+        # role_stats = {role.name: len(discord.guild.Roles(role).members) for role in discord.guild.Roles()}
+
 
     # async def get_members_by_roles(self, roles: List[str], include_bots=False):
     #     # TODO: WIP
