@@ -286,7 +286,7 @@ class AutoRole(commands.Cog):
 
     async def handle_role_conflict(self, ctx, confirm_msg):  # TODO: Make static
         #reaction_emoji = {'yes': ':white_check_mark:', 'no': ':no_entry:'}
-        react_unicode = {'yes': '\u2714', 'no': '\u26D4'}
+        react_unicode = {'yes': '\uFE0F', 'no': '\u26D4'}
         for emoji in react_unicode.values():
             await confirm_msg.add_reaction(emoji)
 
@@ -298,7 +298,7 @@ class AutoRole(commands.Cog):
         except asyncio.TimeoutError:
             await ctx.send(f'Request timed out :(')
         else:
-            print(f'reaction_emoji: {reaction.emoji}')
+            print(f'reaction_emoji: {reaction} | {reaction.emoji}')
             await ctx.send(f'Received reaction: {reaction.emoji} from user: {user}')
 
     @commands.command(name='lfg-add')  # , aliases=['game-role', 'lfg-role'])
