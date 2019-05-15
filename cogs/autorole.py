@@ -574,4 +574,4 @@ class Autorole(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(AutoRole(bot))
+    bot.add_cog(Autorole(bot))
