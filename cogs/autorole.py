@@ -227,7 +227,7 @@ class AutoRole(commands.Cog):
                             f'  To cancel the role change command select :no_entry:'
                         )
                         # TODO: Ask for a reset of conflicting role here :check
-                        await self.handle_role_conflict(ctx, role_conflict_msg)
+                        ok_to_update_roles = await self.handle_role_conflict(ctx, role_conflict_msg)
                 # for role_limit in role_limits:
                 #     # First, check all the users roles against all the roles in the conflict list
                 #     # Then gather a list of conflicting_roles...
@@ -285,6 +285,7 @@ class AutoRole(commands.Cog):
     # TODO: Break it down into a simple set of funcs/rules
 
     async def handle_role_conflict(self, ctx, confirm_msg):  # TODO: Make static
+        """Returns a bool for confirmation"""
         #reaction_emoji = {'yes': ':white_check_mark:', 'no': ':no_entry:'}
         react_unicode = {'yes': '\u2705', 'no': '\u26D4'}
         for emoji in react_unicode.values():
@@ -300,6 +301,13 @@ class AutoRole(commands.Cog):
         else:
             print(f'reaction_emoji: {reaction} | {reaction.emoji}')
             await ctx.send(f'Received reaction: {reaction.emoji} from user: {user}')
+            if reaction.emoji == react_unicode['yes']:
+                return True
+            elif reaction.emoji == react_unicode['no']:
+                return False
+            else:
+                print('Something really horrible has happened, not sure what, but good luck...')
+
 
     @commands.command(name='lfg-add')  # , aliases=['game-role', 'lfg-role'])
     @commands.guild_only()
