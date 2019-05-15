@@ -344,7 +344,7 @@ class Members(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command()
+    @commands.command(aliases=['m'])
     @commands.cooldown(1, 600, commands.BucketType.guild)
     @commands.guild_only()
     async def members(self, ctx):
@@ -587,7 +587,7 @@ class Members(commands.Cog):
         #await send_multipart_msg(ctx, msg_final)
         await ctx.send(result_msg)
 
-    @commands.command(name='members-online')
+    @commands.command(name='members-online', aliases=['mo'])
     async def members_online(self, ctx):
         """Lists Ghost Proxy Members currently playing."""
         async with ctx.typing():
@@ -611,7 +611,7 @@ class Members(commands.Cog):
     #     bungie_get_profile()
     #     return
 
-    @commands.command(name='find-player')
+    @commands.command(name='find-player', aliases=['fp'])
     @commands.guild_only()
     async def find_player(self, ctx, *, player_name):
         """Simple Bungie PC player search."""
