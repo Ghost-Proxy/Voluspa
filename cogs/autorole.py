@@ -33,7 +33,7 @@ def match_users(user_list, username):
     return matched_users
 
 
-class Autorole(commands.Cog):
+class AutoRole(commands.Cog):
     """Automatic Role Management System (ARMS)"""
     # OR Discord Role Management heh DRM...
     def __init__(self, bot):
@@ -575,4 +575,4 @@ class Autorole(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Autorole(bot))
+    bot.add_cog(AutoRole(bot))
