@@ -8,6 +8,7 @@ import datetime
 import discord
 from discord.ext import commands
 
+from modules.custom_embed import default_embed
 
 logger = logging.getLogger('voluspa.cog.utilities')
 
@@ -90,7 +91,7 @@ class Utilities(commands.Cog):
                 moscow_time = await get_online_datetime('Europe/Moscow')
                 shanghai_time = await get_online_datetime('Asia/Shanghai')
 
-            datetime_embed = discord.Embed(
+            datetime_embed = default_embed(
                 title=":globe_with_meridians: :clock1: World Clocks",
                 description=f'Provided by Völuspá Timekeeping {self.bot.get_emoji(562955074708439040)}',
                 color=0x4286f4
@@ -129,8 +130,6 @@ class Utilities(commands.Cog):
                 datetime_embed.add_field(name='Auckland', value=display_datetime(*auckland_time, verbose=verbose))
                 datetime_embed.add_field(name='\uFEFF', value='\uFEFF')
                 datetime_embed.add_field(name='\u200B', value='\uFEFF', inline=False)
-
-            datetime_embed.set_footer(text="via python & worldtimeapi.org")
 
         await ctx.send(embed=datetime_embed)
 
