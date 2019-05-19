@@ -596,10 +596,28 @@ class AutoRole(commands.Cog):
 
         Can only be used by Admins (atm).
         """
-        roles = ctx.guild.roles
-        #pass
-        # role_stats = {role.name: len(discord.guild.Roles(role).members) for role in discord.guild.Roles()}
+        async with ctx.typing():
+            num_roles = len(ctx.guild.roles) - 1  # account for `@everyone`
+            role_stats = {f'{role.name}': len(role.members()) for role in ctx.guild.roles}
+            formatted_role_stats = [f'**{r_name}** {r_mems}' for r_name, r_mems in role_stats.items()]
+            nl = '\n'
 
+            embed = default_embed(
+                title='Role Stats',
+                description='List of Roles and number of associated Users'
+            )
+            embed.add_field(
+                name='Number of Roles',
+                value=num_roles,
+                inline=False
+            )
+            embed.add_field(
+                name='Roles and number of Users',
+                value=f'{nl.join(formatted_role_stats)}',
+                inline=False
+            )
+
+        await ctx.send(embed=embed)
 
     # async def get_members_by_roles(self, roles: List[str], include_bots=False):
     #     # TODO: WIP
