@@ -261,9 +261,10 @@ class AutoRole(commands.Cog):
                 if ok_to_update_roles:
 
                     role_embed = default_embed(
-                        title=f'{ctx.message.author.mention} - :white_check_mark: Setting User Roles',
-                        description=f'`{user_matches[0]["name"]}#{user_matches[0]["salt"]} ({user_matches[0]["nick"]})`\n'
-                        f'to Role(s):\n'
+                        title=':white_check_mark: Setting User Roles',
+                        description=f'{ctx.message.author.mention}\n'
+                        f'`{user_matches[0]["name"]}#{user_matches[0]["salt"]} ({user_matches[0]["nick"]})`\n\n'
+                        f'to Role(s):\n\n'
                         f'`{", ".join(roles)}`'
                     )
 
@@ -314,14 +315,13 @@ class AutoRole(commands.Cog):
             return False
         else:
             print(f'reaction_emoji: {reaction} | {reaction.emoji}')
-            await ctx.send(f'Received reaction: {reaction.emoji} from user: {user}')
+            # await ctx.send(f'Received reaction: {reaction.emoji} from user: {user}')
             if reaction.emoji == react_unicode['yes']:
                 return True
             elif reaction.emoji == react_unicode['no']:
                 return False
             else:
                 print('Something really horrible has happened, not sure what, but good luck...')
-
 
     @commands.command(name='lfg-add')  # , aliases=['game-role', 'lfg-role'])
     @commands.guild_only()
@@ -593,7 +593,7 @@ class AutoRole(commands.Cog):
             )
             embed.add_field(
                 name='Current Non-Roles',
-                value=f'```{" ".join(formatted_non_roles)}```',
+                value=f'```{" ".join(formatted_non_roles)}```' if len(formatted_non_roles) >= 1 else '_N/A_',
                 inline=False
             )
 
@@ -614,7 +614,7 @@ class AutoRole(commands.Cog):
             role_stats = OrderedDict()
             for role in ctx.guild.roles:
                 role_stats[role.name] = len(role.members)
-            formatted_role_stats = [f'{r_mems:<8}`{r_name}`' for r_name, r_mems in reversed(role_stats.items())]
+            formatted_role_stats = [f'{r_mems:<8}{r_name}' for r_name, r_mems in reversed(role_stats.items())]
             nl = '\n'
 
             embed = default_embed(
