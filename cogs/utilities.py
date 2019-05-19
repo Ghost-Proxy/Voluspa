@@ -114,11 +114,13 @@ class Utilities(commands.Cog):
             else:
                 datetime_embed.add_field(name='Pacific', value=display_datetime(*pacific_time, verbose=verbose))
                 datetime_embed.add_field(name='Mountain', value=display_datetime(*mountain_time, verbose=verbose))
-                datetime_embed.add_field(name='Central', value=display_datetime(*central_time, verbose=verbose), inline=False)
+                datetime_embed.add_field(name='\uFEFF', value='\uFEFF')
+                datetime_embed.add_field(name='Central', value=display_datetime(*central_time, verbose=verbose))
                 datetime_embed.add_field(name='Eastern', value=display_datetime(*eastern_time, verbose=verbose))
-                datetime_embed.add_field(name='\u200B', value='\u200B', inline=False)
+                datetime_embed.add_field(name='\uFEFF', value='\uFEFF')
                 datetime_embed.add_field(name='London', value=display_datetime(*london_time, verbose=verbose))
-                datetime_embed.add_field(name='Dubai', value=display_datetime(dubai_time[0], 'GST', verbose=verbose), inline=False)
+                datetime_embed.add_field(name='Dubai', value=display_datetime(dubai_time[0], 'GST', verbose=verbose))
+                datetime_embed.add_field(name='\uFEFF', value='\uFEFF')
                 datetime_embed.add_field(name='Tokyo', value=display_datetime(*tokyo_time, verbose=verbose))
                 datetime_embed.add_field(name='Auckland', value=display_datetime(*auckland_time, verbose=verbose))
 
