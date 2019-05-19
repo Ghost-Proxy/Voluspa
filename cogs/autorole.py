@@ -141,7 +141,13 @@ class AutoRole(commands.Cog):
             return
 
         if confirm:
-            await ctx.send(f'{ctx.message.author.mention} {update_message} role(s):  `{", ".join(roles_to_update)}`')
+            nl = '\n'
+            confirm_embed = default_embed(
+                title='Role Update',
+                description=f'\n{update_message.capitalize()} role(s):```{nl.join(roles_to_update)}```',
+                color=STYLES.colors.success
+            )
+            await ctx.send(f'{ctx.message.author.mention}', embed=confirm_embed)
 
     async def assign_roles_to_user(self,
                                    ctx,
@@ -207,10 +213,12 @@ class AutoRole(commands.Cog):
                 multiple_users_found = True
                 temp_list = [f'{user["name"]}#{user["salt"]} ({user["nick"]})' for user in user_matches]
                 nl = "\n"
-                await ctx.send(
-                    f'{ctx.message.author.mention} - '
-                    f':warning: Found multiple Users, need more info:```{nl.join(temp_list)}```'
+                multiple_users_warn_embed = default_embed(
+                    title='Multiple Users Found!',
+                    description=f'\n:warning: Found multiple Users, need more info:```{nl.join(temp_list)}```',
+                    color=STYLES.colors.warning
                 )
+                await ctx.send(f'{ctx.message.author.mention}', embed=multiple_users_warn_embed)
             elif len(user_matches) == 1:
                 # TODO: Do role limit check here... for now!
                 # TODO: Support multiple role limits -- list: [role, role]
@@ -220,54 +228,37 @@ class AutoRole(commands.Cog):
                     if conflicting_roles:
                         ok_to_update_roles = False
                         nl = "\n"
-                        await ctx.send(
-                            f'{ctx.message.author.mention} - '
-                            f':no_entry: Sorry, could not immediately change Roles for:\n'
+                        conflict_roles_embed = default_embed(
+                            title='Role Update Error',
+                            description=f'\n:no_entry: Sorry, could not immediately change Roles for:\n\n'
                             f'`{user_matches[0]["name"]}#{user_matches[0]["salt"]} ({user_matches[0]["nick"]})`'
-                            f'\n\nUser has the following conflicting Role(s):```{nl.join(conflicting_roles)}```'
+                            f'\n\nUser has the following conflicting Role(s):```{nl.join(conflicting_roles)}```',
+                            color=STYLES.color.danger
                         )
+                        await ctx.send(f'{ctx.message.author.mention}', embed=conflict_roles_embed)
 
                         conflict_embed = default_embed(
                             title='Role Conflict',
-                            description='Would you like to remove the conflicting role(s)'
-                            ' and continue with role updates?\n'
+                            description='\nWould you like to remove the conflicting role(s)'
+                            ' and continue with role updates?\n\n'
                             '  To remove the role and continue select :white_check_mark:\n'
                             '  To cancel the role change command select :no_entry:',
-                            color=STYLES.COLORS.warning
+                            color=STYLES.colors.warning
                         )
-
                         role_conflict_msg = await ctx.send(embed=conflict_embed)
                         # TODO: Ask for a reset of conflicting role here :check
                         ok_to_update_roles = await self.handle_role_conflict(ctx, role_conflict_msg)
-                        # for role_limit in role_limits:
-                        #     # First, check all the users roles against all the roles in the conflict list
-                        #     # Then gather a list of conflicting_roles...
-                        #     # display all at once, and prompt for single removal to continue
-                        #     if role_limit and (role_limit in user_matches[0]['roles'] or role_limit == user_matches[0]['top_role']):
-                        #         ok_to_update_roles = False
-                        #         await ctx.send(
-                        #             f'{ctx.message.author.mention} - '
-                        #             f':no_entry: Sorry, could not change Roles for:\n'
-                        #             f'`{user_matches[0]["name"]}#{user_matches[0]["salt"]} ({user_matches[0]["nick"]})`'
-                        #             f'\n\nUser has the following conflicting Role(s): `{role_limit}`'
-                        #         )
-                        #         handle_conflict_msg = await ctx.send(
-                        #             f'Would you like to remove the conflicting role and continue with role updates?\n'
-                        #             f'To remove the role and continue select :white_check_mark\n'
-                        #             f'To cancel the role change command select :no_entry:'
-                        #         )
-                        #         # TODO: Ask for a reset of conflicting role here :check
 
                 if ok_to_update_roles:
-
+                    nl = '\n'
                     role_embed = default_embed(
                         title=':white_check_mark: Setting User Roles',
-                        description=f'`{user_matches[0]["name"]}#{user_matches[0]["salt"]} '
+                        description=f'`\n{user_matches[0]["name"]}#{user_matches[0]["salt"]} '
                         f'({user_matches[0]["nick"]})`\n\n'
                         f'to Role(s):\n\n'
-                        f'`{", ".join(roles)}`'
+                        f'```{nl.join(roles)}```',
+                        color=STYLES.colors.success
                     )
-
                     await ctx.send(f'{ctx.message.author.mention}', embed=role_embed)
                     # await self.update_roles(ctx, 'ghost_proxy_roles', ['gpf'])  # TODO: Abstract this to params...
                     await self.update_roles(
@@ -281,19 +272,24 @@ class AutoRole(commands.Cog):
                         }
                     )
             else:
-                await ctx.send(
-                    f'{ctx.message.author.mention} - '
-                    f':no_entry: Sorry, could not find a matching User for:'
+                error_embed = default_embed(
+                    title='No Matching User',
+                    description=f'\n:no_entry: Sorry, could not find a matching User for:\n\n'
                     f'\n`{req_user}`'
-                    f'\n\nPlease try again.'
+                    f'\n\nPlease try again.',
+                    color=STYLES.colors.danger
                 )
+                await ctx.send(f'{ctx.message.author.mention}', embed=error_embed)
 
         if multiple_users_found:
-            await ctx.send(
-                f'_ _\n**NOTE:** _Multiple User results were found for 1 or more requested Users._\n\n'
+            multiple_users_embed = default_embed(
+                title='Multiple Users Found',
+                description=f'\n**NOTE:** _Multiple User results were found for 1 or more requested Users._\n\n'
                 f'Please review the results above and then try again with a full Username.\n\n'
-                f'_Example:_  `<user>#<id>`  ->  `$p2f guardian#1234`'
+                f'_Example:_  `<user>#<id>`  ->  `$p2f guardian#1234`',
+                color=STYLES.colors.info
             )
+            await ctx.send(embed=multiple_users_embed)
 
     # TODO: Improve this structure, use cog's and command structure/features better
     # TODO: Break it down into a simple set of funcs/rules
@@ -311,7 +307,7 @@ class AutoRole(commands.Cog):
         try:
             reaction, user = await self.bot.wait_for('reaction_add', check=check, timeout=60)
         except asyncio.TimeoutError:
-            await ctx.send(f'Request timed out :(')
+            await ctx.send(f'Request timed out... :(')
             return False
         else:
             print(f'reaction_emoji: {reaction} | {reaction.emoji}')
