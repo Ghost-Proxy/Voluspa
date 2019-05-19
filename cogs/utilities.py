@@ -54,51 +54,53 @@ class Utilities(commands.Cog):
     @commands.cooldown(1, 5)
     async def current_times(self, ctx):
         """Current date and time for several time zones"""
+
+        async with ctx.typing():
         # sys_time_local = datetime.datetime.now(), None  #.strftime("%Y/%m/%d %a %I:%M %p")
-        sys_time_utc = datetime.datetime.utcnow(), None  #.strftime("%Y/%m/%d %a %I:%M %p")
+            sys_time_utc = datetime.datetime.utcnow(), None  #.strftime("%Y/%m/%d %a %I:%M %p")
 
-        hawaii_time = await get_online_datetime('Pacific/Honolulu')
-        pacific_time = await get_online_datetime('America/Los_Angeles')
-        mountain_time = await get_online_datetime('America/Denver')
-        central_time = await get_online_datetime('America/Chicago')
-        eastern_time = await get_online_datetime('America/New_York')
+            hawaii_time = await get_online_datetime('Pacific/Honolulu')
+            pacific_time = await get_online_datetime('America/Los_Angeles')
+            mountain_time = await get_online_datetime('America/Denver')
+            central_time = await get_online_datetime('America/Chicago')
+            eastern_time = await get_online_datetime('America/New_York')
 
-        london_time = await get_online_datetime('Europe/London')
-        berlin_time = await get_online_datetime('Europe/Berlin')
-        moscow_time = await get_online_datetime('Europe/Moscow')
-        dubai_time = await get_online_datetime('Asia/Dubai')
-        tokyo_time = await get_online_datetime('Asia/Tokyo')
+            london_time = await get_online_datetime('Europe/London')
+            berlin_time = await get_online_datetime('Europe/Berlin')
+            moscow_time = await get_online_datetime('Europe/Moscow')
+            dubai_time = await get_online_datetime('Asia/Dubai')
+            tokyo_time = await get_online_datetime('Asia/Tokyo')
 
-        auckland_time = await get_online_datetime('Pacific/Auckland')
+            auckland_time = await get_online_datetime('Pacific/Auckland')
 
-        datetime_embed = discord.Embed(
-            title="World Clocks :globe_with_meridians: :clock1:",
-            description='Provided by Völuspá Timekeeping :voluspa_thinking:',
-            color=0x4286f4
-        )
-        # datetime_embed.set_author(name="Völuspá Timekeeping")
-        datetime_embed.add_field(name='\u200B', value='\u200B', inline=False)
-        # datetime_embed.add_field(name='System Clock Local', value=display_datetime(*sys_time_local), inline=False)
-        datetime_embed.add_field(name='Local System (UTC)', value=display_datetime(*sys_time_utc), inline=False)
+            datetime_embed = discord.Embed(
+                title="World Clocks :globe_with_meridians: :clock1:",
+                description='Provided by Völuspá Timekeeping :voluspa_thinking:',
+                color=0x4286f4
+            )
+            # datetime_embed.set_author(name="Völuspá Timekeeping")
+            datetime_embed.add_field(name='\u200B', value='\u200B', inline=False)
+            # datetime_embed.add_field(name='System Clock Local', value=display_datetime(*sys_time_local), inline=False)
+            datetime_embed.add_field(name='Local System (UTC)', value=display_datetime(*sys_time_utc), inline=False)
 
-        datetime_embed.add_field(name='\u200B', value='\u200B', inline=False)
+            datetime_embed.add_field(name='\u200B', value='\u200B', inline=False)
 
-        datetime_embed.add_field(name='Hawaii', value=display_datetime(*hawaii_time), inline=False)
-        datetime_embed.add_field(name='Pacific', value=display_datetime(*pacific_time), inline=False)
-        datetime_embed.add_field(name='Mountain', value=display_datetime(*mountain_time), inline=False)
-        datetime_embed.add_field(name='Central', value=display_datetime(*central_time), inline=False)
-        datetime_embed.add_field(name='Eastern', value=display_datetime(*eastern_time), inline=False)
+            datetime_embed.add_field(name='Hawaii', value=display_datetime(*hawaii_time), inline=False)
+            datetime_embed.add_field(name='Pacific', value=display_datetime(*pacific_time), inline=False)
+            datetime_embed.add_field(name='Mountain', value=display_datetime(*mountain_time), inline=False)
+            datetime_embed.add_field(name='Central', value=display_datetime(*central_time), inline=False)
+            datetime_embed.add_field(name='Eastern', value=display_datetime(*eastern_time), inline=False)
 
-        datetime_embed.add_field(name='London', value=display_datetime(*london_time), inline=False)
-        datetime_embed.add_field(name='Berlin', value=display_datetime(*berlin_time), inline=False)
-        datetime_embed.add_field(name='Moscow', value=display_datetime(*moscow_time), inline=False)
-        datetime_embed.add_field(name='Dubai', value=display_datetime(dubai_time[0], 'GST'), inline=False)  #GST
-        datetime_embed.add_field(name='Tokyo', value=display_datetime(*tokyo_time), inline=False)
+            datetime_embed.add_field(name='London', value=display_datetime(*london_time), inline=False)
+            datetime_embed.add_field(name='Berlin', value=display_datetime(*berlin_time), inline=False)
+            datetime_embed.add_field(name='Moscow', value=display_datetime(*moscow_time), inline=False)
+            datetime_embed.add_field(name='Dubai', value=display_datetime(dubai_time[0], 'GST'), inline=False)  #GST
+            datetime_embed.add_field(name='Tokyo', value=display_datetime(*tokyo_time), inline=False)
 
-        datetime_embed.add_field(name='Auckland', value=display_datetime(*auckland_time), inline=False)
+            datetime_embed.add_field(name='Auckland', value=display_datetime(*auckland_time), inline=False)
 
-        datetime_embed.add_field(name='\u200B', value='\u200B', inline=False)
-        datetime_embed.set_footer(text="via python & worldtimeapi.org")
+            datetime_embed.add_field(name='\u200B', value='\u200B', inline=False)
+            datetime_embed.set_footer(text="via python & worldtimeapi.org")
 
         await ctx.send(embed=datetime_embed)
 
