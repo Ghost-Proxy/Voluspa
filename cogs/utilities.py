@@ -79,11 +79,11 @@ class Utilities(commands.Cog):
                 color=0x4286f4
             )
             # datetime_embed.set_author(name="Völuspá Timekeeping")
-            datetime_embed.add_field(name='\u200B', value='\u200B', inline=False)
+            datetime_embed.add_field(name='\u200B', value='', inline=False)
             # datetime_embed.add_field(name='System Clock Local', value=display_datetime(*sys_time_local), inline=False)
             datetime_embed.add_field(name='Local System (UTC)', value=display_datetime(*sys_time_utc), inline=False)
 
-            datetime_embed.add_field(name='\u200B', value='\u200B', inline=False)
+            datetime_embed.add_field(name='', value='\u200B', inline=False)
 
             datetime_embed.add_field(name='Hawaii', value=display_datetime(*hawaii_time), inline=False)
             datetime_embed.add_field(name='Pacific', value=display_datetime(*pacific_time), inline=False)
@@ -99,7 +99,7 @@ class Utilities(commands.Cog):
 
             datetime_embed.add_field(name='Auckland', value=display_datetime(*auckland_time), inline=False)
 
-            datetime_embed.add_field(name='\u200B', value='\u200B', inline=False)
+            datetime_embed.add_field(name='', value='', inline=False)
             datetime_embed.set_footer(text="via python & worldtimeapi.org")
 
         await ctx.send(embed=datetime_embed)
