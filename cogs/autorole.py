@@ -233,7 +233,7 @@ class AutoRole(commands.Cog):
                             description=f'\n:no_entry: Sorry, could not immediately change Roles for:\n\n'
                             f'`{user_matches[0]["name"]}#{user_matches[0]["salt"]} ({user_matches[0]["nick"]})`'
                             f'\n\nUser has the following conflicting Role(s):```{nl.join(conflicting_roles)}```',
-                            color=STYLES.color.danger
+                            color=STYLES.colors.danger
                         )
                         await ctx.send(f'{ctx.message.author.mention}', embed=conflict_roles_embed)
 
