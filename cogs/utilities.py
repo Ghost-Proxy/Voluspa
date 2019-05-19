@@ -98,10 +98,13 @@ class Utilities(commands.Cog):
             )
             # datetime_embed.set_author(name="Völuspá Timekeeping")
             # datetime_embed.add_field(name='System Clock Local', value=display_datetime(*sys_time_local), inline=False)
-            datetime_embed.add_field(name='Local System (UTC)', value=display_datetime(*sys_time_utc), inline=False)
+            datetime_embed.add_field(
+                name='Local System (UTC)',
+                value=f'{display_datetime(*sys_time_utc)}\n',
+                inline=False
+            )
 
             if verbose:
-                datetime_embed.add_field(name='\u200B', value='\u200B', inline=False)
                 datetime_embed.add_field(name='Hawaii', value=display_datetime(*hawaii_time), inline=False)
                 datetime_embed.add_field(name='Los Angeles', value=display_datetime(*pacific_time), inline=False)
                 datetime_embed.add_field(name='Denver', value=display_datetime(*mountain_time), inline=False)
@@ -114,9 +117,7 @@ class Utilities(commands.Cog):
                 datetime_embed.add_field(name='Shanghai', value=display_datetime(*shanghai_time), inline=False)
                 datetime_embed.add_field(name='Tokyo', value=display_datetime(*tokyo_time), inline=False)
                 datetime_embed.add_field(name='Auckland', value=display_datetime(*auckland_time), inline=False)
-                datetime_embed.add_field(name='\u200B', value='\u200B', inline=False)
             else:
-                datetime_embed.add_field(name='\u200B', value='\uFEFF', inline=False)
                 datetime_embed.add_field(name='Pacific (LA)', value=display_datetime(*pacific_time, verbose=verbose))
                 datetime_embed.add_field(name='Mountain (DEN)', value=display_datetime(*mountain_time, verbose=verbose))
                 datetime_embed.add_field(name='\uFEFF', value='\uFEFF')
@@ -129,7 +130,6 @@ class Utilities(commands.Cog):
                 datetime_embed.add_field(name='Tokyo', value=display_datetime(*tokyo_time, verbose=verbose))
                 datetime_embed.add_field(name='Auckland', value=display_datetime(*auckland_time, verbose=verbose))
                 datetime_embed.add_field(name='\uFEFF', value='\uFEFF')
-                datetime_embed.add_field(name='\u200B', value='\uFEFF', inline=False)
 
         await ctx.send(embed=datetime_embed)
 
