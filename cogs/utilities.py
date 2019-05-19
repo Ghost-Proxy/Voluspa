@@ -15,9 +15,9 @@ logger = logging.getLogger('voluspa.cog.utilities')
 
 
 async def get_online_datetime(location):
-    xkcd_index_url = f'https://http://worldtimeapi.org/api/timezone/{location}'
+    worldtimeapi_url = f'https://www.worldtimeapi.org/api/timezone/{location}'
     async with aiohttp.ClientSession() as session:
-        async with session.get(xkcd_index_url) as r:
+        async with session.get(worldtimeapi_url) as r:
             if r.status == 200:
                 json_resp = await r.json()
                 #datetime_str = json_resp['datetime']
