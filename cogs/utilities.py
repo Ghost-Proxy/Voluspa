@@ -65,11 +65,11 @@ class Utilities(commands.Cog):
 
     @commands.command(name='time', aliases=['clock', 't'])
     @commands.guild_only()
-    @commands.cooldown(1, 5)
+    @commands.cooldown(1, 30)
     async def current_times(self, ctx, verbose: bool = False):
         """Current date and time for several time zones
 
-        Cooldown limited to 1 use per 5 seconds across the server"""
+        Cooldown limited to 1 use per 30 seconds across the server"""
 
         async with ctx.typing():
             # sys_time_local = datetime.datetime.now(), None  #.strftime("%Y/%m/%d %a %I:%M %p")
@@ -92,7 +92,7 @@ class Utilities(commands.Cog):
 
             datetime_embed = discord.Embed(
                 title="World Clocks :globe_with_meridians: :clock1:",
-                description='Provided by Völuspá Timekeeping <:voluspa_thinking:562955074708439040>',
+                description=f'Provided by Völuspá Timekeeping {self.bot.get_emoji(562955074708439040)}',
                 color=0x4286f4
             )
             # datetime_embed.set_author(name="Völuspá Timekeeping")
