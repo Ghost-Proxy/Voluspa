@@ -556,6 +556,38 @@ class AutoRole(commands.Cog):
             action='remove'
         )
 
+    @commands.command(name='get-non-roles', aliases=['lnr', 'arn'])
+    @commands.has_role('ghost-proxy-vanguard')
+    @commands.guild_only()
+    async def get_non_role_users(self, ctx):
+        """WIP: Gets all non-role Discord users
+
+        Outputs a reference list for use with other AutoRole commands.
+
+        Can only be used by Vanguard (atm).
+        """
+        async with ctx.typing():
+            non_role_members = [member for member in self.bot.get_all_members() if len(member.roles) == 1]
+            num_non_roles = len(non_role_members)
+            formatted_non_roles = [f'{nrm["name"]}#{nrm["salt"]}' for nrm in non_role_members]
+
+            embed = default_embed(
+                title='Current Non-Role Discord Users',
+                description='Reference list for use with other AutoRole commands'
+            )
+            embed.add_field(
+                name='Number of Non-Roles',
+                value=num_non_roles,
+                inline=False
+            )
+            embed.add_field(
+                name='Current Non-Roles',
+                value=f'```{" ".join(formatted_non_roles)}```',
+                inline=False
+            )
+
+        await ctx.send(embed=embed)
+
     @commands.command(name='role-stats', aliases=['rs'])
     @commands.has_role('ghost-proxy-admin')
     @commands.guild_only()
