@@ -12,7 +12,7 @@ def default_embed(title='Völuspá', description=''):
     )
     # embed.set_author(name='\uFEFF', icon_url=f'{CONFIG.Resources.image_bucket_root_url}/ghost-proxy/GP_Logo-2.png')
     embed.set_footer(
-        text=f'via Völuspá with \u1F49A \u2764',
+        text=f'via Völuspá with \u2764',
         icon_url=f"{CONFIG.Resources.image_bucket_root_url}/voluspa/Voluspa_icon_64x48.png"
     )
     return embed
