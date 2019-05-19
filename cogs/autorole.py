@@ -6,6 +6,8 @@ from typing import Any, List, Dict, Tuple, Sequence
 import discord
 from discord.ext import commands
 
+from modules.custom_embed import default_embed
+
 logger = logging.getLogger('voluspa.cog.autorole')
 
 
@@ -58,7 +60,8 @@ class AutoRole(commands.Cog):
                 'og-osu': ['osu'],
                 'og-ow': ['overwatch', 'ow'],
                 # 'og-rage': ['rage 2', 'rage'],
-                # 'og-r6s': ['rainbow six siege', 'r6s', 'rss', 'rainbow', 'siege', 'rainbow six', 'rainbow six: siege'],
+                'og-r6s': ['rainbow six siege', 'r6s', 'rss', 'rainbow', 'siege', 'rainbow six', 'rainbow six: siege'],
+                'og-steep': ['steep']
                 # 'og-wow': ['world of warcraft', 'wow', 'warcraft'],
             },
             'raid_leads': {
