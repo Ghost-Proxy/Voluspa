@@ -17,6 +17,8 @@ import requests
 
 logger = logging.getLogger('voluspa.cog.members')
 
+from modules.custom_embed import default_embed
+
 
 def filter_character_types(clan_characters, min_level=0):
     hunters = []
@@ -562,9 +564,7 @@ class Members(commands.Cog):
             hunters, titans, warlocks, num_clan_chars = filter_character_types(clan_characters, min_level)
             num_filtered_chars = len(hunters) + len(titans) + len(warlocks)
             all_chars = hunters + titans + warlocks
-            result_msg = '--\\\\\\\\//--\n' \
-                '**Clan Character Stats**\n\n' \
-                '{}{}' \
+            result_msg = '{}{}' \
                 'Total Number of Characters {}: **{}**\n' \
                 '  - Lowest Light Level: {}\n' \
                 '  - Mean / Median Light Level: {} / {}\n' \
@@ -585,7 +585,12 @@ class Members(commands.Cog):
                     await generate_char_stats_message(warlocks, num_filtered_chars, 'Warlocks')
                 )
         #await send_multipart_msg(ctx, msg_final)
-        await ctx.send(result_msg)
+
+            embed = default_embed(
+                title='Clan Character Stats',
+                description=result_msg
+            )
+        await ctx.send(embed=embed)
 
     @commands.command(name='members-online', aliases=['mo'])
     async def members_online(self, ctx):
