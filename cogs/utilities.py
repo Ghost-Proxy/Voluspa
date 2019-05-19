@@ -50,11 +50,11 @@ class Utilities(commands.Cog):
         self.bot = bot
 
     @commands.command(name='time', aliases=['clock', 't'])
-    @commands.has_role('ghost-proxy-vanguard')
     @commands.guild_only()
+    @commands.cooldown(1, 5)
     async def current_times(self, ctx):
         """Current date and time for several time zones"""
-        sys_time_local = datetime.datetime.now(), None  #.strftime("%Y/%m/%d %a %I:%M %p")
+        # sys_time_local = datetime.datetime.now(), None  #.strftime("%Y/%m/%d %a %I:%M %p")
         sys_time_utc = datetime.datetime.utcnow(), None  #.strftime("%Y/%m/%d %a %I:%M %p")
 
         hawaii_time = await get_online_datetime('Pacific/Honolulu')
@@ -72,13 +72,16 @@ class Utilities(commands.Cog):
         auckland_time = await get_online_datetime('Pacific/Auckland')
 
         datetime_embed = discord.Embed(
-            title="World Clock :globe_with_meridians: :clock1:",
-            description='_ _',
+            title="World Clocks :globe_with_meridians: :clock1:",
+            description='_Provided by Völuspá Timekeeping :voluspa_thinking:_',
             color=0x4286f4
         )
-        datetime_embed.set_author(name="Völuspá :voluspa_thinking:")
-        datetime_embed.add_field(name='System Clock Local', value=display_datetime(*sys_time_local), inline=False)
-        datetime_embed.add_field(name='System Clock UTC', value=display_datetime(*sys_time_utc), inline=False)
+        # datetime_embed.set_author(name="Völuspá Timekeeping")
+        datetime_embed.add_field(name='\u200B', value='\u200B', inline=False)
+        # datetime_embed.add_field(name='System Clock Local', value=display_datetime(*sys_time_local), inline=False)
+        datetime_embed.add_field(name='Local System (UTC)', value=display_datetime(*sys_time_utc), inline=False)
+
+        datetime_embed.add_field(name='\u200B', value='\u200B', inline=False)
 
         datetime_embed.add_field(name='Hawaii', value=display_datetime(*hawaii_time), inline=False)
         datetime_embed.add_field(name='Pacific', value=display_datetime(*pacific_time), inline=False)
@@ -94,6 +97,7 @@ class Utilities(commands.Cog):
 
         datetime_embed.add_field(name='Auckland', value=display_datetime(*auckland_time), inline=False)
 
+        datetime_embed.add_field(name='\u200B', value='\u200B', inline=False)
         datetime_embed.set_footer(text="via python & worldtimeapi.org")
 
         await ctx.send(embed=datetime_embed)
