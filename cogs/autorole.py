@@ -569,7 +569,7 @@ class AutoRole(commands.Cog):
         async with ctx.typing():
             non_role_members = [member for member in self.bot.get_all_members() if len(member.roles) == 1]
             num_non_roles = len(non_role_members)
-            formatted_non_roles = [f'{nrm["name"]}#{nrm["salt"]}' for nrm in non_role_members]
+            formatted_non_roles = [f'{nrm.name.casefold()}#{nrm.discriminator}' for nrm in non_role_members]
 
             embed = default_embed(
                 title='Current Non-Role Discord Users',
@@ -598,7 +598,7 @@ class AutoRole(commands.Cog):
         """
         async with ctx.typing():
             num_roles = len(ctx.guild.roles) - 1  # account for `@everyone`
-            role_stats = {f'{role.name}': len(role.members()) for role in ctx.guild.roles}
+            role_stats = {f'{role.name}': len(role.members) for role in ctx.guild.roles}
             formatted_role_stats = [f'**{r_name}** {r_mems}' for r_name, r_mems in role_stats.items()]
             nl = '\n'
 
