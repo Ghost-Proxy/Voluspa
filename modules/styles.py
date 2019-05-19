@@ -1,7 +1,7 @@
 from modules.misc import AttrDict
 
 STYLES = {
-    'COLORS': {
+    'colors': {
         'voluspa': 0x009933,
         'info': 0x4286f4,
         'warning': 0xffc107,  # d1c222
