@@ -8,6 +8,7 @@ import discord
 from discord.ext import commands
 
 from modules.custom_embed import default_embed
+from modules.styles import STYLES
 
 logger = logging.getLogger('voluspa.cog.autorole')
 
@@ -225,40 +226,48 @@ class AutoRole(commands.Cog):
                             f'`{user_matches[0]["name"]}#{user_matches[0]["salt"]} ({user_matches[0]["nick"]})`'
                             f'\n\nUser has the following conflicting Role(s):```{nl.join(conflicting_roles)}```'
                         )
-                        role_conflict_msg = await ctx.send(
-                            f'Would you like to remove the conflicting role(s) and continue with role updates?\n'
-                            f'  To remove the role and continue select :white_check_mark:\n'
-                            f'  To cancel the role change command select :no_entry:'
+
+                        conflict_embed = default_embed(
+                            title='Role Conflict',
+                            description='Would you like to remove the conflicting role(s)'
+                            ' and continue with role updates?\n'
+                            '  To remove the role and continue select :white_check_mark:\n'
+                            '  To cancel the role change command select :no_entry:',
+                            color=STYLES.COLORS.warning
                         )
+
+                        role_conflict_msg = await ctx.send(embed=conflict_embed)
                         # TODO: Ask for a reset of conflicting role here :check
                         ok_to_update_roles = await self.handle_role_conflict(ctx, role_conflict_msg)
-                # for role_limit in role_limits:
-                #     # First, check all the users roles against all the roles in the conflict list
-                #     # Then gather a list of conflicting_roles...
-                #     # display all at once, and prompt for single removal to continue
-                #     if role_limit and (role_limit in user_matches[0]['roles'] or role_limit == user_matches[0]['top_role']):
-                #         ok_to_update_roles = False
-                #         await ctx.send(
-                #             f'{ctx.message.author.mention} - '
-                #             f':no_entry: Sorry, could not change Roles for:\n'
-                #             f'`{user_matches[0]["name"]}#{user_matches[0]["salt"]} ({user_matches[0]["nick"]})`'
-                #             f'\n\nUser has the following conflicting Role(s): `{role_limit}`'
-                #         )
-                #         handle_conflict_msg = await ctx.send(
-                #             f'Would you like to remove the conflicting role and continue with role updates?\n'
-                #             f'To remove the role and continue select :white_check_mark\n'
-                #             f'To cancel the role change command select :no_entry:'
-                #         )
-                #         # TODO: Ask for a reset of conflicting role here :check
+                        # for role_limit in role_limits:
+                        #     # First, check all the users roles against all the roles in the conflict list
+                        #     # Then gather a list of conflicting_roles...
+                        #     # display all at once, and prompt for single removal to continue
+                        #     if role_limit and (role_limit in user_matches[0]['roles'] or role_limit == user_matches[0]['top_role']):
+                        #         ok_to_update_roles = False
+                        #         await ctx.send(
+                        #             f'{ctx.message.author.mention} - '
+                        #             f':no_entry: Sorry, could not change Roles for:\n'
+                        #             f'`{user_matches[0]["name"]}#{user_matches[0]["salt"]} ({user_matches[0]["nick"]})`'
+                        #             f'\n\nUser has the following conflicting Role(s): `{role_limit}`'
+                        #         )
+                        #         handle_conflict_msg = await ctx.send(
+                        #             f'Would you like to remove the conflicting role and continue with role updates?\n'
+                        #             f'To remove the role and continue select :white_check_mark\n'
+                        #             f'To cancel the role change command select :no_entry:'
+                        #         )
+                        #         # TODO: Ask for a reset of conflicting role here :check
 
                 if ok_to_update_roles:
-                    await ctx.send(
-                        f'{ctx.message.author.mention} - '
-                        f':white_check_mark: Promoting User:\n'
-                        f'`{user_matches[0]["name"]}#{user_matches[0]["salt"]} ({user_matches[0]["nick"]})`\n'
+
+                    role_embed = default_embed(
+                        title=f'{ctx.message.author.mention} - :white_check_mark: Setting User Roles',
+                        description=f'`{user_matches[0]["name"]}#{user_matches[0]["salt"]} ({user_matches[0]["nick"]})`\n'
                         f'to Role(s):\n'
                         f'`{", ".join(roles)}`'
                     )
+
+                    await ctx.send(embed=role_embed)
                     # await self.update_roles(ctx, 'ghost_proxy_roles', ['gpf'])  # TODO: Abstract this to params...
                     await self.update_roles(
                         ctx,
@@ -302,6 +311,7 @@ class AutoRole(commands.Cog):
             reaction, user = await self.bot.wait_for('reaction_add', check=check, timeout=60)
         except asyncio.TimeoutError:
             await ctx.send(f'Request timed out :(')
+            return False
         else:
             print(f'reaction_emoji: {reaction} | {reaction.emoji}')
             await ctx.send(f'Received reaction: {reaction.emoji} from user: {user}')
@@ -618,7 +628,7 @@ class AutoRole(commands.Cog):
             )
             embed.add_field(
                 name='Roles and number of Users',
-                value=f'{nl.join(formatted_role_stats)}',
+                value=f'```{nl.join(formatted_role_stats)}```',
                 inline=False
             )
 
