@@ -2,6 +2,7 @@
 import asyncio
 import logging
 from typing import Any, List, Dict, Tuple, Sequence
+from collections import OrderedDict
 
 import discord
 from discord.ext import commands
@@ -598,8 +599,12 @@ class AutoRole(commands.Cog):
         """
         async with ctx.typing():
             num_roles = len(ctx.guild.roles) - 1  # account for `@everyone`
-            role_stats = {f'{role.name}': len(role.members) for role in ctx.guild.roles}
-            formatted_role_stats = [f'**{r_name}** {r_mems}' for r_name, r_mems in role_stats.items()]
+            # Non-ordered Dict...
+            # role_stats = {f'{role.name}': len(role.members) for role in ctx.guild.roles}
+            role_stats = OrderedDict()
+            for role in ctx.guild.roles:
+                role_stats[role.name] = len(role.members)
+            formatted_role_stats = [f'`{r_name}`\t\t{r_mems}' for r_name, r_mems in role_stats.items()]
             nl = '\n'
 
             embed = default_embed(
