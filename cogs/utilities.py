@@ -56,7 +56,7 @@ class Utilities(commands.Cog):
     @commands.is_owner()
     async def custom_emotes_list(self, ctx):
         bot_emojis = self.bot.emojis
-        guild_emojis = ctx.guild.emojis()
+        guild_emojis = ctx.guild.emojis
         nl = '\n'
         logger.info(f'Bot Emojis: {nl.join(bot_emojis)}\n')
         logger.info(f'Guild Emojis: {nl.join(guild_emojis)}\n')
