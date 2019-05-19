@@ -262,13 +262,13 @@ class AutoRole(commands.Cog):
 
                     role_embed = default_embed(
                         title=':white_check_mark: Setting User Roles',
-                        description=f'{ctx.message.author.mention}\n'
-                        f'`{user_matches[0]["name"]}#{user_matches[0]["salt"]} ({user_matches[0]["nick"]})`\n\n'
+                        description=f'`{user_matches[0]["name"]}#{user_matches[0]["salt"]} '
+                        f'({user_matches[0]["nick"]})`\n\n'
                         f'to Role(s):\n\n'
                         f'`{", ".join(roles)}`'
                     )
 
-                    await ctx.send(embed=role_embed)
+                    await ctx.send(f'{ctx.message.author.mention}', embed=role_embed)
                     # await self.update_roles(ctx, 'ghost_proxy_roles', ['gpf'])  # TODO: Abstract this to params...
                     await self.update_roles(
                         ctx,
