@@ -604,7 +604,7 @@ class AutoRole(commands.Cog):
             role_stats = OrderedDict()
             for role in ctx.guild.roles:
                 role_stats[role.name] = len(role.members)
-            formatted_role_stats = [f'`{r_name}`\t\t{r_mems}' for r_name, r_mems in role_stats.items()]
+            formatted_role_stats = [f'{r_mems:<8}`{r_name}`' for r_name, r_mems in reversed(role_stats.items())]
             nl = '\n'
 
             embed = default_embed(
