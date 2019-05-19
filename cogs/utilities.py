@@ -103,6 +103,7 @@ class Utilities(commands.Cog):
                 value=f'{display_datetime(*sys_time_utc)}\n',
                 inline=False
             )
+            datetime_embed.add_field(name='\u200B', value='\u200B', inline=False)
 
             if verbose:
                 datetime_embed.add_field(name='Hawaii', value=display_datetime(*hawaii_time), inline=False)
