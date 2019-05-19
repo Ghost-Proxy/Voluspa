@@ -58,8 +58,10 @@ class Utilities(commands.Cog):
         bot_emojis = self.bot.emojis
         guild_emojis = ctx.guild.emojis
         nl = '\n'
-        logger.info(f'Bot Emojis: {nl.join(bot_emojis)}\n')
-        logger.info(f'Guild Emojis: {nl.join(guild_emojis)}\n')
+        # logger.info(f'Bot Emojis: {nl.join(bot_emojis)}\n')
+        # logger.info(f'Guild Emojis: {nl.join(guild_emojis)}\n')
+        logger.info(f'bot emojis: {bot_emojis}')
+        logger.info(f'guild emojis: {guild_emojis}')
 
     @commands.command(name='time', aliases=['clock', 't'])
     @commands.guild_only()
