@@ -77,7 +77,6 @@ class Utilities(commands.Cog):
             mountain_time = await get_online_datetime('America/Denver')
             central_time = await get_online_datetime('America/Chicago')
             eastern_time = await get_online_datetime('America/New_York')
-
             london_time = await get_online_datetime('Europe/London')
             dubai_time = await get_online_datetime('Asia/Dubai')
             tokyo_time = await get_online_datetime('Asia/Tokyo')
@@ -105,31 +104,23 @@ class Utilities(commands.Cog):
                 datetime_embed.add_field(name='Mountain', value=display_datetime(*mountain_time), inline=False)
                 datetime_embed.add_field(name='Central', value=display_datetime(*central_time), inline=False)
                 datetime_embed.add_field(name='Eastern', value=display_datetime(*eastern_time), inline=False)
-            else:
-                datetime_embed.add_field(
-                    name='West / Mountain / Central / East',
-                    value=(
-                        f'{display_datetime(*pacific_time, verbose=verbose)} / '
-                        f'{display_datetime(*mountain_time, verbose=verbose)} / '
-                        f'{display_datetime(*central_time, verbose=verbose)} / '
-                        f'{display_datetime(*eastern_time, verbose=verbose)}'
-                    ),
-                    inline=False
-                )
-
-            datetime_embed.add_field(name='London', value=display_datetime(*london_time), inline=False)
-
-            if verbose:
+                datetime_embed.add_field(name='London', value=display_datetime(*london_time), inline=False)
                 datetime_embed.add_field(name='Berlin', value=display_datetime(*berlin_time), inline=False)
                 datetime_embed.add_field(name='Moscow', value=display_datetime(*moscow_time), inline=False)
-
-            datetime_embed.add_field(name='Dubai', value=display_datetime(dubai_time[0], 'GST'), inline=False)  #GST
-
-            if verbose:
+                datetime_embed.add_field(name='Dubai', value=display_datetime(dubai_time[0], 'GST'), inline=False)
                 datetime_embed.add_field(name='Shanghai', value=display_datetime(*shanghai_time), inline=False)
-
-            datetime_embed.add_field(name='Tokyo', value=display_datetime(*tokyo_time), inline=False)
-            datetime_embed.add_field(name='Auckland', value=display_datetime(*auckland_time), inline=False)
+                datetime_embed.add_field(name='Tokyo', value=display_datetime(*tokyo_time), inline=False)
+                datetime_embed.add_field(name='Auckland', value=display_datetime(*auckland_time), inline=False)
+            else:
+                datetime_embed.add_field(name='Pacific', value=display_datetime(*pacific_time))
+                datetime_embed.add_field(name='Mountain', value=display_datetime(*mountain_time))
+                datetime_embed.add_field(name='Central', value=display_datetime(*central_time))
+                datetime_embed.add_field(name='Eastern', value=display_datetime(*eastern_time))
+                datetime_embed.add_field(name='\u200B', value='\u200B', inline=False)
+                datetime_embed.add_field(name='London', value=display_datetime(*london_time))
+                datetime_embed.add_field(name='Dubai', value=display_datetime(dubai_time[0], 'GST'))
+                datetime_embed.add_field(name='Tokyo', value=display_datetime(*tokyo_time))
+                datetime_embed.add_field(name='Auckland', value=display_datetime(*auckland_time))
 
             datetime_embed.add_field(name='\u200B', value='\u200B', inline=False)
             datetime_embed.set_footer(text="via python & worldtimeapi.org")
