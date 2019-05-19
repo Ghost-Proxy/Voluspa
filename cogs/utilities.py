@@ -73,7 +73,7 @@ class Utilities(commands.Cog):
 
         datetime_embed = discord.Embed(
             title="World Clocks :globe_with_meridians: :clock1:",
-            description='_Provided by Völuspá Timekeeping :voluspa_thinking:_',
+            description='Provided by Völuspá Timekeeping :voluspa_thinking:',
             color=0x4286f4
         )
         # datetime_embed.set_author(name="Völuspá Timekeeping")
