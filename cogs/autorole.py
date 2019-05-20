@@ -1,13 +1,13 @@
 # import re
 import asyncio
 import logging
-from typing import Any, List, Dict, Tuple, Sequence
+from typing import Any, List, Dict, Tuple, Sequence, Iterable
 from collections import OrderedDict
 
 import discord
 from discord.ext import commands
 
-from modules.custom_embed import default_embed
+from modules.custom_embed import default_embed, format_list
 from modules.styles import STYLES
 
 logger = logging.getLogger('voluspa.cog.autorole')
@@ -141,10 +141,9 @@ class AutoRole(commands.Cog):
             return
 
         if confirm:
-            nl = '\n'
             confirm_embed = default_embed(
                 title='Role Update',
-                description=f'\n{update_message.capitalize()} role(s):```{nl.join(roles_to_update)}```',
+                description=f'\n{update_message.capitalize()} role(s):{format_list(roles_to_update)}',
                 color=STYLES.colors.success
             )
             await ctx.send(f'{ctx.message.author.mention}', embed=confirm_embed)
@@ -212,10 +211,9 @@ class AutoRole(commands.Cog):
             if len(user_matches) > 1:
                 multiple_users_found = True
                 temp_list = [f'{user["name"]}#{user["salt"]} ({user["nick"]})' for user in user_matches]
-                nl = "\n"
                 multiple_users_warn_embed = default_embed(
                     title='Multiple Users Found!',
-                    description=f'\n:warning: Found multiple Users, need more info:```{nl.join(temp_list)}```',
+                    description=f'\n:warning: Found multiple Users, need more info:{format_list(temp_list)}',
                     color=STYLES.colors.warning
                 )
                 await ctx.send(f'{ctx.message.author.mention}', embed=multiple_users_warn_embed)
@@ -226,13 +224,11 @@ class AutoRole(commands.Cog):
                 if role_limits:
                     conflicting_roles = [role for role in role_limits if role in user_matches[0]['roles']]
                     if conflicting_roles:
-                        ok_to_update_roles = False
-                        nl = "\n"
                         conflict_roles_embed = default_embed(
                             title='Role Update Error',
                             description=f'\n:no_entry: Sorry, could not immediately change Roles for:\n\n'
                             f'`{user_matches[0]["name"]}#{user_matches[0]["salt"]} ({user_matches[0]["nick"]})`'
-                            f'\n\nUser has the following conflicting Role(s):```{nl.join(conflicting_roles)}```',
+                            f'\n\nUser has the following conflicting Role(s):{format_list(conflicting_roles)}',
                             color=STYLES.colors.danger
                         )
                         await ctx.send(f'{ctx.message.author.mention}', embed=conflict_roles_embed)
@@ -256,7 +252,7 @@ class AutoRole(commands.Cog):
                         description=f'`\n{user_matches[0]["name"]}#{user_matches[0]["salt"]} '
                         f'({user_matches[0]["nick"]})`\n\n'
                         f'to Role(s):\n\n'
-                        f'```{nl.join(roles)}```',
+                        f'{format_list(roles)}',
                         color=STYLES.colors.success
                     )
                     await ctx.send(f'{ctx.message.author.mention}', embed=role_embed)
@@ -370,7 +366,7 @@ class AutoRole(commands.Cog):
 
         await ctx.send(
             f'_ _\nCurrent available roles and channels for Other Games:\n'
-            f'```{og_list if og_list else "None"}```'
+            f'{format_list(og_list, none_msg="None")}'
         )
 
     @commands.command(name='og-add', aliases=['other-game-add'])
@@ -589,7 +585,7 @@ class AutoRole(commands.Cog):
             )
             embed.add_field(
                 name='Current Non-Roles',
-                value=f'```{" ".join(formatted_non_roles)}```' if len(formatted_non_roles) >= 1 else '_N/A_',
+                value=f'{format_list(formatted_non_roles)}',
                 inline=False
             )
 
@@ -624,7 +620,7 @@ class AutoRole(commands.Cog):
             )
             embed.add_field(
                 name='Roles and number of Users',
-                value=f'```{nl.join(formatted_role_stats)}```',
+                value=f'{format_list(formatted_role_stats)}',
                 inline=False
             )
 
