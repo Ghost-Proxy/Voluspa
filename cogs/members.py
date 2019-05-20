@@ -15,6 +15,8 @@ import requests
 # import fuzzyset  # TODO: Meh, need to revisit
 # https://github.com/seatgeek/fuzzywuzzy <- instead
 
+from modules.custom_embed import default_embed, format_list
+
 logger = logging.getLogger('voluspa.cog.members')
 
 from modules.custom_embed import default_embed
@@ -603,13 +605,15 @@ class Members(commands.Cog):
                 for member in member_list
                 if member['isOnline']
             ]
-            result_msg = '--\\\\\\\\//--\n\n' \
-                '**Ghost Proxy Members In-Game: {}**\n' \
-                '```  {}```'.format(
-                    len(cur_members_online),
-                    '\n  '.join(cur_members_online)
-                )
-        await ctx.send(result_msg)
+            result_msg = f'**Ghost Proxy Members In-Game** {len(cur_members_online)}\n'\
+                f'{format_list(cur_members_online, none_msg="None - Check back soon!")}'
+
+            mem_online_embed = default_embed(
+                title='Ghost Proxy Members In-Game',
+                description=result_msg
+            )
+
+        await ctx.send(embed=mem_online_embed)
 
     # @bot.command(name='get-profile')
     # async def get_player_profile(ctx, *, player_name):
