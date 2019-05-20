@@ -156,6 +156,9 @@ class AutoRole(commands.Cog):
             )
             await ctx.send(f'{ctx.message.author.mention}', embed=confirm_embed)
 
+        # TODO: Better guarantee of succees...
+        return True
+
     async def assign_roles_to_user(self,
                                    ctx,
                                    role_class: str,
@@ -228,6 +231,7 @@ class AutoRole(commands.Cog):
             elif len(user_matches) == 1:
                 # TODO: Do role limit check here... for now!
                 # TODO: Support multiple role limits -- list: [role, role]
+                # TODO: THIS IS WAY TOO BIG! -- BREAK IT UP!!
                 ok_to_update_roles = True
                 if role_limits:
                     conflicting_roles = [role for role in role_limits if role in user_matches[0]['roles']]
@@ -253,8 +257,29 @@ class AutoRole(commands.Cog):
                         # TODO: Ask for a reset of conflicting role here :check
                         ok_to_update_roles = await self.handle_role_conflict(ctx, role_conflict_msg)
 
+                        if ok_to_update_roles:
+                            # Remove conflicting roles
+                            roles_removed = []
+                            for conf_role in conflicting_roles:
+                                rm_role = await self.update_roles(
+                                    ctx,
+                                    role_class,
+                                    [conf_role],  # Could technically pass in the list of roles...
+                                    user_id=user_matches[0]['id'],
+                                    options={
+                                        'confirm': False,
+                                        'action': 'remove'
+                                    }
+                                )
+                                if rm_role:
+                                    roles_removed.append(conf_role)
+
+                            ok_to_update_roles = set(conflicting_roles) == set(roles_removed)
+                            if not ok_to_update_roles:
+                                logger.info('Error during conflict role updating!')
+                                await ctx.send(':no_entry: ERROR: Problem updating conflicting roles!')
+
                 if ok_to_update_roles:
-                    nl = '\n'
                     role_embed = default_embed(
                         title=':white_check_mark: Setting User Roles',
                         description=f'`\n{user_matches[0]["name"]}#{user_matches[0]["salt"]} '
