@@ -40,6 +40,8 @@ def match_users(user_list, username):
 class AutoRole(commands.Cog):
     """Automatic Role Management System (ARMS)"""
     # OR Discord Role Management heh DRM...
+    # TODO: Improve this structure, use cog's and command structure/features better
+    # TODO: Break it down into a simple set of funcs/rules
     def __init__(self, bot):
         self.bot = bot
         self.roles_dicts = {
@@ -99,8 +101,14 @@ class AutoRole(commands.Cog):
         # Set options and values
         if not options:
             options = {}
-        update_message = options.get('update_message', 'added')
         action = options.get('action', 'add')
+        if action not in ['add', 'remove']:
+            return
+        update_message = options.get('update_message', 'set')
+        if action and update_message == 'add':
+            update_message = 'added'
+        elif action and update_message == 'remove':
+            update_message = 'removed'
         confirm = options.get('confirm', True)
         role_dict = self.roles_dicts[role_class]
 
@@ -287,9 +295,6 @@ class AutoRole(commands.Cog):
             )
             await ctx.send(embed=multiple_users_embed)
 
-    # TODO: Improve this structure, use cog's and command structure/features better
-    # TODO: Break it down into a simple set of funcs/rules
-
     async def handle_role_conflict(self, ctx, confirm_msg):  # TODO: Make static
         """Returns a bool for confirmation"""
         #reaction_emoji = {'yes': ':white_check_mark:', 'no': ':no_entry:'}
@@ -475,7 +480,6 @@ class AutoRole(commands.Cog):
         else:
             await self.update_roles(ctx, 'rythm_dj', ['dj'])
 
-    # TODO: STUB
     @commands.command(name='set-member', aliases=['p2m', 'arm'])
     @commands.has_role('ghost-proxy-vanguard')
     @commands.guild_only()
