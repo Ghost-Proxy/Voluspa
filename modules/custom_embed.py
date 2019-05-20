@@ -6,7 +6,14 @@ from voluspa import CONFIG
 from typing import Any, List, Dict, Tuple, Sequence, Iterable
 
 
-def default_embed(title='Völuspá', description='', color=0x009933, **kwargs):
+# TODO:
+#  - Prompts/confirm "dialog"
+#  - Paging support
+#  - Automatic cleanup
+#  - built in "theme" handling (conv funcs/wrappers)
+
+
+def default_embed(title='Völuspá', description='', color=0x009933, footer_notes=None, **kwargs):
     embed = Embed(
         title=title,
         description=description,
@@ -15,7 +22,7 @@ def default_embed(title='Völuspá', description='', color=0x009933, **kwargs):
     )
     # embed.set_author(name='\uFEFF', icon_url=f'{CONFIG.Resources.image_bucket_root_url}/ghost-proxy/GP_Logo-2.png')
     embed.set_footer(
-        text='via Völuspá with \u2764',
+        text=f'via Völuspá with \u2764{f" | {footer_notes}" if footer_notes else ""}',
         icon_url=f"{CONFIG.Resources.image_bucket_root_url}/voluspa/Voluspa_icon_64x48.png"
     )
     return embed
