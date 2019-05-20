@@ -605,7 +605,7 @@ class Members(commands.Cog):
                 for member in member_list
                 if member['isOnline']
             ]
-            result_msg = f'**Ghost Proxy Members In-Game** {len(cur_members_online)}\n'\
+            result_msg = f'{len(cur_members_online)} Members Online\n' \
                 f'{format_list(cur_members_online, none_msg="None - Check back soon!")}'
 
             mem_online_embed = default_embed(
