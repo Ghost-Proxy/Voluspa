@@ -391,13 +391,16 @@ class AutoRole(commands.Cog):
         og_list = ''
         if self.roles_dicts['other_games']:
             og_list += 'ROLE    GAME\n-------------------------\n'
-        for og_role, og_names in self.roles_dicts['other_games'].items():
-            og_list += f'{og_role.replace("og-", "") + "":<8}{og_names[0].title()}\n'
+            for og_role, og_names in self.roles_dicts['other_games'].items():
+                og_list += f'{og_role.replace("og-", "") + "":<8}{og_names[0].title()}\n'
 
-        await ctx.send(
-            f'_ _\nCurrent available roles and channels for Other Games:\n'
-            f'{format_list(og_list, none_msg="None")}'
+        og_list_embed = default_embed(
+            title='Other Games List',
+            description=f'Current available roles and channels for Other Games:\n'
+            f'```\n{og_list}\n```'
         )
+
+        await ctx.send(embed=og_list_embed)
 
     @commands.command(name='og-add', aliases=['other-game-add'])
     @commands.guild_only()
