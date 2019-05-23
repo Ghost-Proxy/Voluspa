@@ -405,7 +405,7 @@ class AutoRole(commands.Cog):
     @commands.command(name='og-add', aliases=['other-game-add'])
     @commands.guild_only()
     async def other_game_add(self, ctx, *games: str):
-        """Adds Other-Game roles for pings/channels.
+        """Adds Other-Game roles
 
         Uses either short names like 'div2' or full names like 'Division2'.
 
@@ -430,7 +430,7 @@ class AutoRole(commands.Cog):
     @commands.command(name='og-remove', aliases=['other-game-remove'])
     @commands.guild_only()
     async def other_game_remove(self, ctx, *games: str):
-        """Removes Other-Game roles for pings/channels.
+        """Removes Other-Game roles
 
         Uses either short names like 'div2' or full names like 'Division2'.
 
@@ -497,7 +497,7 @@ class AutoRole(commands.Cog):
     @commands.has_any_role('ghost-proxy-member', 'ghost-proxy-envoy')
     @commands.guild_only()
     async def set_dj(self, ctx):
-        """Sets DJ role for Rythm
+        """Adds DJ role for Rythm
 
         Can only be used by Members.
         """
@@ -627,7 +627,7 @@ class AutoRole(commands.Cog):
     @commands.has_role('ghost-proxy-admin')
     @commands.guild_only()
     async def role_stats(self, ctx):
-        """WIP: Displays stats for Roles
+        """WIP: Lists Discord role stats
 
         Can only be used by Admins (atm).
         """
