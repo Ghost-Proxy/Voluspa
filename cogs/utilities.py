@@ -68,7 +68,7 @@ class Utilities(commands.Cog):
     @commands.guild_only()
     @commands.cooldown(1, 30)
     async def current_times(self, ctx, verbose: bool = False):
-        """Current date and time for several time zones
+        """Displays date/time for several time zones
 
         Cooldown limited to 1 use per 30 seconds across the server"""
 
@@ -76,6 +76,7 @@ class Utilities(commands.Cog):
             # sys_time_local = datetime.datetime.now(), None  #.strftime("%Y/%m/%d %a %I:%M %p")
             sys_time_utc = datetime.datetime.utcnow(), None  #.strftime("%Y/%m/%d %a %I:%M %p")
 
+            hawaii_time = await get_online_datetime('Pacific/Honolulu')
             pacific_time = await get_online_datetime('America/Los_Angeles')
             mountain_time = await get_online_datetime('America/Denver')
             central_time = await get_online_datetime('America/Chicago')
@@ -86,7 +87,6 @@ class Utilities(commands.Cog):
             auckland_time = await get_online_datetime('Pacific/Auckland')
 
             if verbose:
-                hawaii_time = await get_online_datetime('Pacific/Honolulu')
                 berlin_time = await get_online_datetime('Europe/Berlin')
                 moscow_time = await get_online_datetime('Europe/Moscow')
                 shanghai_time = await get_online_datetime('Asia/Shanghai')
@@ -119,18 +119,15 @@ class Utilities(commands.Cog):
                 datetime_embed.add_field(name='Tokyo', value=display_datetime(*tokyo_time), inline=False)
                 datetime_embed.add_field(name='Auckland', value=display_datetime(*auckland_time), inline=False)
             else:
+                datetime_embed.add_field(name='Hawaii', value=display_datetime(*hawaii_time, verbose=verbose))
                 datetime_embed.add_field(name='Pacific (LA)', value=display_datetime(*pacific_time, verbose=verbose))
                 datetime_embed.add_field(name='Mountain (DEN)', value=display_datetime(*mountain_time, verbose=verbose))
-                datetime_embed.add_field(name='\uFEFF', value='\uFEFF')
                 datetime_embed.add_field(name='Central (CHI)', value=display_datetime(*central_time, verbose=verbose))
                 datetime_embed.add_field(name='Eastern (NY)', value=display_datetime(*eastern_time, verbose=verbose))
-                datetime_embed.add_field(name='\uFEFF', value='\uFEFF')
                 datetime_embed.add_field(name='London', value=display_datetime(*london_time, verbose=verbose))
                 datetime_embed.add_field(name='Dubai', value=display_datetime(dubai_time[0], 'GST', verbose=verbose))
-                datetime_embed.add_field(name='\uFEFF', value='\uFEFF')
                 datetime_embed.add_field(name='Tokyo', value=display_datetime(*tokyo_time, verbose=verbose))
                 datetime_embed.add_field(name='Auckland', value=display_datetime(*auckland_time, verbose=verbose))
-                datetime_embed.add_field(name='\uFEFF', value='\uFEFF')
 
         await ctx.send(embed=datetime_embed)
 
