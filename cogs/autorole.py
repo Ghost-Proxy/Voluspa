@@ -519,7 +519,9 @@ class AutoRole(commands.Cog):
         await self.assign_roles_to_user(
             ctx,
             'ghost_proxy_roles',
-            ['ghost-proxy-member'],
+            [
+                'ghost-proxy-member'
+            ],
             users,
             role_limits=['ghost-proxy-friend']
         )
@@ -535,7 +537,9 @@ class AutoRole(commands.Cog):
         await self.assign_roles_to_user(
             ctx,
             'ghost_proxy_roles',
-            ['ghost-proxy-friend'],
+            [
+                'ghost-proxy-friend'
+            ],
             users,
             role_limits=['ghost-proxy-member']
         )
@@ -551,9 +555,12 @@ class AutoRole(commands.Cog):
         await self.assign_roles_to_user(
             ctx,
             'ghost_proxy_roles',
-            ['ghost-proxy-envoy'],  # ['ghost-proxy-friend', 'ghost-proxy-envoy'],
+            [
+                'ghost-proxy-envoy',
+                'ghost-proxy-friend',
+            ],
             users,
-            #role_limits=['ghost-proxy-friend']
+            role_limits=['ghost-proxy-member']
         )
 
     @commands.command(name='set-legacy', aliases=['p2l', 'arl'])
@@ -567,7 +574,10 @@ class AutoRole(commands.Cog):
         await self.assign_roles_to_user(
             ctx,
             'ghost_proxy_roles',
-            ['ghost-proxy-friend', 'ghost-proxy-legacy'],
+            [
+                'ghost-proxy-friend',
+                'ghost-proxy-legacy',
+            ],
             users,
             role_limits=['ghost-proxy-member']
         )
@@ -585,9 +595,14 @@ class AutoRole(commands.Cog):
         await self.assign_roles_to_user(
             ctx,
             'ghost_proxy_roles',
-            ['ghost-proxy-friend', 'ghost-proxy-legacy', 'ghost-proxy-member', 'ghost-proxy-admin'],
+            [
+                'ghost-proxy-friend',
+                'ghost-proxy-legacy',
+                'ghost-proxy-member',
+                'ghost-proxy-admin',
+                'ghost-proxy-envoy',
+            ],
             users,
-            #role_limits=['ghost-proxy-friend'],
             action='remove'
         )
 
@@ -639,7 +654,6 @@ class AutoRole(commands.Cog):
             for role in ctx.guild.roles:
                 role_stats[role.name] = len(role.members)
             formatted_role_stats = [f'{r_mems:<8}{r_name}' for r_name, r_mems in reversed(role_stats.items())]
-            nl = '\n'
 
             embed = default_embed(
                 title='Role Stats',
