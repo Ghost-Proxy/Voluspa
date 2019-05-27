@@ -523,7 +523,11 @@ class AutoRole(commands.Cog):
                 'ghost-proxy-member'
             ],
             users,
-            role_limits=['ghost-proxy-friend']
+            role_limits=[
+                'ghost-proxy-friend',
+                'ghost-proxy-legacy',
+                'ghost-proxy-envoy',
+            ]
         )
 
     @commands.command(name='set-friend', aliases=['p2f', 'arf'])
