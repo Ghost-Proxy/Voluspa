@@ -92,7 +92,7 @@ class Utilities(commands.Cog):
                 shanghai_time = await get_online_datetime('Asia/Shanghai')
 
             datetime_embed = default_embed(
-                title=":globe_with_meridians: :clock1: World Clocks",
+                title=":globe_with_meridians: World Clocks :clock1:",
                 description=f'Provided by Völuspá Timekeeping {self.bot.get_emoji(562955074708439040)}',
                 color=0x4286f4
             )
