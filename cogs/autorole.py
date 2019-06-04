@@ -549,12 +549,12 @@ class AutoRole(commands.Cog):
         )
 
     @commands.command(name='set-envoy', aliases=['p2e', 'are'])
-    @commands.has_role('ghost-proxy-gatekeeper')
+    @commands.has_any_role('ghost-proxy-vanguard', 'div2-admin')
     @commands.guild_only()
     async def set_to_envoy(self, ctx, *users: str):
         """WIP: Sets User(s) to Envoy(s)
 
-        Can only be used by Gatekeepers (atm).
+        Can only be used by Vanguard and Div2 Admins (atm).
         """
         await self.assign_roles_to_user(
             ctx,
@@ -565,6 +565,25 @@ class AutoRole(commands.Cog):
             ],
             users,
             role_limits=['ghost-proxy-member']
+        )
+
+    # TODO: Hack job
+    @commands.command(name='remove-envoy')
+    @commands.has_any_role('ghost-proxy-vanguard', 'div2-admin')
+    @commands.guild_only()
+    async def remove_envoy(self, ctx, *users: str):
+        """WIP: Removes Envoy(s) rom User(s)
+
+        Can only be used by Vanguard and Div2 Admins (atm).
+        """
+        await self.assign_roles_to_user(
+            ctx,
+            'ghost_proxy_roles',
+            [
+                'ghost-proxy-envoy',
+            ],
+            users,
+            action='remove'
         )
 
     @commands.command(name='set-legacy', aliases=['p2l', 'arl'])
