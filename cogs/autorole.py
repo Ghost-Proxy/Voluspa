@@ -566,6 +566,12 @@ class AutoRole(commands.Cog):
             users,
             role_limits=['ghost-proxy-member']
         )
+        await self.assign_roles_to_user(
+            ctx,
+            'other_games',
+            ['og-div2'],
+            users
+        )
 
     # TODO: Hack job
     @commands.command(name='remove-envoy')
