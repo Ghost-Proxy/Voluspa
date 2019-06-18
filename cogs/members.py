@@ -349,7 +349,7 @@ class Members(commands.Cog):
         self.bot = bot
 
     @commands.command(aliases=['m'])
-    @commands.cooldown(1, 600, commands.BucketType.guild)
+    @commands.cooldown(1, 180, commands.BucketType.guild)
     @commands.guild_only()
     async def members(self, ctx):
         """Returns Discord member information"""
