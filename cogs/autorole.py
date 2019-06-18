@@ -622,7 +622,7 @@ class AutoRole(commands.Cog):
 
     # TODO: RESET MEMBER
     # TODO: ADD EXCEPTION/BLOCK LIST (anyone below Gatekeeper)
-    @commands.command(name='autorole-reset', aliases=['ar-reset'])
+    @commands.command(name='remove-roles', aliases=['autorole-reset', 'ar-reset', 'reset-roles', 'roles-reset', 'ARR'])
     @commands.has_role('ghost-proxy-gatekeeper')
     @commands.guild_only()
     async def reset_user(self, ctx, *users: str):
