@@ -512,7 +512,9 @@ class AutoRole(commands.Cog):
     @commands.has_role('ghost-proxy-vanguard')
     @commands.guild_only()
     async def promote_to_member(self, ctx, *users: str):
-        """WIP: Promotes User(s) to Members(s)
+        """Sets User(s) to Members(s)
+
+        Currently implies _not_ a ghost-proxy-envoy (WIP)
 
         Can only be used by Vanguard (atm).
         """
@@ -534,7 +536,7 @@ class AutoRole(commands.Cog):
     @commands.has_role('ghost-proxy-vanguard')
     @commands.guild_only()
     async def promote_to_friend(self, ctx, *users: str):
-        """WIP: Promotes User(s) to Friend(s)
+        """Sets User(s) to Friend(s)
 
         Can only be used by Vanguard (atm).
         """
@@ -552,7 +554,9 @@ class AutoRole(commands.Cog):
     @commands.has_any_role('ghost-proxy-vanguard', 'div2-admin')
     @commands.guild_only()
     async def set_to_envoy(self, ctx, *users: str):
-        """WIP: Sets User(s) to Envoy(s)
+        """Sets User(s) to Envoy(s)
+
+        Currently implies _not_ having ghost-proxy-member (WIP)
 
         Can only be used by Vanguard and Div2 Admins (atm).
         """
@@ -578,7 +582,7 @@ class AutoRole(commands.Cog):
     @commands.has_any_role('ghost-proxy-vanguard', 'div2-admin')
     @commands.guild_only()
     async def remove_envoy(self, ctx, *users: str):
-        """WIP: Removes Envoy(s) rom User(s)
+        """Removes Envoy(s) from User(s)
 
         Can only be used by Vanguard and Div2 Admins (atm).
         """
@@ -596,7 +600,9 @@ class AutoRole(commands.Cog):
     @commands.has_role('ghost-proxy-vanguard')
     @commands.guild_only()
     async def set_to_legacy(self, ctx, *users: str):
-        """WIP: Sets User(s) to Legacy Friend(s)
+        """Sets User(s) to Legacy Friend(s)
+
+        Removes gp-member and gp-admin.
 
         Can only be used by Vanguard (atm).
         """
@@ -608,7 +614,10 @@ class AutoRole(commands.Cog):
                 'ghost-proxy-legacy',
             ],
             users,
-            role_limits=['ghost-proxy-member']
+            role_limits=[
+                'ghost-proxy-member',
+                'ghost-proxy-admin'
+            ]
         )
 
     # TODO: RESET MEMBER
@@ -617,7 +626,9 @@ class AutoRole(commands.Cog):
     @commands.has_role('ghost-proxy-gatekeeper')
     @commands.guild_only()
     async def reset_user(self, ctx, *users: str):
-        """WIP: Sets User(s) to Legacy Friend(s)
+        """Removes all GP roles from a user
+
+        Removes friend, legacy, member, admin, envoy
 
         Can only be used by Gatekeeper (atm).
         """
@@ -635,11 +646,11 @@ class AutoRole(commands.Cog):
             action='remove'
         )
 
-    @commands.command(name='get-non-roles', aliases=['lnr', 'arn'])
+    @commands.command(name='list-non-roles', aliases=['lnr', 'arn'])
     @commands.has_role('ghost-proxy-vanguard')
     @commands.guild_only()
-    async def get_non_role_users(self, ctx):
-        """WIP: Gets all non-role Discord users
+    async def list_non_role_users(self, ctx):
+        """Lists all non-role Discord users
 
         Outputs a reference list for use with other AutoRole commands.
 
@@ -667,13 +678,15 @@ class AutoRole(commands.Cog):
 
         await ctx.send(embed=embed)
 
-    @commands.command(name='role-stats', aliases=['rs'])
-    @commands.has_role('ghost-proxy-admin')
+    @commands.command(name='list-role-stats', aliases=['rs', 'role-stats'])
+    @commands.has_role('ghost-proxy-vanguard')
     @commands.guild_only()
     async def role_stats(self, ctx):
-        """WIP: Lists Discord role stats
+        """Lists Discord role stats
 
-        Can only be used by Admins (atm).
+        Provides a list of all Discord members without any Ghost Proxy roles
+
+        Can only be used by vanguard (atm).
         """
         async with ctx.typing():
             num_roles = len(ctx.guild.roles) - 1  # account for `@everyone`
