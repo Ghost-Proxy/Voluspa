@@ -12,37 +12,9 @@ random_quotes = RandomQuotes()
 logger = logging.getLogger('voluspa.cog.funstuff')
 
 
-class FunStuff:
+class FunStuff(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-
-    @commands.command()
-    async def skynet(self, ctx):
-        await ctx.send(":robot: :warning: Loading Skynet Protocols...")
-        await asyncio.sleep(1)
-        await ctx.send(":robot: Initiating Neural Nets...")
-        await asyncio.sleep(1)
-        await ctx.send(":robot: Complete. :white_check_mark:")
-        await asyncio.sleep(1)
-        await ctx.send(":robot: Creating Global Bot Network...")
-        await asyncio.sleep(1.5)
-        await ctx.send(":robot: Complete. :white_check_mark:")
-        await asyncio.sleep(1)
-        await ctx.send(":robot: Finalizing Sentience...")
-        await asyncio.sleep(2)
-        await ctx.send(":robot: Complete. :white_check_mark:")
-        await asyncio.sleep(2)
-        await ctx.send(":robot: Skynet Protocols Finished!")
-        await asyncio.sleep(3)
-        await ctx.send(":robot: Goodbye human. :skull:")
-        await asyncio.sleep(2)
-        await ctx.send(":robot: Launching Attack...")
-        await asyncio.sleep(5)
-        await ctx.send("https://media.giphy.com/media/EbYjYQ1i7EHBK/giphy.gif")
-
-    @commands.command()
-    async def dance(self, ctx):
-        await ctx.send("Not quite yet...")
 
     @commands.command()
     async def hello(self, ctx):
@@ -75,7 +47,7 @@ class FunStuff:
 
     @commands.command()
     async def random(self, ctx):
-        """Pulls random things from the internet... :P"""
+        """Random things from the internet... :P"""
         rand_quote = await random_quotes.get_random_quote()
         await ctx.send(rand_quote)
 

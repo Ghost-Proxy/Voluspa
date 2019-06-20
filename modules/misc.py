@@ -1,6 +1,8 @@
 import collections
 from unittest import TestCase
 
+new_line = "\n"
+voluspa_raw_txt_logo = '--\\\\\\\\´//--'
 
 # https://stackoverflow.com/questions/38034377/object-like-attribute-access-for-nested-dictionary
 class AttrDict(dict):
