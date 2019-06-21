@@ -5,3 +5,6 @@ Bungie:
 
 Discord:
   api_key: ""
+
+Resources:
+  image_bucket_root_url: ''

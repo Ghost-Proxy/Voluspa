@@ -2,43 +2,50 @@
 
 """Voluspa Ghost Proxy Discord Bot"""
 
-VOLUSPA_VERSION = 'v0.0.4 build: 2019-01-26'
+VOLUSPA_VERSION = 'v0.0.7a'
 
 # REF:
 # https://gist.github.com/EvieePy/d78c061a4798ae81be9825468fe146be
 
 # Built-in Imports
-import os
-import sys
-import asyncio
-import logging
-from logging.handlers import RotatingFileHandler
-import traceback
+# import os
+# import sys
+# import asyncio
+# import logging
+# from logging.handlers import RotatingFileHandler
+# import traceback
 import datetime
 
-# Custom Imports
-from modules.fun import Quotes, RandomQuotes
-from modules.database import Database
 from modules.config import CONFIG
+
+# Custom Imports
+from modules.logger import Archivist
+archivist = Archivist()
+logger = archivist.get_logger()
+
+from modules.fun import Quotes
+from modules.database import Database
 from modules.discord_utils import get_prefix, update_status_task
 
 # Third-Party Imports
 import discord
 from discord.ext import commands
 
-from modules.logger import LOGGER as logger  # HACK
-
 # Setup Initial Stuff
+VOLUSPA_SHA = CONFIG.Voluspa.sha[:10]
 client = discord.Client()
+
+# These should perhaps be cogs..?
 quotes = Quotes()
-random_quotes = RandomQuotes()
 db = Database()
 
 cog_extensions = [
     'cogs.autorole',
     'cogs.systems',
     'cogs.funstuff',
-    'cogs.members'
+    'cogs.members',
+    'cogs.destinyart',
+    'cogs.utilities',
 ]
 
 # bot = commands.AutoShardedBot()

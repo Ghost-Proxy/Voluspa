@@ -1,5 +1,6 @@
 import os
 import yaml
+import datetime
 
 from modules.misc import merge_dicts, AttrDict
 
@@ -19,7 +20,21 @@ def read_config():
     Reads in ./config/secrets.yml in the format of config.yml for local dev env
     If ./config/secrets.yml is not present, they are pulled from env vars
     """
+    # TODO: This is convoluted...
     file_config = read_yaml('./config/config.yaml')
+
+    print('Setting Voluspa boot settings...')
+    voluspa_info = {
+        'Voluspa': {
+            'sha': os.getenv('SOURCE_VERSION', 'Unknown'),
+            'app_cwd': os.path.abspath(os.getcwd()),
+            'boot_time': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        }
+    }
+
+    merged_config_1 = merge_dicts(file_config, voluspa_info)
+    print(f'Merged Config:\n{merged_config_1}')
+
     secrets_path = os.path.join(os.getcwd(), './config/secrets.yaml')
     print(f'Attempting to load secrets from: {secrets_path}')
     if os.path.isfile(secrets_path):
@@ -35,12 +50,21 @@ def read_config():
             },
             'Discord': {
                 'api_key': os.environ['DISCORD_API_KEY']
-            }}
+            }
+        }
 
-    merged_config = merge_dicts(file_config, secrets)
-    nested_config = AttrDict.from_nested_dict(merged_config)
+    merged_config_2 = merge_dicts(merged_config_1, secrets)
+
+    nested_config = AttrDict.from_nested_dict(merged_config_2)
+    # Add resources from env
+    # TODO Redo this flow...
+    if not nested_config.Resources.image_bucket_root_url:
+        nested_config.Resources.image_bucket_root_url = os.getenv('IMAGE_BUCKET_ROOT_URL', '')
+
+    print(f'Voluspa merged config -- Resources:\n{nested_config.Resources}')
+    print(f'Voluspa merged config -- Voluspa:\n{nested_config.Voluspa}')
+
     return nested_config
 
 
 CONFIG = read_config()
-CONFIG['app_cwd'] = os.path.abspath(os.getcwd())

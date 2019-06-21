@@ -4,27 +4,70 @@ from logging.handlers import RotatingFileHandler
 
 from modules.config import CONFIG
 
-# Logging
-# TODO: Cleanup and consolidate / move to module...
-root_logger = logging.getLogger()
-root_logger.setLevel(logging.DEBUG)
-log_formatter = logging.Formatter('%(asctime)s [%(levelname)s] %(name)s:  %(message)s')
 
-file_handler = RotatingFileHandler(
-    filename=os.path.join(CONFIG.app_cwd, 'logs/voluspa.log'),
-    encoding='utf-8',
-    maxBytes=1024*1024*10,
-    backupCount=10
-)
-file_handler.setLevel(logging.DEBUG)
-file_handler.setFormatter(log_formatter)
+class Archivist(object):
+    def __init__(self):
+        self.logger = None
+        if self.logger is None:
+            self.logger = _setup_logging()
 
-stream_handler = logging.StreamHandler()
-stream_handler.setLevel(logging.DEBUG)
-stream_handler.setFormatter(log_formatter)
+    def get_logger(self):
+        if self.logger is None:
+            self.logger = _setup_logging()
+        return self.logger
 
-root_logger.addHandler(file_handler)
-root_logger.addHandler(stream_handler)
 
-LOGGER = logging.getLogger('voluspa')
+def _setup_logging():
+    logging.getLogger().handlers.clear()
+    root_logger = logging.getLogger()
+    root_logger.setLevel(logging.DEBUG)
+    log_formatter = logging.Formatter('%(asctime)s [%(levelname)s] %(name)s:  %(message)s')
+
+    # TODO if on heroku, don't run file logger?
+    log_file_path = os.path.join(CONFIG.Voluspa.app_cwd, 'logs/root.log')
+    print(f'Bootstrap - Setting logger path to: [{log_file_path}]')
+    file_handler = RotatingFileHandler(
+        filename=log_file_path,
+        encoding='utf-8',
+        maxBytes=1024*1024*10,
+        backupCount=10
+    )
+    file_handler.setLevel(logging.DEBUG)
+    file_handler.setFormatter(log_formatter)
+
+    stream_handler = logging.StreamHandler()
+    stream_handler.setLevel(logging.DEBUG)
+    stream_handler.setFormatter(log_formatter)
+
+    root_logger.addHandler(file_handler)
+    root_logger.addHandler(stream_handler)
+
+    discord_logger = logging.getLogger('discord')
+    discord_logger.setLevel(logging.DEBUG)
+    discord_log_file_path = os.path.join(CONFIG.Voluspa.app_cwd, 'logs/discord.log')
+    discord_file_handler = RotatingFileHandler(
+        filename=discord_log_file_path,
+        encoding='utf-8',
+        maxBytes=1024*1024*10,
+        backupCount=10
+    )
+    discord_file_handler.setFormatter(log_formatter)
+    discord_logger.addHandler(discord_file_handler)
+
+    voluspa_logger = logging.getLogger('voluspa')
+    voluspa_log_file_path = os.path.join(CONFIG.Voluspa.app_cwd, 'logs/voluspa.log')
+    voluspa_file_handler = RotatingFileHandler(
+        filename=voluspa_log_file_path,
+        encoding='utf-8',
+        maxBytes=1024*1024*10,
+        backupCount=10
+    )
+    voluspa_file_handler.setLevel(logging.DEBUG)
+    voluspa_file_handler.setFormatter(log_formatter)
+
+    voluspa_logger.info('Logging online!')
+    voluspa_logger.info(f'Log file [{"exists" if os.path.isfile(log_file_path) else "does NOT exist"}] at: [{log_file_path}]')
+    voluspa_logger.info(f'Log file [{"exists" if os.path.isfile(discord_log_file_path) else "does NOT exist"}] at: [{discord_log_file_path}]')
+    voluspa_logger.info(f'Log file [{"exists" if os.path.isfile(voluspa_log_file_path) else "does NOT exist"}] at: [{voluspa_log_file_path}]')
+    return voluspa_logger
 

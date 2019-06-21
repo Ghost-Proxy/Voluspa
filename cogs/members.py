@@ -12,9 +12,14 @@ import aiohttp
 import discord
 from discord.ext import commands
 import requests
-import fuzzyset  # TODO: Meh, need to revisit
+# import fuzzyset  # TODO: Meh, need to revisit
+# https://github.com/seatgeek/fuzzywuzzy <- instead
+
+from modules.custom_embed import default_embed, format_list
 
 logger = logging.getLogger('voluspa.cog.members')
+
+from modules.custom_embed import default_embed
 
 
 def filter_character_types(clan_characters, min_level=0):
@@ -339,20 +344,22 @@ def bungie_get_profile(player_name=None):
     return
 
 
-class Members:
+class Members(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command()
+    @commands.command(aliases=['m'])
+    @commands.cooldown(1, 180, commands.BucketType.guild)
     @commands.guild_only()
     async def members(self, ctx):
         """Returns Discord member information"""
+        # TODO: This is a mess and needs to be unwound
         async with ctx.typing():
         # print(member for member in ctx.message.server.members)
             #dis_client = discord.Client()
             #member_list = [member for member in dis_client.get_all_members()]
             regex_alphanumeric = re.compile('[\W_]+', re.UNICODE)
-            member_list = [member for member in self.bot.get_all_members()]
+            member_list = [member for member in self.bot.get_all_members()]  # TODO: dangerous
             member_dict = {}
             for member in member_list:
                 member_dict[member.id] = {
@@ -361,7 +368,6 @@ class Members:
                     'nick': member.nick,
                     'roles': member.roles,
                     'top_role': member.top_role
-
                 }
             # member_info = ["ID: {}\n\tName: {}\n\tDisplayName: {}\n\tNickname: {}\n\tRoles: {}\n\t"]
             #await dis_client.close()
@@ -417,43 +423,43 @@ class Members:
                 # return re.sub(r'([^\s\w]|_)+', '', _string)
                 # return re.sub(r'\W+', '', _string)
 
-            bungie_member_fuzzyset = fuzzyset.FuzzySet()
-            for member in bungie_member_list_alpha_sorted:
-                bungie_member_fuzzyset.add(sanitize_string(member.lower()))
-
-            discord_member_fuzzyset = fuzzyset.FuzzySet() #gram_size_lower=2, gram_size_upper=6)
-            for member in alpha_sorted_gp_members:
-                discord_member_fuzzyset.add(sanitize_string(member.lower()))
+            # bungie_member_fuzzyset = fuzzyset.FuzzySet()
+            # for member in bungie_member_list_alpha_sorted:
+            #     bungie_member_fuzzyset.add(sanitize_string(member.lower()))
+            #
+            # discord_member_fuzzyset = fuzzyset.FuzzySet() #gram_size_lower=2, gram_size_upper=6)
+            # for member in alpha_sorted_gp_members:
+            #     discord_member_fuzzyset.add(sanitize_string(member.lower()))
 
             missing_discord_members = []
             missing_discord_admins = []
             fuzzy_missing_members = []
 
             for bungie_member in bungie_member_list_alpha_sorted:
-                fuzzy_results = discord_member_fuzzyset.get(bungie_member.lower())
+                # fuzzy_results = discord_member_fuzzyset.get(bungie_member.lower())
                 # logger.info('--> Fuzzy results for [{}]: {}'.format(
                 #     bungie_member,
                 #     fuzzy_results
                 # ))
-                fuzz_member_missing = True
-                if fuzzy_results:
-                    for fuzz_res in fuzzy_results:
-                        fuzz_confidence = fuzz_res[0]
-                        fuzz_name = fuzz_res[1]
-                        if fuzz_confidence > 0.5:
-                            logger.info('Fuzz Result -- FOUND -- for [{}]: {} (conf:{})'.format(
-                                bungie_member,
-                                fuzz_name,
-                                fuzz_confidence
-                            ))
-                            fuzz_member_missing = False
-                            break
-                if fuzz_member_missing:
-                    logger.info('Fuzz Result -- MISSING -- for [{}] - Fuzzy results: {}'.format(
-                        bungie_member,
-                        fuzzy_results
-                    ))
-                    fuzzy_missing_members.append(bungie_member)
+                # fuzz_member_missing = True
+                # if fuzzy_results:
+                #     for fuzz_res in fuzzy_results:
+                #         fuzz_confidence = fuzz_res[0]
+                #         fuzz_name = fuzz_res[1]
+                #         if fuzz_confidence > 0.5:
+                #             logger.info('Fuzz Result -- FOUND -- for [{}]: {} (conf:{})'.format(
+                #                 bungie_member,
+                #                 fuzz_name,
+                #                 fuzz_confidence
+                #             ))
+                #             fuzz_member_missing = False
+                #             break
+                # if fuzz_member_missing:
+                #     logger.info('Fuzz Result -- MISSING -- for [{}] - Fuzzy results: {}'.format(
+                #         bungie_member,
+                #         fuzzy_results
+                #     ))
+                #     fuzzy_missing_members.append(bungie_member)
 
                 member_missing = True
                 for discord_member in alpha_sorted_gp_members:
@@ -560,9 +566,7 @@ class Members:
             hunters, titans, warlocks, num_clan_chars = filter_character_types(clan_characters, min_level)
             num_filtered_chars = len(hunters) + len(titans) + len(warlocks)
             all_chars = hunters + titans + warlocks
-            result_msg = '--\\\\\\\\//--\n' \
-                '**Clan Character Stats**\n\n' \
-                '{}{}' \
+            result_msg = '{}{}' \
                 'Total Number of Characters {}: **{}**\n' \
                 '  - Lowest Light Level: {}\n' \
                 '  - Mean / Median Light Level: {} / {}\n' \
@@ -583,11 +587,16 @@ class Members:
                     await generate_char_stats_message(warlocks, num_filtered_chars, 'Warlocks')
                 )
         #await send_multipart_msg(ctx, msg_final)
-        await ctx.send(result_msg)
 
-    @commands.command(name='members-online')
-    @commands.guild_only()
+            embed = default_embed(
+                title='Clan Character Stats',
+                description=result_msg
+            )
+        await ctx.send(embed=embed)
+
+    @commands.command(name='members-online', aliases=['mo'])
     async def members_online(self, ctx):
+        """Lists Ghost Proxy Members currently playing."""
         async with ctx.typing():
             logger.info('Looking up currently online Ghost Proxy members...')
             num_members, member_list = await async_get_clan_members()
@@ -596,22 +605,25 @@ class Members:
                 for member in member_list
                 if member['isOnline']
             ]
-            result_msg = '--\\\\\\\\//--\n\n' \
-                '**Ghost Proxy Members In-Game: {}**\n' \
-                '```  {}```'.format(
-                    len(cur_members_online),
-                    '\n  '.join(cur_members_online)
-                )
-        await ctx.send(result_msg)
+            result_msg = f'{len(cur_members_online)} Members Online\n' \
+                f'{format_list(cur_members_online, none_msg="None - Check back soon!")}'
+
+            mem_online_embed = default_embed(
+                title='Ghost Proxy Members In-Game',
+                description=result_msg
+            )
+
+        await ctx.send(embed=mem_online_embed)
 
     # @bot.command(name='get-profile')
     # async def get_player_profile(ctx, *, player_name):
     #     bungie_get_profile()
     #     return
 
-    @commands.command(name='find-player')
+    @commands.command(name='find-player', aliases=['fp'])
     @commands.guild_only()
     async def find_player(self, ctx, *, player_name):
+        """Simple Bungie PC player search."""
         #num_players, results = bungie_search_users(player_name)
         results = bungie_search_users(player_name)
         logger.info('>> Bungie Player Search Results: {}'.format(results))
