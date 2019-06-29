@@ -665,7 +665,7 @@ class AutoRole(commands.Cog):
     @commands.command(name='remove-all-roles', aliases=['NFO', 'AR-RAR'])
     @commands.has_role('founder')
     async def remove_all_roles(self, ctx, *users: str):
-        """Removes all GP roles from a user
+        """Removes ALL roles from a user!
 
         Removes friend, legacy, member, admin, envoy
 
