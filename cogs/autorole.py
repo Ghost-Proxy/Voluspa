@@ -110,66 +110,67 @@ class AutoRole(commands.Cog):
                            options: Dict = None,
                            allow_all=False):
         # TODO: Make it so that if the roles list is not supplied, the entire roles_dict is used?
-        # Set options and values
-        if not options:
-            options = {}
-        action = options.get('action', 'add')
-        if action not in ['add', 'remove']:
-            return
-        update_message = options.get('update_message', 'set')
-        if action and update_message == 'add':
-            update_message = 'added'
-        elif action and update_message == 'remove':
-            update_message = 'removed'
-        confirm = options.get('confirm', True)
-        role_dict = self.roles_dicts[role_class]
+        async with ctx.typing():
+            # Set options and values
+            if not options:
+                options = {}
+            action = options.get('action', 'add')
+            if action not in ['add', 'remove']:
+                return
+            update_message = options.get('update_message', 'set')
+            if action and update_message == 'add':
+                update_message = 'added'
+            elif action and update_message == 'remove':
+                update_message = 'removed'
+            confirm = options.get('confirm', True)
+            role_dict = self.roles_dicts[role_class]
 
-        if len(role_dict) <= 0:
-            logger.info('Invalid role class!')
-            return
+            if len(role_dict) <= 0:
+                logger.info('Invalid role class!')
+                return
 
-        # Process input and sanitize
-        logger.info(f'update_roles - roles_input: {roles}')
-        roles_to_update = process_role_inputs(roles, role_dict, allow_all=allow_all)
+            # Process input and sanitize
+            logger.info(f'update_roles - roles_input: {roles}')
+            roles_to_update = process_role_inputs(roles, role_dict, allow_all=allow_all)
 
-        print(f'Roles to Update: {roles_to_update}')
-        print(f'Role Dict: {role_dict}')
+            print(f'Roles to Update: {roles_to_update}')
+            print(f'Role Dict: {role_dict}')
 
-        if not list(roles_to_update):
-            return
+            if not list(roles_to_update):
+                return
 
-        # Build list of roles to add
-        updated_roles = [discord.utils.get(ctx.guild.roles, name=role) for role in roles_to_update]
+            # Build list of roles to add
+            updated_roles = [discord.utils.get(ctx.guild.roles, name=role) for role in roles_to_update]
 
-        # elif:  # if 'DJ' in [role.name for role in ctx.message.author.roles]:
-        # pass
+            # elif:  # if 'DJ' in [role.name for role in ctx.message.author.roles]:
+            # pass
 
-        # TODO: Add check if roles are already applied and avoid doing it again?
+            # TODO: Add check if roles are already applied and avoid doing it again?
 
-        print(f'"Updating Roles (action: {action}): {updated_roles}')
-        if user_id:
-            user = ctx.guild.get_member(user_id)
-        else:
-            user = ctx.message.author
+            print(f'"Updating Roles (action: {action}): {updated_roles}')
+            if user_id:
+                user = ctx.guild.get_member(user_id)
+            else:
+                user = ctx.message.author
 
-        if action == 'add':
-            await user.add_roles(*updated_roles)
-        elif action == 'remove':
-            await user.remove_roles(*updated_roles)
-        else:
-            print(f"Unknown Action for Update Roles!")
-            return
+            if action == 'add':
+                await user.add_roles(*updated_roles)
+            elif action == 'remove':
+                await user.remove_roles(*updated_roles)
+            else:
+                print(f"Unknown Action for Update Roles!")
+                return
 
-        if confirm:
-            confirm_embed = default_embed(
-                title='Role Update',
-                description=f'\n{update_message.capitalize()} role(s):{format_list(roles_to_update)}',
-                color=STYLES.colors.success
-            )
-            await ctx.send(f'{ctx.message.author.mention}', embed=confirm_embed)
+            if confirm:
+                confirm_embed = default_embed(
+                    title='Role Update',
+                    description=f'\n{update_message.capitalize()} role(s):{format_list(roles_to_update)}',
+                    color=STYLES.colors.success
+                )
+                await ctx.send(f'{ctx.message.author.mention}', embed=confirm_embed)
 
-        # TODO: Better guarantee of succees...
-        return True
+            # TODO: Better guarantee of succees...
+            return True
 
     async def assign_roles_to_user(self,
                                    ctx,
