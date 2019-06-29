@@ -107,6 +107,7 @@ class AutoRole(commands.Cog):
                            user_id: int = None,
                            options: Dict = None,
                            allow_all=False):
+        # TODO: Make it so that if the roles list is not supplied, the entire roles_dict is used?
         # Set options and values
         if not options:
             options = {}
@@ -656,6 +657,52 @@ class AutoRole(commands.Cog):
             ctx,
             'ghost_proxy_roles',
             list(self.roles_dicts['ghost_proxy_roles'].keys()),
+            users,
+            action='remove'
+        )
+
+    # TODO: RESETS ALL ROLES -- DANGER!!!
+    @commands.command(name='remove-all-roles', aliases=['NFO', 'AR-RAR'])
+    @commands.has_role('founder')
+    async def remove_all_roles(self, ctx, *users: str):
+        """Removes all GP roles from a user
+
+        Removes friend, legacy, member, admin, envoy
+
+        Can only be used by Gatekeeper (atm).
+        """
+        await self.assign_roles_to_user(
+            ctx,
+            'ghost_proxy_roles',
+            list(self.roles_dicts['ghost_proxy_roles'].keys()),
+            users,
+            action='remove'
+        )
+        await self.assign_roles_to_user(
+            ctx,
+            'ghost_proxy_elevated_roles',
+            list(self.roles_dicts['ghost_proxy_elevated_roles'].keys()),
+            users,
+            action='remove'
+        )
+        await self.assign_roles_to_user(
+            ctx,
+            'ghost_proxy_protected_roles',
+            list(self.roles_dicts['ghost_proxy_protected_roles'].keys()),
+            users,
+            action='remove'
+        )
+        await self.assign_roles_to_user(
+            ctx,
+            'game_modes',
+            list(self.roles_dicts['game_modes'].keys()),
+            users,
+            action='remove'
+        )
+        await self.assign_roles_to_user(
+            ctx,
+            'other_games',
+            list(self.roles_dicts['other_games'].keys()),
             users,
             action='remove'
         )
