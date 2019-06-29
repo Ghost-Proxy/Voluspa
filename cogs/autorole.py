@@ -685,7 +685,7 @@ class AutoRole(commands.Cog):
         await self.assign_roles_to_user(
             ctx,
             'ghost_proxy_protected_roles',
-            list(self.roles_dicts['ghost_proxy_protected_roles'].keys()),
+            ['ghost-proxy-gatekeeper'],
             users,
             action='remove'
         )
