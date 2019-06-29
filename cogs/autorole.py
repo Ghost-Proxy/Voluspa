@@ -655,13 +655,7 @@ class AutoRole(commands.Cog):
         await self.assign_roles_to_user(
             ctx,
             'ghost_proxy_roles',
-            [
-                'ghost-proxy-friend',
-                'ghost-proxy-legacy',
-                'ghost-proxy-member',
-                'ghost-proxy-admin',
-                'ghost-proxy-envoy',
-            ],
+            list(self.roles_dicts['ghost_proxy_roles'].keys()),
             users,
             action='remove'
         )
