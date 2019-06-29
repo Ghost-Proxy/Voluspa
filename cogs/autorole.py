@@ -308,7 +308,7 @@ class AutoRole(commands.Cog):
                         f'{format_list(roles)}',
                         color=STYLES.colors.success
                     )
-                    await ctx.send(f'{ctx.message.author.mention}', embed=role_embed)
+
                     # await self.update_roles(ctx, 'ghost_proxy_roles', ['gpf'])  # TODO: Abstract this to params...
                     await self.update_roles(
                         ctx,
@@ -320,6 +320,10 @@ class AutoRole(commands.Cog):
                             'action': action
                         }
                     )
+
+                    # Send message after doing the above
+                    # TODO: Ensure guarantee of removal before sending below...?
+                    await ctx.send(f'{ctx.message.author.mention}', embed=role_embed)
             else:
                 error_embed = default_embed(
                     title='No Matching User',
