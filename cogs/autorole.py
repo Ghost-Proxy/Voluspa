@@ -292,9 +292,9 @@ class AutoRole(commands.Cog):
                 if ok_to_update_roles:
 
                     if action == 'add':
-                        action_message = f'adding Role(s): :heavy_plus_sign:\n\n'
+                        action_message = f'**+** adding Role(s):'
                     elif action == 'remove':
-                        action_message = f'removing Role(s): :heavy_minus_sign:\n\n'
+                        action_message = f'**-** removing Role(s):'
                     else:  # TODO: Pretty sure this should not be possible... ?
                         action_message = f'setting Role(s):'
 
