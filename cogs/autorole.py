@@ -640,7 +640,11 @@ class AutoRole(commands.Cog):
             users,
             role_limits=[
                 'ghost-proxy-member',
-                'ghost-proxy-admin'
+                'ghost-proxy-admin',
+                'raid-lead',
+                'crucible-lead',
+                'gambit-lead',
+                'strike-nf-pve-lead'
             ]
         )
 
