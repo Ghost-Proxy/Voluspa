@@ -86,6 +86,8 @@ class AutoRole(commands.Cog):
                 'gambit-lead': ['gambit-lead'],
                 'crucible-lead': ['crucible-lead'],
                 'strike-nf-pve-lead': ['strike-nf-pve-lead'],
+                # And Div2 admins
+                'div2-admin': ['div2-admin'],
                 # Same with sherpa
                 'sherpa-active': ['sherpa-active'],
                 'sherpa-inactive': ['sherpa-inactive'],
