@@ -292,14 +292,11 @@ class AutoRole(commands.Cog):
                 if ok_to_update_roles:
 
                     if action == 'add':
-                        action_message = f'adding Role(s):\n\n'
-                        embed_color = STYLES.colors.success
+                        action_message = f'adding Role(s): :heavy_plus_sign:\n\n'
                     elif action == 'remove':
-                        action_message = f'removing Role(s):\n\n'
-                        embed_color = STYLES.colors.danger
+                        action_message = f'removing Role(s): :heavy_minus_sign:\n\n'
                     else:  # TODO: Pretty sure this should not be possible... ?
                         action_message = f'setting Role(s):\n\n'
-                        embed_color = STYLES.colors.success
 
                     role_embed = default_embed(
                         title=':white_check_mark: Setting User Roles',
@@ -307,7 +304,7 @@ class AutoRole(commands.Cog):
                         f'({user_matches[0]["nick"]})`\n\n'
                         f'{action_message}'
                         f'{format_list(roles)}',
-                        color=embed_color
+                        color=STYLES.colors.success
                     )
                     await ctx.send(f'{ctx.message.author.mention}', embed=role_embed)
                     # await self.update_roles(ctx, 'ghost_proxy_roles', ['gpf'])  # TODO: Abstract this to params...
