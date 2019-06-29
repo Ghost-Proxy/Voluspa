@@ -296,12 +296,12 @@ class AutoRole(commands.Cog):
                     elif action == 'remove':
                         action_message = f'removing Role(s): :heavy_minus_sign:\n\n'
                     else:  # TODO: Pretty sure this should not be possible... ?
-                        action_message = f'setting Role(s):\n\n'
+                        action_message = f'setting Role(s):\n'
 
                     role_embed = default_embed(
                         title=':white_check_mark: Setting User Roles',
                         description=f'`\n{user_matches[0]["name"]}#{user_matches[0]["salt"]} '
-                        f'({user_matches[0]["nick"]})`\n\n'
+                        f'({user_matches[0]["nick"]})`\n'
                         f'{action_message}'
                         f'{format_list(roles)}',
                         color=STYLES.colors.success
