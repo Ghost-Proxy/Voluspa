@@ -65,7 +65,8 @@ class AutoRole(commands.Cog):
                 'og-ow': ['overwatch', 'ow'],
                 # 'og-rage': ['rage 2', 'rage'],
                 'og-r6s': ['rainbow six siege', 'r6s', 'rss', 'rainbow', 'siege', 'rainbow six', 'rainbow six: siege'],
-                'og-steep': ['steep']
+                'og-steep': ['steep'],
+                'og-warf': ['warframe', 'wf', 'warf']
                 # 'og-wow': ['world of warcraft', 'wow', 'warcraft'],
             },
             'raid_leads': {
