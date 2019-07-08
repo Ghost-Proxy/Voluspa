@@ -90,6 +90,7 @@ class Utilities(commands.Cog):
                 berlin_time = await get_online_datetime('Europe/Berlin')
                 moscow_time = await get_online_datetime('Europe/Moscow')
                 shanghai_time = await get_online_datetime('Asia/Shanghai')
+                australia_east_time = await get_online_datetime('Australia/Sydney')
 
             datetime_embed = default_embed(
                 title=":globe_with_meridians: World Clocks :clock1:",
@@ -117,6 +118,7 @@ class Utilities(commands.Cog):
                 datetime_embed.add_field(name='Dubai', value=display_datetime(dubai_time[0], 'GST'), inline=False)
                 datetime_embed.add_field(name='Shanghai', value=display_datetime(*shanghai_time), inline=False)
                 datetime_embed.add_field(name='Tokyo', value=display_datetime(*tokyo_time), inline=False)
+                datetime_embed.add_field(name='Australia East', value=display_datetime(*australia_east_time), inline=False)
                 datetime_embed.add_field(name='Auckland', value=display_datetime(*auckland_time), inline=False)
             else:
                 datetime_embed.add_field(name='Hawaii', value=display_datetime(*hawaii_time, verbose=verbose))
