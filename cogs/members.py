@@ -143,7 +143,7 @@ async def async_get_clan_members():
                 bungie_results = raw_json['Response']
                 member_list = bungie_results['results']
                 num_members = bungie_results['totalResults']
-                # logger.info('BUNGIE MEMBER LIST:\n{}'.format(member_list))
+                logger.info('BUNGIE MEMBER LIST:\n{}'.format(member_list))
                 return num_members, member_list
 
 
