@@ -367,15 +367,15 @@ class Members(commands.Cog):
                 }
 
             gp_member_roles = filter_members_by_field(member_dict, 'roles')
-            logger.info(pprint.pformat(gp_member_roles))
+            #logger.info(pprint.pformat(gp_member_roles))
             gp_members = get_members_name_list_by_role(gp_member_roles, 'ghost-proxy-member')
             alpha_sorted_gp_members = sorted(gp_members, key=str.lower)
-            logger.info("GP Members on Discord ({}):\n{}\n".format(len(alpha_sorted_gp_members), alpha_sorted_gp_members))
+            #logger.info("GP Members on Discord ({}):\n{}\n".format(len(alpha_sorted_gp_members), alpha_sorted_gp_members))
 
             bungie_num_members, bungie_member_list = get_bungie_member_list()
             _, bungie_member_types_dict = get_bungie_member_type_dict()
             bungie_member_list_alpha_sorted = sorted(bungie_member_list, key=str.lower)
-            logger.info("GP Members Bungie.net ({}):\n{}\n".format(bungie_num_members, bungie_member_list_alpha_sorted))
+            #logger.info("GP Members Bungie.net ({}):\n{}\n".format(bungie_num_members, bungie_member_list_alpha_sorted))
             # """
             # msg2 = '---\nGhost Proxy Members (Bungie.net): {}\n\n```  {}```'.format(
             #     bungie_num_members,
@@ -449,7 +449,7 @@ class Members(commands.Cog):
                 member_missing = True
                 for discord_member in alpha_sorted_gp_members:
                     #print('comparing: {} to {}'.format(bungie_member.lower(), discord_member.lower()))
-                    logger.info(f'Comparing -- Bungie member: [{bungie_member.lower()}] | Discord member: [{discord_member.lower()}]')
+                    #logger.info(f'Comparing -- Bungie member: [{bungie_member.lower()}] | Discord member: [{discord_member.lower()}]')
                     if bungie_member.lower() in discord_member.lower() or discord_member.lower() in bungie_member.lower():
                         member_missing = False
                         break
@@ -465,10 +465,10 @@ class Members(commands.Cog):
                 for bungie_member in bungie_member_list_alpha_sorted:
                     if bungie_member.lower() in discord_member.lower():
                         member_found = True
-                        logger.info('Reverse Lookup -- Found: {}'.format(bungie_member))
+                        #logger.info('Reverse Lookup -- Found: {}'.format(bungie_member))
                         break
                 if not member_found:
-                    logger.info('>>> Reverse Lookup -- NON-MEMBER: {}'.format(discord_member))
+                    #logger.info('>>> Reverse Lookup -- NON-MEMBER: {}'.format(discord_member))
                     invalid_discord_members.append(discord_member)
 
             logger.info("GP Members missing from Discord ({}):\n{}\n".format(
@@ -502,6 +502,8 @@ class Members(commands.Cog):
             error_diff = (num_gp_all_members_bungie - num_gp_all_members_discord) - num_gp_all_members_missing
             raw_bungie_diff = num_gp_all_members_bungie - num_gp_all_members_discord
             percent_gp_all_members_missing = math.ceil(num_gp_all_members_discord / num_gp_all_members_bungie * 100)
+
+            logger.info(f'Potential Invalid members: {invalid_discord_members}')
 
             msg_final = '--\\\\\\\\//--\n' \
                         '**Ghost Proxy Members on Discord: {}**\n' \
