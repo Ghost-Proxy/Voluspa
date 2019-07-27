@@ -1,6 +1,6 @@
-PyYAML==3.13
-requests==2.19.1
-asyncpg==0.18.2
-aiohttp==3.3.2
+PyYAML==5.1.1
+requests==2.22.0
+asyncpg==0.18.3
+aiohttp==3.5.4
 fuzzywuzzy[speedup]==0.17.0
 discord.py[voice]==1.2.3
