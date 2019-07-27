@@ -23,6 +23,7 @@ async def update_status_task(bot, quotes):
         await asyncio.sleep(30)
 
 
+# TODO: Create a multipart(paged) embed...
 async def send_multipart_msg(ctx, raw_msg):
     msg_len = len(raw_msg)
     # >>> chunks, chunk_size = len(x), len(x)/4

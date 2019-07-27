@@ -65,7 +65,8 @@ class AutoRole(commands.Cog):
                 'og-ow': ['overwatch', 'ow'],
                 # 'og-rage': ['rage 2', 'rage'],
                 'og-r6s': ['rainbow six siege', 'r6s', 'rss', 'rainbow', 'siege', 'rainbow six', 'rainbow six: siege'],
-                'og-steep': ['steep']
+                'og-steep': ['steep'],
+                'og-warf': ['warframe', 'wf', 'warf']
                 # 'og-wow': ['world of warcraft', 'wow', 'warcraft'],
             },
             'raid_leads': {
@@ -80,13 +81,24 @@ class AutoRole(commands.Cog):
                 'ghost-proxy-member': ['gpm', 'gp-member', 'ghost-proxy-member'],
                 'ghost-proxy-legacy': ['gpl', 'gp-legacy', 'ghost-proxy-legacy'],
                 'ghost-proxy-envoy': ['gpe', 'gp-envoy', 'ghost-proxy-envoy'],
-            },
+                'ghost-proxy-admin': ['admin', 'gp-admin', 'ghost-proxy-admin'],
+                # Include lead roles for reset
+                'raid-lead': ['raid-lead'],
+                'gambit-lead': ['gambit-lead'],
+                'crucible-lead': ['crucible-lead'],
+                'strike-nf-pve-lead': ['strike-nf-pve-lead'],
+                # And Div2 admins
+                'div2-admin': ['div2-admin'],
+                # Same with sherpa
+                'sherpa-active': ['sherpa-active'],
+                'sherpa-inactive': ['sherpa-inactive'],
+            },  # TODO: Figure out what the plan was with the below...
             'ghost_proxy_elevated_roles': {
                 'ghost-proxy-vanguard': ['vanguard', 'gp-vanguard', 'ghost-proxy-vanguard'],
                 'ghost-proxy-admin': ['admin', 'gp-admin', 'ghost-proxy-admin']
             },
             'ghost_proxy_protected_roles': {
-                'ghost-proxy-founder': ['founder', 'gp-founder', 'ghost-proxy-founder'],
+                'founder': ['founder', 'gp-founder', 'ghost-proxy-founder'],  # 'ghost-proxy-founder'
                 'ghost-proxy-gatekeeper': ['gatekeeper', 'gp-gatekeeper', 'ghost-proxy-gatekeeper']
             }
         }
@@ -98,66 +110,68 @@ class AutoRole(commands.Cog):
                            user_id: int = None,
                            options: Dict = None,
                            allow_all=False):
-        # Set options and values
-        if not options:
-            options = {}
-        action = options.get('action', 'add')
-        if action not in ['add', 'remove']:
-            return
-        update_message = options.get('update_message', 'set')
-        if action and update_message == 'add':
-            update_message = 'added'
-        elif action and update_message == 'remove':
-            update_message = 'removed'
-        confirm = options.get('confirm', True)
-        role_dict = self.roles_dicts[role_class]
+        # TODO: Make it so that if the roles list is not supplied, the entire roles_dict is used?
+        async with ctx.typing():
+            # Set options and values
+            if not options:
+                options = {}
+            action = options.get('action', 'add')
+            if action not in ['add', 'remove']:
+                return
+            update_message = options.get('update_message', 'set')
+            if action and update_message == 'add':
+                update_message = 'added'
+            elif action and update_message == 'remove':
+                update_message = 'removed'
+            confirm = options.get('confirm', True)
+            role_dict = self.roles_dicts[role_class]
 
-        if len(role_dict) <= 0:
-            logger.info('Invalid role class!')
-            return
+            if len(role_dict) <= 0:
+                logger.info('Invalid role class!')
+                return
 
-        # Process input and sanitize
-        logger.info(f'update_roles - roles_input: {roles}')
-        roles_to_update = process_role_inputs(roles, role_dict, allow_all=allow_all)
+            # Process input and sanitize
+            logger.info(f'update_roles - roles_input: {roles}')
+            roles_to_update = process_role_inputs(roles, role_dict, allow_all=allow_all)
 
-        print(f'Roles to Update: {roles_to_update}')
-        print(f'Role Dict: {role_dict}')
+            print(f'Roles to Update: {roles_to_update}')
+            print(f'Role Dict: {role_dict}')
 
-        if not list(roles_to_update):
-            return
+            if not list(roles_to_update):
+                return
 
-        # Build list of roles to add
-        updated_roles = [discord.utils.get(ctx.guild.roles, name=role) for role in roles_to_update]
+            # Build list of roles to add
+            updated_roles = [discord.utils.get(ctx.guild.roles, name=role) for role in roles_to_update]
 
-        # elif:  # if 'DJ' in [role.name for role in ctx.message.author.roles]:
-        # pass
+            # elif:  # if 'DJ' in [role.name for role in ctx.message.author.roles]:
+            # pass
 
-        # TODO: Add check if roles are already applied and avoid doing it again?
+            # TODO: Add check if roles are already applied and avoid doing it again?
 
-        print(f'"Updating Roles (action: {action}): {updated_roles}')
-        if user_id:
-            user = ctx.guild.get_member(user_id)
-        else:
-            user = ctx.message.author
+            print(f'"Updating Roles (action: {action}): {updated_roles}')
+            if user_id:
+                user = ctx.guild.get_member(user_id)
+            else:
+                user = ctx.message.author
 
-        if action == 'add':
-            await user.add_roles(*updated_roles)
-        elif action == 'remove':
-            await user.remove_roles(*updated_roles)
-        else:
-            print(f"Unknown Action for Update Roles!")
-            return
+            if action == 'add':
+                await user.add_roles(*updated_roles)
+            elif action == 'remove':
+                await user.remove_roles(*updated_roles)
+            else:
+                print(f"Unknown Action for Update Roles!")
+                return
 
-        if confirm:
-            confirm_embed = default_embed(
-                title='Role Update',
-                description=f'\n{update_message.capitalize()} role(s):{format_list(roles_to_update)}',
-                color=STYLES.colors.success
-            )
-            await ctx.send(f'{ctx.message.author.mention}', embed=confirm_embed)
+            if confirm:
+                confirm_embed = default_embed(
+                    title='Role Update',
+                    description=f'\n{update_message.capitalize()} role(s):{format_list(roles_to_update)}',
+                    color=STYLES.colors.success
+                )
+                await ctx.send(f'{ctx.message.author.mention}', embed=confirm_embed)
 
-        # TODO: Better guarantee of succees...
-        return True
+            # TODO: Better guarantee of succees...
+            return True
 
     async def assign_roles_to_user(self,
                                    ctx,
@@ -280,15 +294,23 @@ class AutoRole(commands.Cog):
                                 await ctx.send(':no_entry: ERROR: Problem updating conflicting roles!')
 
                 if ok_to_update_roles:
+
+                    if action == 'add':
+                        action_message = f'**+** adding Role(s):'
+                    elif action == 'remove':
+                        action_message = f'**-** removing Role(s):'
+                    else:  # TODO: Pretty sure this should not be possible... ?
+                        action_message = f'setting Role(s):'
+
                     role_embed = default_embed(
                         title=':white_check_mark: Setting User Roles',
                         description=f'`\n{user_matches[0]["name"]}#{user_matches[0]["salt"]} '
                         f'({user_matches[0]["nick"]})`\n\n'
-                        f'to Role(s):\n\n'
+                        f'{action_message}'
                         f'{format_list(roles)}',
                         color=STYLES.colors.success
                     )
-                    await ctx.send(f'{ctx.message.author.mention}', embed=role_embed)
+
                     # await self.update_roles(ctx, 'ghost_proxy_roles', ['gpf'])  # TODO: Abstract this to params...
                     await self.update_roles(
                         ctx,
@@ -300,6 +322,10 @@ class AutoRole(commands.Cog):
                             'action': action
                         }
                     )
+
+                    # Send message after doing the above
+                    # TODO: Ensure guarantee of removal before sending below...?
+                    await ctx.send(f'{ctx.message.author.mention}', embed=role_embed)
             else:
                 error_embed = default_embed(
                     title='No Matching User',
@@ -616,13 +642,17 @@ class AutoRole(commands.Cog):
             users,
             role_limits=[
                 'ghost-proxy-member',
-                'ghost-proxy-admin'
+                'ghost-proxy-admin',
+                'raid-lead',
+                'crucible-lead',
+                'gambit-lead',
+                'strike-nf-pve-lead'
             ]
         )
 
     # TODO: RESET MEMBER
     # TODO: ADD EXCEPTION/BLOCK LIST (anyone below Gatekeeper)
-    @commands.command(name='autorole-reset', aliases=['ar-reset'])
+    @commands.command(name='remove-roles', aliases=['autorole-reset', 'ar-reset', 'reset-roles', 'roles-reset', 'ARR'])
     @commands.has_role('ghost-proxy-gatekeeper')
     @commands.guild_only()
     async def reset_user(self, ctx, *users: str):
@@ -635,13 +665,53 @@ class AutoRole(commands.Cog):
         await self.assign_roles_to_user(
             ctx,
             'ghost_proxy_roles',
-            [
-                'ghost-proxy-friend',
-                'ghost-proxy-legacy',
-                'ghost-proxy-member',
-                'ghost-proxy-admin',
-                'ghost-proxy-envoy',
-            ],
+            list(self.roles_dicts['ghost_proxy_roles'].keys()),
+            users,
+            action='remove'
+        )
+
+    # TODO: RESETS ALL ROLES -- DANGER!!!
+    @commands.command(name='remove-all-roles', aliases=['NFO', 'AR-RAR'])
+    @commands.has_role('founder')
+    async def remove_all_roles(self, ctx, *users: str):
+        """Removes ALL roles from a user!
+
+        Removes friend, legacy, member, admin, envoy
+
+        Can only be used by Gatekeeper (atm).
+        """
+        await self.assign_roles_to_user(
+            ctx,
+            'ghost_proxy_roles',
+            list(self.roles_dicts['ghost_proxy_roles'].keys()),
+            users,
+            action='remove'
+        )
+        await self.assign_roles_to_user(
+            ctx,
+            'ghost_proxy_elevated_roles',
+            list(self.roles_dicts['ghost_proxy_elevated_roles'].keys()),
+            users,
+            action='remove'
+        )
+        await self.assign_roles_to_user(
+            ctx,
+            'ghost_proxy_protected_roles',
+            ['ghost-proxy-gatekeeper'],
+            users,
+            action='remove'
+        )
+        await self.assign_roles_to_user(
+            ctx,
+            'game_modes',
+            list(self.roles_dicts['game_modes'].keys()),
+            users,
+            action='remove'
+        )
+        await self.assign_roles_to_user(
+            ctx,
+            'other_games',
+            list(self.roles_dicts['other_games'].keys()),
             users,
             action='remove'
         )

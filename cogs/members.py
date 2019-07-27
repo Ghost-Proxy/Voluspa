@@ -85,7 +85,6 @@ async def get_destiny_profile_characters(destiny_membership_id, membership_type)
     # https://bungie-net.github.io/multi/operation_get_Destiny2-GetProfile.html#operation_get_Destiny2-GetProfile
     # {'iconPath': '', 'membershipType': 4, 'membershipId': '4611686018467468651', 'displayName': 'Mirage'}
     # request_url = https://www.bungie.net/platform/Destiny2/4/Profile/4611686018467468651/
-    # r = requests.get(request_url, headers={'X-API-Key': bb9fce44fcc14387a36ba1d90f7ea300})
     target_endpoint = '/Destiny2/{}/Profile/{}/'.format(membership_type, destiny_membership_id)
     # ?components=Profiles,Characters
     profile_params = {'components': 'Profiles,Characters'}
@@ -144,7 +143,7 @@ async def async_get_clan_members():
                 bungie_results = raw_json['Response']
                 member_list = bungie_results['results']
                 num_members = bungie_results['totalResults']
-                # logger.info('BUNGIE MEMBER LIST:\n{}'.format(member_list))
+                logger.info('BUNGIE MEMBER LIST:\n{}'.format(member_list))
                 return num_members, member_list
 
 
@@ -355,11 +354,8 @@ class Members(commands.Cog):
         """Returns Discord member information"""
         # TODO: This is a mess and needs to be unwound
         async with ctx.typing():
-        # print(member for member in ctx.message.server.members)
-            #dis_client = discord.Client()
-            #member_list = [member for member in dis_client.get_all_members()]
             regex_alphanumeric = re.compile('[\W_]+', re.UNICODE)
-            member_list = [member for member in self.bot.get_all_members()]  # TODO: dangerous
+            member_list = [member for member in self.bot.get_all_members()]  # TODO: dangerous at scale...
             member_dict = {}
             for member in member_list:
                 member_dict[member.id] = {
@@ -369,28 +365,17 @@ class Members(commands.Cog):
                     'roles': member.roles,
                     'top_role': member.top_role
                 }
-            # member_info = ["ID: {}\n\tName: {}\n\tDisplayName: {}\n\tNickname: {}\n\tRoles: {}\n\t"]
-            #await dis_client.close()
+
             gp_member_roles = filter_members_by_field(member_dict, 'roles')
-            logger.info(pprint.pformat(gp_member_roles))
-            #sorted(lst, key=str.lower)
+            #logger.info(pprint.pformat(gp_member_roles))
             gp_members = get_members_name_list_by_role(gp_member_roles, 'ghost-proxy-member')
             alpha_sorted_gp_members = sorted(gp_members, key=str.lower)
-            logger.info("GP Members on Discord ({}):\n{}\n".format(len(alpha_sorted_gp_members), alpha_sorted_gp_members))
-            #_debug_member_info = pprint.pformat(gp_members)
-            #msg = "{}".format(_debug_member_info)  #'\n'.join(_debug_member_info))
-            # """
-            # msg1 = '---\n**Ghost Proxy Members on Discord: {}**\n_Total Discord Members: {}_\n\n```  {}```'.format(
-            #     len(alpha_sorted_gp_members),
-            #     len(member_dict),
-            #     '\n  '.join(alpha_sorted_gp_members)
-            # )
-            # """
+            #logger.info("GP Members on Discord ({}):\n{}\n".format(len(alpha_sorted_gp_members), alpha_sorted_gp_members))
 
             bungie_num_members, bungie_member_list = get_bungie_member_list()
             _, bungie_member_types_dict = get_bungie_member_type_dict()
             bungie_member_list_alpha_sorted = sorted(bungie_member_list, key=str.lower)
-            logger.info("GP Members Bungie.net ({}):\n{}\n".format(bungie_num_members, bungie_member_list_alpha_sorted))
+            #logger.info("GP Members Bungie.net ({}):\n{}\n".format(bungie_num_members, bungie_member_list_alpha_sorted))
             # """
             # msg2 = '---\nGhost Proxy Members (Bungie.net): {}\n\n```  {}```'.format(
             #     bungie_num_members,
@@ -464,7 +449,7 @@ class Members(commands.Cog):
                 member_missing = True
                 for discord_member in alpha_sorted_gp_members:
                     #print('comparing: {} to {}'.format(bungie_member.lower(), discord_member.lower()))
-                    logger.info(f'Comparing -- Bungie member: [{bungie_member.lower()}] | Discord member: [{discord_member.lower()}]')
+                    #logger.info(f'Comparing -- Bungie member: [{bungie_member.lower()}] | Discord member: [{discord_member.lower()}]')
                     if bungie_member.lower() in discord_member.lower() or discord_member.lower() in bungie_member.lower():
                         member_missing = False
                         break
@@ -480,10 +465,10 @@ class Members(commands.Cog):
                 for bungie_member in bungie_member_list_alpha_sorted:
                     if bungie_member.lower() in discord_member.lower():
                         member_found = True
-                        logger.info('Reverse Lookup -- Found: {}'.format(bungie_member))
+                        #logger.info('Reverse Lookup -- Found: {}'.format(bungie_member))
                         break
                 if not member_found:
-                    logger.info('>>> Reverse Lookup -- NON-MEMBER: {}'.format(discord_member))
+                    #logger.info('>>> Reverse Lookup -- NON-MEMBER: {}'.format(discord_member))
                     invalid_discord_members.append(discord_member)
 
             logger.info("GP Members missing from Discord ({}):\n{}\n".format(
@@ -517,6 +502,8 @@ class Members(commands.Cog):
             error_diff = (num_gp_all_members_bungie - num_gp_all_members_discord) - num_gp_all_members_missing
             raw_bungie_diff = num_gp_all_members_bungie - num_gp_all_members_discord
             percent_gp_all_members_missing = math.ceil(num_gp_all_members_discord / num_gp_all_members_bungie * 100)
+
+            logger.info(f'Potential Invalid members: {invalid_discord_members}')
 
             msg_final = '--\\\\\\\\//--\n' \
                         '**Ghost Proxy Members on Discord: {}**\n' \
