@@ -69,10 +69,10 @@ async def on_ready():
 async def on_member_join(member):
 
     server_info_channel = discord.utils.get(member.guild.channels, name='server-info')
-    rules_channel = discord.utils.get(member.guild.channels, name='server-info')
+    rules_channel = discord.utils.get(member.guild.channels, name='rules-conduct')
     # server-info ID: 548653299109462017 | <#server-info:548653299109462017>
     welcome_msg = f'Please read the above, {rules_channel.mention}, and {server_info_channel.mention}.\n' \
-                  f'Then take a look around, check things out, and have fun!\n' \
+                  f'Then take a look around, check things out, start chatting, and have fun!\n' \
                   f'Feel free to ask if you have any questions, thanks! <:cayde_thumbs_up:451649810894946314>'
     # channel = bot.get_channel(542680659228098561)
     channel = discord.utils.get(member.guild.channels, name='start-here')
