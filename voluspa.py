@@ -70,19 +70,18 @@ async def on_member_join(member):
 
     server_info_channel = discord.utils.get(member.guild.channels, name='server-info')
     # server-info ID: 548653299109462017 | <#server-info:548653299109462017>
-    welcome_msg = f'Welcome to Ghost Proxy! <:ghost_proxy:455130405398380564> \n' \
-                  f'Please read {server_info_channel.mention} and then take a look around and check things out. ' \
+    welcome_msg = f'Please read {server_info_channel.mention} and then take a look around and check things out. ' \
                   f'Feel free to ask if you have any questions, thanks! <:cayde_thumbs_up:451649810894946314>'
     # channel = bot.get_channel(542680659228098561)
     channel = discord.utils.get(member.guild.channels, name='start-here')
     # General ID: '374330517165965315'
     # Welcome - Start Here ID: '542680659228098561'
     embed = discord.Embed(
-        title='Welcome! :wave:',
+        title=f'Greetings {member.name}! :wave:',
         color=0x009933
     )
     embed.add_field(
-        name=f'\u200B',
+        name=f'Welcome to Ghost Proxy! <:ghost_proxy:455130405398380564>',
         value=welcome_msg,
         inline=False
     )
