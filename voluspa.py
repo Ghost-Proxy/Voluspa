@@ -73,11 +73,10 @@ async def on_member_join(member):
     channel = member.guild.system_channel  # This should be "general"
     embed = discord.Embed(
         title='Welcome! :wave:',
-        description=f'{member.mention}',
         color=0x009933
     )
     embed.add_field(
-        name='',
+        name=f'{member.mention}',
         value=welcome_msg,
         inline=False
     )
