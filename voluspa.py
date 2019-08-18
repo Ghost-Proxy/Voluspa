@@ -70,7 +70,10 @@ async def on_member_join(member):
     welcome_msg = f'Welcome to Ghost Proxy! <:ghost_proxy:455130405398380564> \n' \
                   f'Please read #server-info and then take a look around and check things out. ' \
                   f'Feel free to ask if you have any questions, thanks! <:cayde_thumbs_up:451649810894946314>'
-    channel = member.guild.system_channel  # This should be "general"
+    # channel = bot.get_channel(542680659228098561)
+    channel = discord.utils.get(member.guild.channels, name='start-here')
+    # General ID: '374330517165965315'
+    # Welcome - Start Here ID: '542680659228098561'
     embed = discord.Embed(
         title='Welcome! :wave:',
         color=0x009933
@@ -85,7 +88,7 @@ async def on_member_join(member):
         icon_url=f"{CONFIG.Resources.image_bucket_root_url}/voluspa/Voluspa_icon_64x64.png"
     )
     if channel is not None:
-        await channel.send(embed=embed)
+        await channel.send(embed=embed, delete_after=28800)  # delete after 8 hours
 
 
 # https://gist.github.com/AileenLumina/510438b241c16a2960e9b0b014d9ed06
