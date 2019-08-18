@@ -1,31 +1,25 @@
 #!/usr/bin/env python3
 
 """Voluspa Ghost Proxy Discord Bot"""
-
 VOLUSPA_VERSION = 'v0.0.7a'
+# Bot Example: https://gist.github.com/EvieePy/d78c061a4798ae81be9825468fe146be
 
-# REF:
-# https://gist.github.com/EvieePy/d78c061a4798ae81be9825468fe146be
-
-# Built-in Imports
-# import os
-# import sys
-# import asyncio
-# import logging
-# from logging.handlers import RotatingFileHandler
-# import traceback
 import datetime
-
-from modules.config import CONFIG
+import math
+import sys
+import traceback
 
 # Custom Imports
+from modules.config import CONFIG
 from modules.logger import Archivist
+
 archivist = Archivist()
 logger = archivist.get_logger()
 
 from modules.fun import Quotes
 from modules.database import Database
 from modules.discord_utils import get_prefix, update_status_task
+from modules.custom_embed import default_embed
 
 # Third-Party Imports
 import discord
@@ -70,6 +64,91 @@ async def on_ready():
     # ' bot.send_message('message.channel')
     # ' general_channel = discord.Object(id='channel_id_here')
     # ' await bot.send_message(message.channel, fmt.format(message))
+
+
+@bot.event
+async def on_member_join(member):
+    welcome_msg = f'Welcome to Ghost Proxy! <:ghost_proxy:455130405398380564> \n' \
+                  f'Please read #server-info and then take a look around and check things out. ' \
+                  f'Feel free to ask if you have any questions, thanks! <:cayde_thumbs_up:451649810894946314>'
+    channel = member.guild.system_channel  # This should be "general"
+
+    embed = default_embed(
+        title='Welcome! :wave:',
+        description=f'{member.mention}'
+    )
+    embed.add_field(
+        name='',
+        value=welcome_msg,
+        inline=False
+    )
+
+    if channel is not None:
+        await channel.send(embed=embed)
+
+
+# https://gist.github.com/AileenLumina/510438b241c16a2960e9b0b014d9ed06
+@bot.event
+async def on_command_error(ctx, error):
+    # if command has local error handler, return
+    if hasattr(ctx.command, 'on_error'):
+        return
+
+    # get the original exception
+    error = getattr(error, 'original', error)
+
+    if isinstance(error, commands.CommandNotFound):
+        return
+
+    if isinstance(error, commands.BotMissingPermissions):
+        missing = [perm.replace('_', ' ').replace('guild', 'server').title() for perm in error.missing_perms]
+        if len(missing) > 2:
+            fmt = '{}, and {}'.format("**, **".join(missing[:-1]), missing[-1])
+        else:
+            fmt = ' and '.join(missing)
+        _message = 'I need the **{}** permission(s) to run this command.'.format(fmt)
+        await ctx.send(_message)
+        return
+
+    # if isinstance(error, commands.DisabledCommand):
+    #     await ctx.send('This command has been disabled.')
+    #     return
+
+    if isinstance(error, commands.CommandOnCooldown):
+        await ctx.send("This command is on cooldown, please retry in {}s.".format(math.ceil(error.retry_after)))
+        return
+
+    if isinstance(error, commands.MissingPermissions):
+        missing = [perm.replace('_', ' ').replace('guild', 'server').title() for perm in error.missing_perms]
+        if len(missing) > 2:
+            fmt = '{}, and {}'.format("**, **".join(missing[:-1]), missing[-1])
+        else:
+            fmt = ' and '.join(missing)
+        _message = 'You need the **{}** permission(s) to use this command.'.format(fmt)
+        await ctx.send(_message)
+        return
+
+    if isinstance(error, commands.UserInputError):
+        await ctx.send("Invalid input.")
+        await ctx.command.send_command_help(ctx)
+        return
+
+    if isinstance(error, commands.NoPrivateMessage):
+        try:
+            await ctx.author.send('This command cannot be used in direct messages.')
+        except discord.Forbidden:
+            pass
+        return
+
+    if isinstance(error, commands.CheckFailure):
+        await ctx.send("You do not have permission to use this command.")
+        return
+
+    # ignore all other exception types, but print them to stderr
+    print('Ignoring exception in command {}:'.format(ctx.command), file=sys.stderr)
+
+    traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
+
 
 # TODO: Get Error Handling working...
 # @bot.event
