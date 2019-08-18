@@ -19,7 +19,6 @@ logger = archivist.get_logger()
 from modules.fun import Quotes
 from modules.database import Database
 from modules.discord_utils import get_prefix, update_status_task
-from modules.custom_embed import default_embed
 
 # Third-Party Imports
 import discord
@@ -72,17 +71,20 @@ async def on_member_join(member):
                   f'Please read #server-info and then take a look around and check things out. ' \
                   f'Feel free to ask if you have any questions, thanks! <:cayde_thumbs_up:451649810894946314>'
     channel = member.guild.system_channel  # This should be "general"
-
-    embed = default_embed(
+    embed = discord.Embed(
         title='Welcome! :wave:',
-        description=f'{member.mention}'
+        description=f'{member.mention}',
+        color=0x009933
     )
     embed.add_field(
         name='',
         value=welcome_msg,
         inline=False
     )
-
+    embed.set_footer(
+        text=f'via Völuspá with \u2764',
+        icon_url=f"{CONFIG.Resources.image_bucket_root_url}/voluspa/Voluspa_icon_64x64.png"
+    )
     if channel is not None:
         await channel.send(embed=embed)
 
