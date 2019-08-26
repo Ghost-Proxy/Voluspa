@@ -1,13 +1,13 @@
 FROM ubuntu:16.04
 LABEL maintainer="Mirage"
-ENV PY_VER="3.7.2"
+ENV PY_VER="3.7.3"
 ENV PY_VER_MAJOR="3.7"
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && \
     apt-get install -qq \
-        locales
-RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
+        locales && \
+    sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
     locale-gen
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
@@ -40,10 +40,8 @@ RUN python${PY_VER_MAJOR} --version && \
     python${PY_VER_MAJOR} -m pip install -U pip
 
 RUN mkdir -p /app/voluspa
-ADD . /app/voluspa/
 COPY . /app/voluspa/
 WORKDIR /app/voluspa
-
 RUN pip3 install -r requirements.txt
 
 # Dockerfile Build
@@ -53,7 +51,7 @@ RUN pip3 install -r requirements.txt
 # Running the container
 
     # Mac/Nix
-    # docker run -it -v $(pwd):/app/voluspa voluspa:local python3 ./voluspa.py
+    # docker run -it -v $(pwd):/app/voluspa:ro voluspa:local python3 ./voluspa.py
 
     # Powershell
-    # docker run -it -v ${$pwd.Path}:/app/voluspa voluspa:local python3 ./voluspa.py
+    # docker run -it -v ${$pwd.Path}:/app/voluspa:ro voluspa:local python3 ./voluspa.py
