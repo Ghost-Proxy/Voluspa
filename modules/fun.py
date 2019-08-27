@@ -58,6 +58,7 @@ async def get_xkcd_comic(latest=False):
     return xkcd_comic
 
 
+# TODO: Break this out into a better means of handling... could just be functional...
 class Quotes(object):
     def __init__(self):
         self.Voluspa_quotes = {
