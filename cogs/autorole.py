@@ -37,7 +37,7 @@ def match_users(user_list, username):
     return matched_users
 
 
-class AutoRole(commands.Cog):
+class Autorole(commands.Cog):
     """Automatic Role Management System (ARMS)"""
     # OR Discord Role Management heh DRM...
     # TODO: Improve this structure, use cog's and command structure/features better
@@ -722,7 +722,7 @@ class AutoRole(commands.Cog):
     async def list_non_role_users(self, ctx):
         """Lists all non-role Discord users
 
-        Outputs a reference list for use with other AutoRole commands.
+        Outputs a reference list for use with other Autorole commands.
 
         Can only be used by Vanguard (atm).
         """
@@ -733,7 +733,7 @@ class AutoRole(commands.Cog):
 
             embed = default_embed(
                 title='Current Non-Role Discord Users',
-                description='Reference list for use with other AutoRole commands'
+                description='Reference list for use with other Autorole commands'
             )
             embed.add_field(
                 name='Number of Non-Roles',
@@ -801,4 +801,4 @@ class AutoRole(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(AutoRole(bot))
+    bot.add_cog(Autorole(bot))
