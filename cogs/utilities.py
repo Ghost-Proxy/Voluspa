@@ -150,7 +150,7 @@ class Utilities(commands.Cog):
         """Creates a new poll: $poll "title" "opt-a" "opt-b" ..."""
         logger.info(f'New poll requested by {ctx.message.author.name}')
         if len(poll_args) < 3:
-            await ctx.send('Sorry, you poll needs at least 2 options!')
+            await ctx.send('Sorry, your poll needs at least 2 options!')
         elif len(poll_args) > 21:
             await ctx.send('Sorry, `$poll` only supports 20 options!')
         else:
