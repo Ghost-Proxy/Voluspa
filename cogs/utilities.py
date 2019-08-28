@@ -47,6 +47,18 @@ def display_datetime(datetime_str, time_zone=None, verbose=True):
     else:
         return 'Error (Missing)'
 
+def generate_poll_embed(poll_args):
+    desc_str = ""
+    react_char = 'a'
+    for arg_iter in range(1, len(poll_args)):
+        desc_str += f':regional_indicator_{react_char}: {poll_args[arg_iter]}\n'
+        react_char = chr(ord(react_char) + 1)
+    
+    return default_embed(
+        title=poll_args[0],
+        description=desc_str
+    )
+
 
 class Utilities(commands.Cog):
     """Helpful utility functions"""
@@ -132,6 +144,24 @@ class Utilities(commands.Cog):
                 datetime_embed.add_field(name='Auckland', value=display_datetime(*auckland_time, verbose=verbose))
 
         await ctx.send(embed=datetime_embed)
+    
+    @commands.command(name='poll', aliases=['p'])
+    async def create_poll(self, ctx, *poll_args: str):
+        """Creates a new poll: $poll "title" "opt-a" "opt-b" ..."""
+        logger.info(f'New poll requested by {ctx.message.author.name}')
+        if len(poll_args) < 3:
+            await ctx.send('Sorry, your poll needs at least 2 options!')
+        elif len(poll_args) > 21:
+            await ctx.send('Sorry, `$poll` only supports 20 options!')
+        else:
+            async with ctx.typing():
+                poll_embed=generate_poll_embed(poll_args)
+            result_msg = await ctx.send(embed=poll_embed)
+            react_char = '\U0001f1e6'
+            for arg_iter in range(1, len(poll_args)):
+                await result_msg.add_reaction(react_char)
+                react_char = chr(ord(react_char) + 1)
+            
 
 
 def setup(bot):
