@@ -204,7 +204,7 @@ class Utilities(commands.Cog):
                     for option in poll.embeds[0].description.split("\n"):
                         key = emoji.emojize(option[0:option.find(' ')], use_aliases=True)
                         desc = option[option.find(' ') + 1:]
-                        poll_results[desc] = int(opt_to_react_dict[key].count)
+                        poll_results[desc] = int(opt_to_react_dict[key].count - 1)
                     
                     data = pd.Series(poll_results)
                     axes = data.plot.bar(title=poll_title, x='options', color=plt.cm.Paired(range(len(data))))
