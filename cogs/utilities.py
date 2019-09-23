@@ -4,6 +4,10 @@ import aiohttp
 import logging
 # from typing import Any, List, Dict, Tuple, Sequence
 import datetime
+import pandas as pd
+import matplotlib.pyplot as plt
+import io
+import emoji
 
 import discord
 from discord.ext import commands
@@ -49,9 +53,9 @@ def display_datetime(datetime_str, time_zone=None, verbose=True):
 
 def generate_poll_embed(poll_args):
     desc_str = ""
-    react_char = 'a'
+    react_char = '\U0001f1e6'
     for arg_iter in range(1, len(poll_args)):
-        desc_str += f':regional_indicator_{react_char}: {poll_args[arg_iter]}\n'
+        desc_str += f'{react_char} {poll_args[arg_iter]}\n'
         react_char = chr(ord(react_char) + 1)
     
     return default_embed(
@@ -156,13 +160,63 @@ class Utilities(commands.Cog):
         else:
             async with ctx.typing():
                 poll_embed=generate_poll_embed(poll_args)
-            result_msg = await ctx.send(embed=poll_embed)
+                result_msg = await ctx.send(embed=poll_embed)
+                poll_embed.add_field(name="Poll Reference", value=result_msg.id)
+                await result_msg.edit(embed=poll_embed)
+                
             react_char = '\U0001f1e6'
             for arg_iter in range(1, len(poll_args)):
                 await result_msg.add_reaction(react_char)
                 react_char = chr(ord(react_char) + 1)
-            
+                
+    @commands.command(name='collate', aliases=['pc', 'poll-collate', 'cp', 'collate-poll'])
+    async def collate_poll(self, ctx, *poll_ids: str):
+        """Collates and summarises the given poll references"""
+        
+        logger.info(f'Collating {len(poll_ids)} polls')
+        
+        if len(poll_ids) < 1:
+            await ctx.send('Sorry, I need a poll reference to collate!')
+            return
+        
+        async with ctx.typing():
+            for id in poll_ids:
+                try:
+                    try:
+                        poll = await ctx.fetch_message(id)
+                    except discord.NotFound:
+                        await ctx.send(f'Sorry, I couldn\'t find poll `{id}`')
+                        continue
+                    except discord.HTTPException:
+                        await ctx.send(f'Sorry, `{id}` is not a valid poll id')
+                        continue
+                        
+                    if len(poll.embeds) < 1:
+                        await ctx.send(f'Sorry, I couldn\'t find the embed for poll `{id}`')
+                        continue
+                    
+                    opt_to_react_dict = {}
+                    for reaction in poll.reactions:
+                        opt_to_react_dict[str(reaction.emoji)] = reaction
+                    
+                    poll_results = {}
+                    poll_title = poll.embeds[0].title
+                    for option in poll.embeds[0].description.split("\n"):
+                        key = emoji.emojize(option[0:option.find(' ')], use_aliases=True)
+                        desc = option[option.find(' ') + 1:]
+                        poll_results[desc] = int(opt_to_react_dict[key].count)
+                    
+                    data = pd.Series(poll_results)
+                    axes = data.plot.bar(title=poll_title, x='options', color=plt.cm.Paired(range(len(data))))
+                    axes.set_ylabel('Respondents')
+                    
+                    png_wrapper = io.BytesIO()
+                    plt.savefig(png_wrapper, format='png')
+                    png_wrapper.seek(0)
 
+                    await ctx.send(file=discord.File(png_wrapper, filename=(poll_title + ".png")))
+                except KeyError:
+                    await ctx.send(f'Uh oh, I was unable to collate poll `{id}`. Sorry!')
 
 def setup(bot):
     bot.add_cog(Utilities(bot))
