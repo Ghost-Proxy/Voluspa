@@ -214,7 +214,8 @@ class Utilities(commands.Cog):
                     plt.savefig(png_wrapper, format='png')
                     png_wrapper.seek(0)
 
-                    await ctx.send(file=discord.File(png_wrapper, filename=(poll_title + ".png")))
+                    poll_title = poll_title + ".png"
+                    await ctx.send(file=discord.File(png_wrapper, filename=poll_title))
                 except KeyError:
                     await ctx.send(f'Uh oh, I was unable to collate poll `{id}`. Sorry!')
 
