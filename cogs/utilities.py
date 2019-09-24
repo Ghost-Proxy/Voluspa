@@ -248,9 +248,15 @@ class Utilities(commands.Cog):
                     data = pd.Series(poll_results, index=poll_labels)
                     axes = data.plot.bar(title=poll_title, x='options', color=plt.cm.tab10(range(len(data))))
                     axes.set_ylabel('Respondents')
-                    plt.yticks(gen_yticks(max(poll_results)))
+                    plt.yticks(gen_yticks(max(poll_results))) # Appropriate tick spacing for number of respondents
                     plt.xticks(rotation=45)
-                    plt.tight_layout()
+                    plt.margins(y=0.1) # Padding for bar text so that it doesn't overlap with the top of the chart
+                    
+                    # Adds number of respondents at top of bars
+                    for x, y in enumerate(poll_results):
+                        axes.text(x, y, str(y), ha='center', va='bottom')
+                    
+                    plt.tight_layout() # Ensures label text is not cut off
                     
                     png_wrapper = io.BytesIO()
                     plt.savefig(png_wrapper, format='png')
