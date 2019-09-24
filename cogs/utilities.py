@@ -78,6 +78,20 @@ def gen_yticks(max_pt):
     
     return range(0, max_pt + step, step)
 
+def trunc_label(label, num_opts):
+    if num_opts <= 4:
+        max_lines = 4
+    elif num_opts <= 6:
+        max_lines = 3
+    elif num_opts <= 8:
+        max_lines = 2
+    else:
+        max_lines = 1
+        
+    res = wrap(label, 25)[:max_lines]
+    
+    return "\n".join(res) + ("..." if len(res) >= max_lines else "")
+
 class Utilities(commands.Cog):
     """Helpful utility functions"""
     def __init__(self, bot):
@@ -221,7 +235,7 @@ class Utilities(commands.Cog):
                         key = emoji.emojize(option[:option.find(' ')], use_aliases=True)
                         desc = option[option.find(' ') + 1:]
                         
-                        poll_labels.append(wrap(desc, 25)[0] + "...")
+                        poll_labels.append(trunc_label(desc, len(opt_to_react_dict.keys())))
                         poll_results.append(int(opt_to_react_dict[key].count) - 1)
                     
                     data = pd.Series(poll_results, index=poll_labels)
