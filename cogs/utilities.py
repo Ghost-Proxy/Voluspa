@@ -8,6 +8,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import io
 import emoji
+from textwrap import wrap
 
 import discord
 from discord.ext import commands
@@ -63,6 +64,19 @@ def generate_poll_embed(poll_args):
         description=desc_str
     )
 
+def gen_yticks(max_pt):
+    if max_pt <= 10:
+        step = 1
+    elif max_pt <= 50:
+        step = 5
+    elif max_pt <= 100:
+        step = 10
+    elif max_pt <= 500:
+        step = 50
+    else:
+        step = 100
+    
+    return range(0, max_pt + step, step)
 
 class Utilities(commands.Cog):
     """Helpful utility functions"""
@@ -197,18 +211,25 @@ class Utilities(commands.Cog):
                     
                     opt_to_react_dict = {}
                     for reaction in poll.reactions:
-                        opt_to_react_dict[str(reaction.emoji)] = reaction
+                        opt_to_react_dict[reaction.emoji] = reaction
                     
-                    poll_results = {}
+                    poll_labels = []
+                    poll_results = []
                     poll_title = poll.embeds[0].title
-                    for option in poll.embeds[0].description.split("\n"):
-                        key = emoji.emojize(option[0:option.find(' ')], use_aliases=True)
-                        desc = option[option.find(' ') + 1:]
-                        poll_results[desc] = int(opt_to_react_dict[key].count - 1)
                     
-                    data = pd.Series(poll_results)
-                    axes = data.plot.bar(title=poll_title, x='options', color=plt.cm.Paired(range(len(data))))
+                    for option in poll.embeds[0].description.split("\n"):
+                        key = emoji.emojize(option[:option.find(' ')], use_aliases=True)
+                        desc = option[option.find(' ') + 1:]
+                        
+                        poll_labels.append(wrap(desc, 25)[0] + "...")
+                        poll_results.append(int(opt_to_react_dict[key].count) - 1)
+                    
+                    data = pd.Series(poll_results, index=poll_labels)
+                    axes = data.plot.bar(title=poll_title, x='options', color=plt.cm.tab10(range(len(data))))
                     axes.set_ylabel('Respondents')
+                    plt.yticks(gen_yticks(max(poll_results)))
+                    plt.xticks(rotation=45)
+                    plt.tight_layout()
                     
                     png_wrapper = io.BytesIO()
                     plt.savefig(png_wrapper, format='png')
