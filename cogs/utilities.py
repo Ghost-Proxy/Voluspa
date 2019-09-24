@@ -65,6 +65,7 @@ def generate_poll_embed(poll_args):
     )
 
 def gen_yticks(max_pt):
+    """Generates an array of y-axis ticks in integers - step is determined by the largest data point"""
     if max_pt <= 10:
         step = 1
     elif max_pt <= 50:
@@ -79,6 +80,8 @@ def gen_yticks(max_pt):
     return range(0, max_pt + step, step)
 
 def trunc_label(label, num_opts):
+    """Breaks the label up into 25 character max lines."""
+    """If the label space is too small, only some lines will be append and the rest will be represented with ..."""
     if num_opts <= 4:
         max_lines = 4
     elif num_opts <= 6:
@@ -88,9 +91,11 @@ def trunc_label(label, num_opts):
     else:
         max_lines = 1
         
-    res = wrap(label, 25)[:max_lines]
+    res = wrap(label, 25)
+    res_full_length = len(res)
+    res = res[:min(res_full_length, max_lines)]
     
-    return "\n".join(res) + ("..." if len(res) >= max_lines else "")
+    return "\n".join(res) + ("..." if res_full_length > max_lines else "")
 
 class Utilities(commands.Cog):
     """Helpful utility functions"""
@@ -222,11 +227,7 @@ class Utilities(commands.Cog):
                     if len(poll.embeds) < 1:
                         await ctx.send(f'Sorry, I couldn\'t find the embed for poll `{id}`')
                         continue
-                    
-                    opt_to_react_dict = {}
-                    for reaction in poll.reactions:
-                        opt_to_react_dict[reaction.emoji] = reaction
-                    
+                                    
                     poll_labels = []
                     poll_results = []
                     poll_title = poll.embeds[0].title
@@ -235,8 +236,14 @@ class Utilities(commands.Cog):
                         key = emoji.emojize(option[:option.find(' ')], use_aliases=True)
                         desc = option[option.find(' ') + 1:]
                         
-                        poll_labels.append(trunc_label(desc, len(opt_to_react_dict.keys())))
-                        poll_results.append(int(opt_to_react_dict[key].count) - 1)
+                        poll_labels.append(trunc_label(desc, len(poll.reactions)))
+                        
+                        # If polls options don't match reactions, list has been messed with
+                        # Else get count for option
+                        reaction = next((r for r in poll.reactions if r.emoji == key), None)
+                        if reaction == None:
+                            raise KeyError()
+                        poll_results.append(reaction.count - 1)
                     
                     data = pd.Series(poll_results, index=poll_labels)
                     axes = data.plot.bar(title=poll_title, x='options', color=plt.cm.tab10(range(len(data))))
