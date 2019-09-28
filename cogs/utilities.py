@@ -187,7 +187,10 @@ class Utilities(commands.Cog):
     
     @commands.command(name='poll', aliases=['p'])
     async def create_poll(self, ctx, *poll_args: str):
-        """Creates a new poll: $poll "title" "opt-a" "opt-b" ..."""
+        """Creates a new poll
+        
+        $poll "title" "opt-a" "opt-b" ...
+        """
         logger.info(f'New poll requested by {ctx.message.author.name}')
         if len(poll_args) < 3:
             await ctx.send('Sorry, your poll needs at least 2 options!')
@@ -207,7 +210,12 @@ class Utilities(commands.Cog):
                 
     @commands.command(name='collate', aliases=['c', 'cd', 'collate-dark'])
     async def collate_poll(self, ctx, *poll_ids: str):
-        """Summarises the given poll references - use $cd for dark theme"""
+        """Summarises the given poll references
+        
+        Use $cd for dark theme
+        
+        Use $c c<channel-id> <poll-args>... to specify a channel to pull from
+        """
         
         logger.info(f'Collating {len(poll_ids)} polls')
         
@@ -220,7 +228,6 @@ class Utilities(commands.Cog):
             poll_ids = poll_ids[1:]
         else:
             id_fetch_point = ctx.channel
-            
         
         if len(poll_ids) < 1:
             await ctx.send('Sorry, I need a poll reference to collate!')
@@ -257,8 +264,7 @@ class Utilities(commands.Cog):
                         reaction = next((r for r in poll.reactions if r.emoji == key), None)
                         if reaction == None:
                             raise KeyError()
-                        poll_results.append(reaction.count -1)
-                    
+                        poll_results.append(reaction.count - 1)
                     
                     data = pd.Series(poll_results, index=poll_labels)
                         
