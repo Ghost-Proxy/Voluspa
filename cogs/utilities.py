@@ -279,7 +279,7 @@ class Utilities(commands.Cog):
                     
                     # New padding technique for top of chart and bar text
                     _, top_ylim = plt.ylim()
-                    top_ylim *= 1.01
+                    top_ylim *= 1.02
                     plt.ylim(bottom=0, top=top_ylim)
                     
                     plt.yticks(gen_yticks(max(poll_results))) # Appropriate tick spacing for number of respondents                    
