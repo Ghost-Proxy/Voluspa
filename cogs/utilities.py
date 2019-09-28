@@ -266,7 +266,9 @@ class Utilities(commands.Cog):
 
                     poll_title = poll_title + ".png"
                     await ctx.send(file=discord.File(png_wrapper, filename=poll_title))
+                    
                     png_wrapper.close()
+                    plt.close();
                 except KeyError:
                     await ctx.send(f'Uh oh, I was unable to collate poll `{id}`. Sorry!')
 
