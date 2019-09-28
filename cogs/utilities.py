@@ -81,19 +81,20 @@ def gen_yticks(max_pt):
     
     return range(0, max_pt + step, step)
 
-def trunc_label(label, num_opts):
+def trunc_label(label, num_opts=None, max_lines=None, max_length=25):
     """Breaks the label up into 25 character max lines."""
     """If the label space is too small, only some lines will be append and the rest will be represented with ..."""
-    if num_opts <= 4:
-        max_lines = 4
-    elif num_opts <= 6:
-        max_lines = 3
-    elif num_opts <= 8:
-        max_lines = 2
-    else:
-        max_lines = 1
+    if max_lines == None:
+        if num_opts <= 4:
+            max_lines = 4
+        elif num_opts <= 6:
+            max_lines = 3
+        elif num_opts <= 8:
+            max_lines = 2
+        else:
+            max_lines = 1
         
-    res = wrap(label, 25)
+    res = wrap(label, max_length)
     res_full_length = len(res)
     res = res[:min(res_full_length, max_lines)]
     
@@ -232,7 +233,7 @@ class Utilities(commands.Cog):
                                     
                     poll_labels = []
                     poll_results = []
-                    poll_title = poll.embeds[0].title
+                    poll_title = trunc_label(poll.embeds[0].title, max_lines=2, max_length=50)
                     
                     for option in poll.embeds[0].description.split("\n"):
                         key = emoji.emojize(option[:option.find(' ')], use_aliases=True)
@@ -245,14 +246,20 @@ class Utilities(commands.Cog):
                         reaction = next((r for r in poll.reactions if r.emoji == key), None)
                         if reaction == None:
                             raise KeyError()
-                        poll_results.append(reaction.count - 1)
+                        poll_results.append(reaction.count -1)
                     
                     data = pd.Series(poll_results, index=poll_labels)
                     axes = data.plot.bar(title=poll_title, x='options', color=plt.cm.tab10(range(len(data))))
                     axes.set_ylabel('Respondents')
+                    
+                    # New padding technique for top of chart and bar text
+                    _, top_ylim = plt.ylim()
+                    top_ylim *= 1.01
+                    
+                    plt.ylim(bottom=0, top=top_ylim)
                     plt.yticks(gen_yticks(max(poll_results))) # Appropriate tick spacing for number of respondents
+                    
                     plt.xticks(rotation=45)
-                    plt.margins(y=0.1) # Padding for bar text so that it doesn't overlap with the top of the chart
                     
                     # Adds number of respondents at top of bars
                     for x, y in enumerate(poll_results):
