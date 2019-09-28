@@ -211,6 +211,17 @@ class Utilities(commands.Cog):
         
         logger.info(f'Collating {len(poll_ids)} polls')
         
+        if (len(poll_ids) > 0 and poll_ids[0][0] == 'c'):
+            id_fetch_point = ctx.bot.get_channel(int(poll_ids[0][1:]))
+            if id_fetch_point == None:
+                await ctx.send(f'Sorry, `{poll_ids[0][1:]}` is not a valid channel id.')
+                return
+            
+            poll_ids = poll_ids[1:]
+        else:
+            id_fetch_point = ctx.channel
+            
+        
         if len(poll_ids) < 1:
             await ctx.send('Sorry, I need a poll reference to collate!')
             return
@@ -219,7 +230,7 @@ class Utilities(commands.Cog):
             for id in poll_ids:
                 try:
                     try:
-                        poll = await ctx.fetch_message(id)
+                        poll = await id_fetch_point.fetch_message(id)
                     except discord.NotFound:
                         await ctx.send(f'Sorry, I couldn\'t find poll `{id}`')
                         continue
