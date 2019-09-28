@@ -274,10 +274,10 @@ class Utilities(commands.Cog):
                     if ctx.invoked_with in ['cd', 'collate-dark']:
                         line_colors = "#FFFFFF"
                         
-                        axes.spines['bottom'].set_color(line_colors);
-                        axes.spines['top'].set_color(line_colors);
-                        axes.spines['left'].set_color(line_colors);
-                        axes.spines['right'].set_color(line_colors);
+                        axes.spines['bottom'].set_color(line_colors)
+                        axes.spines['top'].set_color(line_colors)
+                        axes.spines['left'].set_color(line_colors)
+                        axes.spines['right'].set_color(line_colors)
                         
                         axes.tick_params(colors=line_colors)
                         
@@ -317,7 +317,7 @@ class Utilities(commands.Cog):
                     await ctx.send(file=discord.File(png_wrapper, filename=filename))
                     
                     png_wrapper.close()
-                    plt.close();
+                    plt.close()
                 except KeyError:
                     await ctx.send(f'Uh oh, I was unable to collate poll `{id}`. Sorry!')
 
