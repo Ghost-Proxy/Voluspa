@@ -205,9 +205,9 @@ class Utilities(commands.Cog):
                 await result_msg.add_reaction(react_char)
                 react_char = chr(ord(react_char) + 1)
                 
-    @commands.command(name='collate', aliases=['pc', 'poll-collate', 'cp', 'collate-poll'])
+    @commands.command(name='collate', aliases=['c', 'cd', 'collate-dark'])
     async def collate_poll(self, ctx, *poll_ids: str):
-        """Collates and summarises the given poll references"""
+        """Summarises the given poll references - use $cd for dark theme"""
         
         logger.info(f'Collating {len(poll_ids)} polls')
         
@@ -248,27 +248,51 @@ class Utilities(commands.Cog):
                             raise KeyError()
                         poll_results.append(reaction.count -1)
                     
+                    
                     data = pd.Series(poll_results, index=poll_labels)
+                        
                     axes = data.plot.bar(title=poll_title, x='options', color=plt.cm.tab10(range(len(data))))
                     axes.set_ylabel('Respondents')
+                    
+                    if ctx.invoked_with in ['cd', 'collate-dark']:
+                        line_colors = "#FFFFFF"
+                        
+                        axes.spines['bottom'].set_color(line_colors);
+                        axes.spines['top'].set_color(line_colors);
+                        axes.spines['left'].set_color(line_colors);
+                        axes.spines['right'].set_color(line_colors);
+                        
+                        axes.tick_params(colors=line_colors)
+                        
+                        axes.yaxis.label.set_color(line_colors)
+                        axes.xaxis.label.set_color(line_colors)
+                        
+                        axes.title.set_color(line_colors)
+                        
+                        axes.set_facecolor("#2C2F33")
+                        
+                        bg_color = "#2C2F33"
+                        bar_top_color = line_colors
+                    else:
+                        bg_color = "#FFFFFF"
+                        bar_top_color = "k" # aka black
                     
                     # New padding technique for top of chart and bar text
                     _, top_ylim = plt.ylim()
                     top_ylim *= 1.01
-                    
                     plt.ylim(bottom=0, top=top_ylim)
-                    plt.yticks(gen_yticks(max(poll_results))) # Appropriate tick spacing for number of respondents
                     
+                    plt.yticks(gen_yticks(max(poll_results))) # Appropriate tick spacing for number of respondents                    
                     plt.xticks(rotation=45)
                     
                     # Adds number of respondents at top of bars
                     for x, y in enumerate(poll_results):
-                        axes.text(x, y, str(y), ha='center', va='bottom')
+                        axes.text(x, y, str(y), ha='center', va='bottom', color=bar_top_color)
                     
                     plt.tight_layout() # Ensures label text is not cut off
                     
                     png_wrapper = io.BytesIO()
-                    plt.savefig(png_wrapper, format='png')
+                    plt.savefig(png_wrapper, format='png', facecolor=bg_color)
                     png_wrapper.seek(0)
 
                     dt = datetime.datetime
