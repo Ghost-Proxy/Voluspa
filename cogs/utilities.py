@@ -271,8 +271,9 @@ class Utilities(commands.Cog):
                     plt.savefig(png_wrapper, format='png')
                     png_wrapper.seek(0)
 
-                    poll_title = poll_title + ".png"
-                    await ctx.send(file=discord.File(png_wrapper, filename=poll_title))
+                    dt = datetime.datetime
+                    filename = "gp-poll-" + id + "-" + dt.strftime(dt.utcnow(), "%Y-%m-%d-%H-%M-%S") + ".png"
+                    await ctx.send(file=discord.File(png_wrapper, filename=filename))
                     
                     png_wrapper.close()
                     plt.close();
