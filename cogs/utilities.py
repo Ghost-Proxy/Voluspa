@@ -1,12 +1,14 @@
 # import re
 # import asyncio
 import aiohttp
+import io
 import logging
 # from typing import Any, List, Dict, Tuple, Sequence
 import datetime
+
+# 3rd-party
 import pandas as pd
 import matplotlib.pyplot as plt
-import io
 import emoji
 from textwrap import wrap
 
