@@ -5,12 +5,12 @@ import io
 import logging
 # from typing import Any, List, Dict, Tuple, Sequence
 import datetime
+from textwrap import wrap
 
 # 3rd-party
 import pandas as pd
 import matplotlib.pyplot as plt
 import emoji
-from textwrap import wrap
 
 import discord
 from discord.ext import commands
