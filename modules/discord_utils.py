@@ -2,17 +2,16 @@ import asyncio
 
 import discord
 from discord.ext import commands
+from voluspa import CONFIG
 
 
 def get_prefix(bot, message):
     """A callable Prefix for our bot. This could be edited to allow per server prefixes."""
-    prefixes = ['$']
-
+    prefixes = [CONFIG.Voluspa.prefix]
     # Check to see if we are outside of a guild. e.g DM's etc.
     if not message.guild:
-        # Only allow ? to be used in DMs
-        return '$'
-
+        # Only allow prefix to be used in DMs
+        return CONFIG.Voluspa.prefix
     # If we are in a guild, we allow for the user to mention us or use any of the prefixes in our list.
     return commands.when_mentioned_or(*prefixes)(bot, message)
 

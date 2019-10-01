@@ -50,8 +50,13 @@ def read_config():
             },
             'Discord': {
                 'api_key': os.environ['DISCORD_API_KEY']
-            }
+            },
         }
+
+        voluspa_config = ['VOLUSPA_PREFIX']
+        for ve in voluspa_config:
+            if os.getenv(ve):
+                secrets['Voluspa'] = {ve.split('_')[1].lower(): os.getenv(ve)}
 
     merged_config_2 = merge_dicts(merged_config_1, secrets)
 
