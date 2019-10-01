@@ -2,6 +2,7 @@
 .misc/
 secrets.yaml
 **/secrets.yaml
+config/*secrets*
 discord.log
 
 # Byte-compiled / optimized / DLL files
