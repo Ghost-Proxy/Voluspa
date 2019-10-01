@@ -41,8 +41,14 @@ cog_extensions = [
     'cogs.utilities',
 ]
 
-# bot = commands.AutoShardedBot()
-bot = commands.Bot(command_prefix=get_prefix, description='Völuspá the Ghost Proxy Proto-Warmind AI')
+
+# Note: AutoShard when guilds > 1000 bot = commands.AutoShardedBot()
+
+bot = commands.Bot(
+    command_prefix=get_prefix,
+    description='Völuspá the Ghost Proxy Proto-Warmind AI',
+    case_insensitive=True
+)
 
 
 @bot.event
