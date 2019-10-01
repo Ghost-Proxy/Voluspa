@@ -18,7 +18,7 @@ logger = archivist.get_logger()
 
 from modules.fun import Quotes
 from modules.database import Database
-from modules.discord_utils import get_prefix, update_status_task
+from modules.discord_utils import update_status_task
 
 # Third-Party Imports
 import discord
@@ -42,8 +42,18 @@ cog_extensions = [
 ]
 
 
-# Note: AutoShard when guilds > 1000 bot = commands.AutoShardedBot()
+def get_prefix(bot, message):
+    """A callable Prefix for our bot. This could be edited to allow per server prefixes."""
+    prefixes = [CONFIG.Voluspa.prefix]
+    # Check to see if we are outside of a guild. e.g DM's etc.
+    if not message.guild:
+        # Only allow prefix to be used in DMs
+        return CONFIG.Voluspa.prefix
+    # If we are in a guild, we allow for the user to mention us or use any of the prefixes in our list.
+    return commands.when_mentioned_or(*prefixes)(bot, message)
 
+
+# Note: AutoShard when guilds > 1000 bot = commands.AutoShardedBot()
 bot = commands.Bot(
     command_prefix=get_prefix,
     description='Völuspá the Ghost Proxy Proto-Warmind AI',
