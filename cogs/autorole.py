@@ -81,7 +81,8 @@ class Autorole(commands.Cog):
                 'ghost-proxy-member': ['gpm', 'gp-member', 'ghost-proxy-member'],
                 'ghost-proxy-legacy': ['gpl', 'gp-legacy', 'ghost-proxy-legacy'],
                 'ghost-proxy-envoy': ['gpe', 'gp-envoy', 'ghost-proxy-envoy'],
-                'ghost-proxy-admin': ['admin', 'gp-admin', 'ghost-proxy-admin'],
+                'ghost-proxy-veteran': ['gpv', 'gp-veteran', 'ghost-proxy-veteran'],
+                'ghost-proxy-archivist': ['gpa', 'gp-archivist', 'ghost-proxy-archivist'],
                 # Include lead roles for reset
                 'raid-lead': ['raid-lead'],
                 'gambit-lead': ['gambit-lead'],
@@ -95,7 +96,8 @@ class Autorole(commands.Cog):
             },  # TODO: Figure out what the plan was with the below...
             'ghost_proxy_elevated_roles': {
                 'ghost-proxy-vanguard': ['vanguard', 'gp-vanguard', 'ghost-proxy-vanguard'],
-                'ghost-proxy-admin': ['admin', 'gp-admin', 'ghost-proxy-admin']
+                'ghost-proxy-veteran': ['gpv', 'gp-veteran', 'ghost-proxy-veteran'],
+                'ghost-proxy-archivist': ['gpa', 'gp-archivist', 'ghost-proxy-archivist']
             },
             'ghost_proxy_protected_roles': {
                 'founder': ['founder', 'gp-founder', 'ghost-proxy-founder'],  # 'ghost-proxy-founder'
@@ -628,7 +630,7 @@ class Autorole(commands.Cog):
     async def set_to_legacy(self, ctx, *users: str):
         """Sets User(s) to Legacy Friend(s)
 
-        Removes gp-member and gp-admin.
+        Removes gp-member and gp-veteran.
 
         Can only be used by Vanguard (atm).
         """
@@ -642,7 +644,7 @@ class Autorole(commands.Cog):
             users,
             role_limits=[
                 'ghost-proxy-member',
-                'ghost-proxy-admin',
+                'ghost-proxy-veteran',
                 'raid-lead',
                 'crucible-lead',
                 'gambit-lead',
@@ -658,7 +660,7 @@ class Autorole(commands.Cog):
     async def reset_user(self, ctx, *users: str):
         """Removes all GP roles from a user
 
-        Removes friend, legacy, member, admin, envoy
+        Removes friend, legacy, member, veteran, envoy
 
         Can only be used by Gatekeeper (atm).
         """
@@ -676,9 +678,9 @@ class Autorole(commands.Cog):
     async def remove_all_roles(self, ctx, *users: str):
         """Removes ALL roles from a user!
 
-        Removes friend, legacy, member, admin, envoy
+        Removes friend, legacy, member, veteran, envoy
 
-        Can only be used by Gatekeeper (atm).
+        Can only be used by Founder (atm).
         """
         await self.assign_roles_to_user(
             ctx,
