@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """Voluspa Ghost Proxy Discord Bot"""
-VOLUSPA_VERSION = 'v0.0.7a'
+VOLUSPA_VERSION = 'v0.0.8'
 # Bot Example: https://gist.github.com/EvieePy/d78c061a4798ae81be9825468fe146be
 
 import datetime
