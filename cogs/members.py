@@ -193,6 +193,7 @@ async def async_get_bungie_clan_members():
     target_endpoint = '/GroupV2/{}/Members/'.format(CONFIG.Bungie.clan_group_id)
     #request_url = 'https://www.bungie.net/platform'
     response = await async_bungie_request_handler(target_endpoint)
+    logger.info(f'Bungie Response: {response}')
     bungie_results = response['Response']
     logger.info('BUNGIE MEMBER LIST:\n{}'.format(bungie_results))
     member_results = bungie_results['results']
