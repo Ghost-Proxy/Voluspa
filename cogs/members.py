@@ -233,13 +233,13 @@ def filter_member_roles():
     pass
 
 
-def get_members_name_list_by_role(member_dict, role_name):
+def get_members_attr_list_by_role(member_dict, role_name, attr):
     filtered_members = []
     for member_id, member_info in member_dict.items():
         exclusion_list = ['@everyone']
         roles = [role.name for role in member_info['roles'] if role.name not in exclusion_list]
         if role_name in roles:
-            filtered_members.append(member_info['name'])
+            filtered_members.append(member_info[attr])
     return filtered_members
 
 # elif message.content.startswith('!members'):
@@ -368,7 +368,7 @@ class Members(commands.Cog):
 
             gp_member_roles = filter_members_by_field(member_dict, 'roles')
             #logger.info(pprint.pformat(gp_member_roles))
-            gp_members = get_members_name_list_by_role(gp_member_roles, 'ghost-proxy-member')
+            gp_members = get_members_attr_list_by_role(gp_member_roles, 'ghost-proxy-member', 'name')
             alpha_sorted_gp_members = sorted(gp_members, key=str.lower)
             #logger.info("GP Members on Discord ({}):\n{}\n".format(len(alpha_sorted_gp_members), alpha_sorted_gp_members))
 
@@ -602,6 +602,29 @@ class Members(commands.Cog):
 
         await ctx.send(embed=mem_online_embed)
 
+    @commands.command(name='members-with-role', aliases=['mwr'])
+    @commands.guild_only()
+    async def members_with_role(self, ctx, *, role_name):
+        """Lists Ghost Proxy Members with a given role."""  
+        async with ctx.typing():
+            logger.info(f'Getting Discord members with role: {role_name}')
+            member_list = [member for member in self.bot.get_all_members()]
+            member_dict = {}
+            for member in member_list:
+                member_dict[member.id] = {
+                    'display_name': member.display_name,
+                    'roles': member.roles
+                }
+            
+            role_members = get_members_attr_list_by_role(member_dict, role_name, 'display_name')
+            result_msg = f'{format_list(role_members, none_msg="No members found!")}'
+            result_embed = default_embed(
+                title=f'{len(role_members)} member{"s" if len(role_members) != 1 else ""} with @{role_name}',
+                description=result_msg
+            )
+        
+        await ctx.send(embed=result_embed)
+            
     # @bot.command(name='get-profile')
     # async def get_player_profile(ctx, *, player_name):
     #     bungie_get_profile()

@@ -2,6 +2,7 @@
 .misc/
 secrets.yaml
 **/secrets.yaml
+config/*secrets*
 discord.log
 
 # Byte-compiled / optimized / DLL files
@@ -118,3 +119,6 @@ venv.bak/
 .mypy_cache/
 .dmypy.json
 dmypy.json
+
+# Unknown (maybe atom?)
+voluspa.db
