@@ -45,14 +45,15 @@ def filter_character_types(clan_characters, min_level=0):
     return hunters, titans, warlocks, total_num_chars
 
 
-async def filter_characters_from_members(destiny_members, platform_type=4):
+async def filter_characters_from_members(destiny_members, platform_type=None):
     clan_characters = []
     for d_member in destiny_members:
-        destiny_member_id = await async_get_member_data_by_id(
-            d_member['membershipId'],
-            d_member['membershipType']
-        )
-        clan_characters.append(await async_get_destiny_profile_characters(destiny_member_id, platform_type))
+        # destiny_member_id = await async_get_member_data_by_id(
+        #     d_member['membershipId'],
+        #     d_member['membershipType']
+        # )
+        membership_type = platform_type if platform_type else d_member['membershipType']
+        clan_characters.append(await async_get_destiny_profile_characters(d_member['membershipId'], membership_type))
     return clan_characters
 
 
@@ -170,9 +171,14 @@ def get_destiny_member_info(member):
     display_name = member['destinyUserInfo']['displayName']
 
     return {
-        'membershipId': membership_id,
-        'membershipType': membership_type,
-        'displayName': display_name
+        'membershipId': member['destinyUserInfo']['membershipId'],
+        'membershipType': member['destinyUserInfo']['membershipType'],
+        'displayName': member['destinyUserInfo']['displayName'],
+        'LastSeenDisplayName': member['destinyUserInfo']['LastSeenDisplayName'],
+        'LastSeenDisplayNameType': member['destinyUserInfo']['LastSeenDisplayNameType'],
+        'crossSaveOverride': member['destinyUserInfo']['crossSaveOverride'],
+        'supplementalDisplayName': member['bungieNetUserInfo']['supplementalDisplayName'],
+        'bungieNetDisplayName': member['bungieNetUserInfo']['displayName'],
     }
 
 
@@ -492,14 +498,14 @@ class Members(commands.Cog):
         if len(invalid_discord_members) > 0:
             await send_multipart_msg(ctx, msg_final2)
 
-    @commands.command(name='clan-stats')
+    @commands.command(name='clan-stats', aliases=['cs'])
     @commands.guild_only()
     async def clan_stats(self, ctx, min_level: int = 0):
         async with ctx.typing():
-            platform_type = 4 # TODO MEH......
+            # platform_type = 4  # TODO MEH......
             num_members, member_list = await async_get_clan_members()
             destiny_members = [get_destiny_member_info(mem) for mem in member_list]
-            clan_characters = await filter_characters_from_members(destiny_members, platform_type)
+            clan_characters = await filter_characters_from_members(destiny_members)
             logger.info('clan_characters:\n{}\n'.format(clan_characters))
             hunters, titans, warlocks, num_clan_chars = filter_character_types(clan_characters, min_level)
             num_filtered_chars = len(hunters) + len(titans) + len(warlocks)
