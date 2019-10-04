@@ -376,7 +376,7 @@ class Autorole(commands.Cog):
     @commands.command(name='lfg-add')  # , aliases=['game-role', 'lfg-role'])
     @commands.guild_only()
     async def lfg_add(self, ctx, *roles: str):
-        """Adds Game Mode roles for @ pings.
+        """Adds Game Mode roles for @ pings
 
         Uses either short names like 'c' for crucible, or full names like 'gambit'.
 
@@ -395,7 +395,7 @@ class Autorole(commands.Cog):
     @commands.command(name='lfg-remove')  # , aliases=['game-role', 'lfg-role'])
     @commands.guild_only()
     async def lfg_remove(self, ctx, *roles: str):
-        """Removes Game Mode roles for @ pings.
+        """Removes Game Mode roles for @ pings
 
         Uses either short names like 'c' for crucible, or full names like 'gambit'.
 
@@ -486,7 +486,7 @@ class Autorole(commands.Cog):
     @commands.has_role('raid-lead')
     @commands.guild_only()
     async def sherpa_on(self, ctx):
-        """Sets Sherpa status to Active.
+        """Sets Sherpa status to Active
 
         Can only be used by Raid Leads.
         """
@@ -505,7 +505,7 @@ class Autorole(commands.Cog):
     @commands.has_role('raid-lead')
     @commands.guild_only()
     async def sherpa_off(self, ctx):
-        """Sets Sherpa status to Inactive.
+        """Sets Sherpa status to Inactive
 
         Can only be used by Raid Leads.
         """
