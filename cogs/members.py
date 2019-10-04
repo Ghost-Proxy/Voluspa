@@ -119,7 +119,7 @@ async def async_get_destiny_profile_characters(destiny_membership_id, membership
                 return characters
 
 
-async def async_get_member_data_by_id(membership_id, membership_type, platform_type=4):  # platform_type 4 is PC
+async def async_get_member_data_by_id(membership_id, membership_type, platform_type=3):  # platform_type 4 is PC
     target_endpoint = '/User/GetMembershipsById/{}/{}/'.format(membership_id, membership_type)
     request_url = 'https://www.bungie.net/platform{}'.format(target_endpoint)
     async with aiohttp.ClientSession() as session:
@@ -162,14 +162,6 @@ def get_member_data_by_id(membership_id, membership_type, platform_type=4):  # p
 
 
 def get_destiny_member_info(member):
-    # >> > m['destinyUserInfo']['membershipType']
-    # 4
-    # >> > m['destinyUserInfo']['membershipId']
-    # 'displayName':
-    membership_type = member['destinyUserInfo']['membershipType']
-    membership_id = member['destinyUserInfo']['membershipId']
-    display_name = member['destinyUserInfo']['displayName']
-
     return {
         'membershipId': member['destinyUserInfo']['membershipId'],
         'membershipType': member['destinyUserInfo']['membershipType'],
