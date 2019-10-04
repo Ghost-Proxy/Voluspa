@@ -534,7 +534,7 @@ class Members(commands.Cog):
 
     @commands.command(name='members-online', aliases=['mo'])
     async def members_online(self, ctx):
-        """Lists Ghost Proxy Members currently playing."""
+        """Lists Ghost Proxy Members currently playing"""
         async with ctx.typing():
             logger.info('Looking up currently online Ghost Proxy members...')
             num_members, member_list = await async_get_clan_members()
@@ -556,7 +556,7 @@ class Members(commands.Cog):
     @commands.command(name='members-with-role', aliases=['mwr'])
     @commands.guild_only()
     async def members_with_role(self, ctx, *, role_name):
-        """Lists Ghost Proxy Members with a given role."""
+        """Lists Ghost Proxy Members with a given role"""
         async with ctx.typing():
             logger.info(f'Getting Discord members with role: {role_name}')
             member_list = [member for member in self.bot.get_all_members()]
@@ -584,7 +584,7 @@ class Members(commands.Cog):
     @commands.command(name='find-player', aliases=['fp'])
     @commands.guild_only()
     async def find_player(self, ctx, *, player_name):
-        """Simple Bungie PC player search."""
+        """Simple Bungie PC player search"""
         #num_players, results = bungie_search_users(player_name)
         results = bungie_search_users(player_name)
         logger.info('>> Bungie Player Search Results: {}'.format(results))

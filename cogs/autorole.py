@@ -415,7 +415,7 @@ class Autorole(commands.Cog):
     @commands.command(name='og-list', aliases=['other-game-list'])
     @commands.guild_only()
     async def other_game_list(self, ctx):
-        """Lists available Other-Game roles/channels."""
+        """Lists available Other-Game channels"""
         og_list = ''
         if self.roles_dicts['other_games']:
             og_list += 'ROLE    GAME\n-------------------------\n'
@@ -750,7 +750,7 @@ class Autorole(commands.Cog):
 
         await ctx.send(embed=embed)
 
-    @commands.command(name='list-role-stats', aliases=['rs', 'role-stats'])
+    @commands.command(name='list-role-stats', aliases=['lrs', 'rs', 'role-stats'])
     @commands.has_role('ghost-proxy-vanguard')
     @commands.guild_only()
     async def role_stats(self, ctx):
