@@ -110,6 +110,7 @@ async def async_get_destiny_profile_characters(destiny_membership_id, membership
     async with aiohttp.ClientSession() as session:
         async with session.get(request_url, headers={'X-API-Key': CONFIG.Bungie.api_key}, params=profile_params) as r:
             if r.status == 200:
+                logger.info(f'Successfully retrieved characters for {target_endpoint}')
                 raw_json = await r.json()
                 bungie_response = raw_json['Response']
                 characters_data = bungie_response['characters']['data']
@@ -117,7 +118,9 @@ async def async_get_destiny_profile_characters(destiny_membership_id, membership
                 for char in characters_data.values():
                     characters.append({'classType': char['classType'], 'light': char['light']})
                 return characters
-
+            else:
+                logger.info(f'ERROR - Unable to retrieve characters for {target_endpoint}\n'
+                            f'Response was: [status {r.status}] {r.text()}')
 
 async def async_get_member_data_by_id(membership_id, membership_type, platform_type=3):  # platform_type 4 is PC
     target_endpoint = '/User/GetMembershipsById/{}/{}/'.format(membership_id, membership_type)
@@ -143,7 +146,7 @@ async def async_get_clan_members():
                 bungie_results = raw_json['Response']
                 member_list = bungie_results['results']
                 num_members = bungie_results['totalResults']
-                logger.info('BUNGIE MEMBER LIST:\n{}'.format(member_list))
+                logger.info('BUNGIE MEMBER LIST:\n{}'.format(len(member_list)))
                 return num_members, member_list
 
 
@@ -495,10 +498,13 @@ class Members(commands.Cog):
     async def clan_stats(self, ctx, min_level: int = 0):
         async with ctx.typing():
             # platform_type = 4  # TODO MEH......
+            logger.info('Getting clan member list for stats...')
             num_members, member_list = await async_get_clan_members()
             destiny_members = [get_destiny_member_info(mem) for mem in member_list]
+            logger.info(f'Found records for {len(destiny_members)} member(s)')
             clan_characters = await filter_characters_from_members(destiny_members)
-            logger.info('clan_characters:\n{}\n'.format(clan_characters))
+            num_characters = sum([len(chars) for chars in clan_characters])
+            logger.info(f'Found records for {num_characters} character(s)')
             hunters, titans, warlocks, num_clan_chars = filter_character_types(clan_characters, min_level)
             num_filtered_chars = len(hunters) + len(titans) + len(warlocks)
             all_chars = hunters + titans + warlocks
