@@ -134,6 +134,9 @@ async def async_get_member_data_by_id(membership_id, membership_type, platform_t
                 destiny_membership_info = [dm for dm in destiny_memberships if dm['membershipType'] == platform_type][0]
                 # logger.info('> Returning: {}'.format(destiny_membership_info['membershipId']))
                 return destiny_membership_info['membershipId']
+            else:
+                logger.info(f'ERROR - Unable to retrieve characters for {target_endpoint}\n'
+                            f'Response was: [status {r.status}] {r.text()}')
 
 
 async def async_get_clan_members():
@@ -148,6 +151,9 @@ async def async_get_clan_members():
                 num_members = bungie_results['totalResults']
                 logger.info('BUNGIE MEMBER LIST:\n{}'.format(len(member_list)))
                 return num_members, member_list
+            else:
+                logger.info(f'ERROR - Unable to retrieve characters for {target_endpoint}\n'
+                            f'Response was: [status {r.status}] {r.text()}')
 
 
 def get_member_data_by_id(membership_id, membership_type, platform_type=4):  # platform_type 4 is PC
