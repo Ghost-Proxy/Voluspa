@@ -9,7 +9,7 @@ from modules.misc import merge_dicts, AttrDict
 # config = configparser.ConfigParser()
 def read_yaml(yaml_file):
     with open(yaml_file, 'r') as yfile:
-        return yaml.load(yfile)
+        return yaml.full_load(yfile)
 
 
 # TODO CLEANUP
