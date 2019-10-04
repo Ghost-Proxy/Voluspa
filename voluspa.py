@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """Voluspa Ghost Proxy Discord Bot"""
-VOLUSPA_VERSION = 'v0.0.7a'
+VOLUSPA_VERSION = 'v0.0.8'
 # Bot Example: https://gist.github.com/EvieePy/d78c061a4798ae81be9825468fe146be
 
 import datetime
@@ -41,8 +41,13 @@ cog_extensions = [
     'cogs.utilities',
 ]
 
-# bot = commands.AutoShardedBot()
-bot = commands.Bot(command_prefix=get_prefix, description='Völuspá the Ghost Proxy Proto-Warmind AI')
+
+# Note: AutoShard when guilds > 1000 bot = commands.AutoShardedBot()
+bot = commands.Bot(
+    command_prefix=get_prefix,
+    description='Völuspá the Ghost Proxy Proto-Warmind AI',
+    case_insensitive=True
+)
 
 
 @bot.event
