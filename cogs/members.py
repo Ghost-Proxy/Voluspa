@@ -120,7 +120,7 @@ async def async_get_destiny_profile_characters(destiny_membership_id, membership
                 return characters
             else:
                 logger.info(f'ERROR - Unable to retrieve characters for {target_endpoint}\n'
-                            f'Response was: [status {r.status}] {r.text()}')
+                            f'Response was: [status {r.status}] {await r.text()}')
 
 async def async_get_member_data_by_id(membership_id, membership_type, platform_type=3):  # platform_type 4 is PC
     target_endpoint = '/User/GetMembershipsById/{}/{}/'.format(membership_id, membership_type)
@@ -136,7 +136,7 @@ async def async_get_member_data_by_id(membership_id, membership_type, platform_t
                 return destiny_membership_info['membershipId']
             else:
                 logger.info(f'ERROR - Unable to retrieve characters for {target_endpoint}\n'
-                            f'Response was: [status {r.status}] {r.text()}')
+                            f'Response was: [status {r.status}] {await r.text()}')
 
 
 async def async_get_clan_members():
@@ -153,7 +153,7 @@ async def async_get_clan_members():
                 return num_members, member_list
             else:
                 logger.info(f'ERROR - Unable to retrieve characters for {target_endpoint}\n'
-                            f'Response was: [status {r.status}] {r.text()}')
+                            f'Response was: [status {r.status}] {await r.text()}')
 
 
 def get_member_data_by_id(membership_id, membership_type, platform_type=4):  # platform_type 4 is PC
