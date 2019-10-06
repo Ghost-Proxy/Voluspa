@@ -1,9 +1,10 @@
-import time
+import asyncio
 import logging
 import datetime
 import statistics
 
-from voluspa import CONFIG, VOLUSPA_VERSION, VOLUSPA_SHA
+from voluspa import CONFIG, VOLUSPA_VERSION
+from modules.custom_embed import default_embed, format_list
 
 import discord
 from discord.ext import commands
@@ -79,31 +80,26 @@ class Systems(commands.Cog):
 
     @commands.command()
     async def ping(self, ctx):
-        """Voluspa's latency"""
+        """Voluspa's latency to Discord"""
         async with ctx.typing():
-        # Get the latency of the bot
-        # latency = bot.latency  # Included in the Discord.py library
-
-            # async def get_latency():
-            #     d_client = discord.Client()
-            #     time.sleep(5)
-            #     lat = d_client.latency
-            #     await d_client.close()
-            #     return lat
-            # TODO: Fix?
-            # latencies = [await get_latency() for _ in range(0, 1)]
-            latencies = [self.bot.latency for _ in range(0, 1)]
+            latencies = []
+            for _ in range(0, 5):
+                latencies.append(self.bot.latency)
+                await asyncio.sleep(1)
             lat_results = ["\t_Ping #{} -- {:.3f} secs ({:.0f} ms)_".format(i + 1, p, p * 1000)
                            for i, p in enumerate(latencies)]
             mean_latency = statistics.mean(latencies)
-            msg = "---\nLatency Results **(WIP)**:\n{}\n---\nAvg: {:.3f} secs ({:.0f} ms)".format(
+            msg = "**Latency Results**\n{}\n---\nAvg: {:.3f} secs ({:.0f} ms)".format(
                 '\n'.join(lat_results),
                 mean_latency,
                 mean_latency * 1000
             )
-        # "Latency: {:.3f} secs ({:.0f} ms)".format(latency, latency * 1000)
-        # Send it to the user
-        await ctx.send(msg)
+            # "Latency: {:.3f} secs ({:.0f} ms)".format(latency, latency * 1000)
+        confirm_embed = default_embed(
+            title='Völuspá to Discord latency',
+            description=f'\n{msg}'
+        )
+        await ctx.send(embed=confirm_embed)
 
 
 def setup(bot):
