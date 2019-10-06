@@ -10,7 +10,7 @@ logger = logging.getLogger('voluspa.bungie_requests')
 
 async def async_bungie_request_handler(target_endpoint, request_url=None, params=None, response_handler=None):
     bungie_platform_url = 'https://www.bungie.net/platform'
-    _request_url = f'{request_url}{target_endpoint}' if request_url else f'{bungie_platform_url}{target_endpoint}'
+    _request_url = request_url if request_url else bungie_platform_url
     resp = await async_request_handler(_request_url,
                                        target_endpoint,
                                        headers={'X-API-Key': CONFIG.Bungie.api_key},
