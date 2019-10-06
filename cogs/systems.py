@@ -82,19 +82,22 @@ class Systems(commands.Cog):
     async def ping(self, ctx):
         """Voluspa's latency to Discord"""
         async with ctx.typing():
-            latencies = []
-            for _ in range(0, 5):
-                latencies.append(self.bot.latency)
-                await asyncio.sleep(1)
-            lat_results = ["\t_Ping #{} -- {:.3f} secs ({:.0f} ms)_".format(i + 1, p, p * 1000)
-                           for i, p in enumerate(latencies)]
-            mean_latency = statistics.mean(latencies)
-            msg = "**Latency Results**\n{}\n---\nAvg: {:.3f} secs ({:.0f} ms)".format(
-                '\n'.join(lat_results),
-                mean_latency,
-                mean_latency * 1000
-            )
+            # latencies = []
+            # for _ in range(0, 5):
+            #     latencies.append(self.bot.latency)
+            #     await asyncio.sleep(1)
+            # lat_results = ["_Ping #{} -- {:.3f} secs ({:.0f} ms)_".format(i + 1, p, p * 1000)
+            #                for i, p in enumerate(latencies)]
+            # mean_latency = statistics.mean(latencies)
+            # msg = "**Latency Results**\n{}\n---\nAvg: {:.3f} secs ({:.0f} ms)".format(
+            #     '\n'.join(lat_results),
+            #     mean_latency,
+            #     mean_latency * 1000
+            # )
             # "Latency: {:.3f} secs ({:.0f} ms)".format(latency, latency * 1000)
+            discord_latency = self.bot.latency
+            msg = "**Latency Result:**\n\n" \
+                  "_Ping of {:.3f} secs ({:.0f} ms)_".format(discord_latency, discord_latency * 1000)
         confirm_embed = default_embed(
             title='Völuspá to Discord latency',
             description=f'\n{msg}'
