@@ -16,6 +16,7 @@ import discord
 from discord.ext import commands
 
 from modules.custom_embed import default_embed
+from voluspa import CONFIG
 
 logger = logging.getLogger('voluspa.cog.utilities')
 
@@ -320,6 +321,23 @@ class Utilities(commands.Cog):
                     plt.close()
                 except KeyError:
                     await ctx.send(f'Uh oh, I was unable to collate poll `{id}`. Sorry!')
+                    
+    @commands.command()                
+    async def vanguard(self, ctx, *, message):
+        """Sends an anonymous message to the Vanguard
+        
+        You can write your message across multiple lines
+        
+        Sign your message if you would like the Vanguard to contact you back"""
+            
+        vanguard_channel = ctx.bot.get_channel(CONFIG.Voluspa.vanguard_channel_id)
+        await vanguard_channel.send("Incoming message for the Vanguard:\n>>> " + message)
+        
+        if isinstance(ctx.message.channel, discord.abc.GuildChannel):
+            await ctx.send("Your message has been forwarded to the Vanguard. These messages will self-destruct in one minute.", delete_after=60)
+            await ctx.message.delete(delay=60)
+        else:
+            await ctx.send("Your message has been forwarded to the Vanguard.")
 
 def setup(bot):
     bot.add_cog(Utilities(bot))

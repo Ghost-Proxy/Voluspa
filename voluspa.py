@@ -143,7 +143,7 @@ async def on_command_error(ctx, error):
 
     if isinstance(error, commands.UserInputError):
         await ctx.send("Invalid input.")
-        await ctx.command.send_command_help(ctx)
+        await ctx.send_help(ctx.command)
         return
 
     if isinstance(error, commands.NoPrivateMessage):

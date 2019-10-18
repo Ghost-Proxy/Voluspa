@@ -13,3 +13,4 @@ Voluspa:
   prefix: '$'
   redis_path: ''
   memcache_path: ''
+  vanguard_channel_id: 0
