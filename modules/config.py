@@ -12,6 +12,22 @@ def read_yaml(yaml_file):
         return yaml.full_load(yfile)
 
 
+def cast_to_native_type(value):
+    if value is None:
+        return value
+    supported_types = [int, bool, float]
+    for _type in supported_types:
+        try:
+            return _type(value)
+        except TypeError:
+            pass
+    return value
+
+
+def getenv_cast(env_var, default=None):
+    return cast_to_native_type(os.getenv(env_var, default))
+
+
 # TODO CLEANUP
 def read_config():
     """
@@ -44,19 +60,19 @@ def read_config():
         print('Local secrets.yml not found, pulling secrets from Env Vars...')
         secrets = {
             'Bungie': {
-                'api_key': os.environ['BUNGIE_API_KEY'],
-                'clan_group_id': os.environ['BUNGIE_CLAN_GROUP_ID'],
-                'oauth_client_id': os.environ['BUNGIE_OAUTH_ID']
+                'api_key': getenv_cast('BUNGIE_API_KEY'),
+                'clan_group_id': getenv_cast('BUNGIE_CLAN_GROUP_ID'),
+                'oauth_client_id': getenv_cast('BUNGIE_OAUTH_ID')
             },
             'Discord': {
-                'api_key': os.environ['DISCORD_API_KEY']
+                'api_key': getenv_cast('DISCORD_API_KEY')
             },
         }
 
         voluspa_config = ['VOLUSPA_PREFIX', 'VOLUSPA_FEEDBACK_CHANNEL_ID']
         for ve in voluspa_config:
             if os.getenv(ve):
-                secrets['Voluspa'] = {ve.split('_', maxsplit=1)[1].lower(): os.getenv(ve)}
+                secrets['Voluspa'] = {ve.split('_', maxsplit=1)[1].lower(): getenv_cast(ve)}
 
     merged_config_2 = merge_dicts(merged_config_1, secrets)
 
