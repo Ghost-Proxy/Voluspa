@@ -19,6 +19,7 @@ logger = archivist.get_logger()
 from modules.fun import Quotes
 from modules.database import Database
 from modules.discord_utils import get_prefix, update_status_task
+from modules.exceptions import VoluspaError, BungieAPIError, BungieAPIOffline
 
 # Third-Party Imports
 import discord
@@ -155,6 +156,14 @@ async def on_command_error(ctx, error):
 
     if isinstance(error, commands.CheckFailure):
         await ctx.send("You do not have permission to use this command.")
+        return
+
+    if isinstance(error, BungieAPIError):
+        await ctx.send("There was an error with the Bungie API.")
+        return
+
+    if isinstance(error, BungieAPIOffline):
+        await ctx.send("Bungie API appears to be currently offline. :(")
         return
 
     # ignore all other exception types, but print them to stderr

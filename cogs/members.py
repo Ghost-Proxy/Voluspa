@@ -1,24 +1,20 @@
 import itertools
 import logging
 import math
-import pprint
 import re
 import statistics
 
 from modules.config import CONFIG
 from modules.discord_utils import send_multipart_msg
+from modules.external_services.bungie import async_bungie_request_handler
 
-import aiohttp
 import discord
 from discord.ext import commands
-import requests
 # https://github.com/seatgeek/fuzzywuzzy <- instead
 
 from modules.custom_embed import default_embed, format_list
 
 logger = logging.getLogger('voluspa.cog.members')
-
-from modules.custom_embed import default_embed
 
 
 def filter_character_types(clan_characters, min_level=0):
@@ -31,7 +27,6 @@ def filter_character_types(clan_characters, min_level=0):
             total_num_chars += 1
             if min_level > 0 and char['light'] < min_level:
                 continue
-
             # Destiny Class
             # Titan: 0
             # Hunter: 1
@@ -80,19 +75,12 @@ async def generate_char_stats_message(light_levels, total_chars, char_type):
     return stats_msg
 
 
-# TODO: Deprecated - Remove
-async def get_destiny_profile_characters(destiny_membership_id, membership_type):
+async def async_get_destiny_profile_characters(destiny_membership_id, membership_type):
     # https://bungie-net.github.io/multi/operation_get_Destiny2-GetProfile.html#operation_get_Destiny2-GetProfile
-    # {'iconPath': '', 'membershipType': 4, 'membershipId': '4611686018467468651', 'displayName': 'Mirage'}
-    # request_url = https://www.bungie.net/platform/Destiny2/4/Profile/4611686018467468651/
-    target_endpoint = '/Destiny2/{}/Profile/{}/'.format(membership_type, destiny_membership_id)
-    # ?components=Profiles,Characters
-    profile_params = {'components': 'Profiles,Characters'}
-    request_url = 'https://www.bungie.net/platform{}'.format(target_endpoint)
-    # TODO: Replace requests with aiohttp
-    r = requests.get(request_url, headers={'X-API-Key': CONFIG.Bungie.api_key}, params=profile_params)
-    raw_json = r.json()
-    # logger.info('Destiny Profile:\n{}'.format(raw_json))
+    target_endpoint = f'/Destiny2/{membership_type}/Profile/{destiny_membership_id}/'
+    profile_params = {'components': 'Profiles,Characters'}  # ?components=Profiles,Characters
+    raw_json = await async_bungie_request_handler(target_endpoint, params=profile_params)
+    logger.info(f'Successfully retrieved characters for {target_endpoint}')
     bungie_response = raw_json['Response']
     characters_data = bungie_response['characters']['data']
     characters = []
@@ -101,58 +89,30 @@ async def get_destiny_profile_characters(destiny_membership_id, membership_type)
     return characters
 
 
-async def async_get_destiny_profile_characters(destiny_membership_id, membership_type):
-    target_endpoint = '/Destiny2/{}/Profile/{}/'.format(membership_type, destiny_membership_id)
-    # ?components=Profiles,Characters
-    profile_params = {'components': 'Profiles,Characters'}
-    request_url = 'https://www.bungie.net/platform{}'.format(target_endpoint)
-
-    async with aiohttp.ClientSession() as session:
-        async with session.get(request_url, headers={'X-API-Key': CONFIG.Bungie.api_key}, params=profile_params) as r:
-            if r.status == 200:
-                raw_json = await r.json()
-                bungie_response = raw_json['Response']
-                characters_data = bungie_response['characters']['data']
-                characters = []
-                for char in characters_data.values():
-                    characters.append({'classType': char['classType'], 'light': char['light']})
-                return characters
-
-
 async def async_get_member_data_by_id(membership_id, membership_type, platform_type=3):  # platform_type 4 is PC
-    target_endpoint = '/User/GetMembershipsById/{}/{}/'.format(membership_id, membership_type)
-    request_url = 'https://www.bungie.net/platform{}'.format(target_endpoint)
-    async with aiohttp.ClientSession() as session:
-        async with session.get(request_url, headers={'X-API-Key': CONFIG.Bungie.api_key}) as r:
-            if r.status == 200:
-                raw_json = await r.json()
-                bungie_response = raw_json['Response']
-                destiny_memberships = bungie_response['destinyMemberships']
-                destiny_membership_info = [dm for dm in destiny_memberships if dm['membershipType'] == platform_type][0]
-                # logger.info('> Returning: {}'.format(destiny_membership_info['membershipId']))
-                return destiny_membership_info['membershipId']
+    target_endpoint = f'/User/GetMembershipsById/{membership_id}/{membership_type}/'
+    raw_json = await async_bungie_request_handler(target_endpoint)
+    bungie_response = raw_json['Response']
+    destiny_memberships = bungie_response['destinyMemberships']
+    destiny_membership_info = [dm for dm in destiny_memberships if dm['membershipType'] == platform_type][0]
+    # logger.info('> Returning: {}'.format(destiny_membership_info['membershipId']))
+    return destiny_membership_info['membershipId']
 
 
 async def async_get_clan_members():
-    target_endpoint = '/GroupV2/{}/Members/'.format(CONFIG.Bungie.clan_group_id)
-    request_url = 'https://www.bungie.net/platform{}'.format(target_endpoint)
-    async with aiohttp.ClientSession() as session:
-        async with session.get(request_url, headers={'X-API-Key': CONFIG.Bungie.api_key}) as r:
-            if r.status == 200:
-                raw_json = await r.json()
-                bungie_results = raw_json['Response']
-                member_list = bungie_results['results']
-                num_members = bungie_results['totalResults']
-                logger.info('BUNGIE MEMBER LIST:\n{}'.format(member_list))
-                return num_members, member_list
+    target_endpoint = f'/GroupV2/{CONFIG.Bungie.clan_group_id}/Members/'
+    raw_json = await async_bungie_request_handler(target_endpoint)
+    bungie_results = raw_json['Response']
+    member_list = bungie_results['results']
+    num_members = bungie_results['totalResults']
+    logger.info('BUNGIE MEMBER LIST:\n{}'.format(len(member_list)))
+    return num_members, member_list
 
 
-def get_member_data_by_id(membership_id, membership_type, platform_type=4):  # platform_type 4 is PC
+async def async_get_member_data_by_id(membership_id, membership_type, platform_type=4):  # platform_type 4 is PC
     # https://bungie-net.github.io/multi/operation_get_User-GetMembershipDataById.html#operation_get_User-GetMembershipDataById
-    target_endpoint = '/User/GetMembershipsById/{}/{}/'.format(membership_id, membership_type)
-    request_url = 'https://www.bungie.net/platform{}'.format(target_endpoint)
-    r = requests.get(request_url, headers={'X-API-Key': CONFIG.Bungie.api_key})
-    raw_json = r.json()
+    target_endpoint = f'/User/GetMembershipsById/{membership_id}/{membership_type}/'
+    raw_json = await async_bungie_request_handler(target_endpoint)
     # logger.info('MEMBER DATA INFO:\n{}'.format(raw_json))
     bungie_response = raw_json['Response']
     destiny_memberships = bungie_response['destinyMemberships']
@@ -174,22 +134,8 @@ def get_destiny_member_info(member):
     }
 
 
-# TODO: Abstract further
-async def async_bungie_request_handler(target_endpoint):  # , request_url):
-    request_url = 'https://www.bungie.net/platform{}'.format(target_endpoint)
-    # target_url = f'{request_url}{target_endpoint}'
-    async with aiohttp.ClientSession() as session:
-        async with session.get(request_url, headers={'X-API-Key': CONFIG.Bungie.api_key}) as r:
-            if r.status == 200:
-                raw_json = await r.json()
-                return raw_json
-            else:
-                return None  # BOOM
-
-
 async def async_get_bungie_clan_members():
-    target_endpoint = '/GroupV2/{}/Members/'.format(CONFIG.Bungie.clan_group_id)
-    #request_url = 'https://www.bungie.net/platform'
+    target_endpoint = f'/GroupV2/{CONFIG.Bungie.clan_group_id}/Members/'
     response = await async_bungie_request_handler(target_endpoint)
     logger.info(f'Bungie Response: {response}')
     bungie_results = response['Response']
@@ -199,22 +145,10 @@ async def async_get_bungie_clan_members():
     member_list = [member['destinyUserInfo']['displayName'] for member in member_results]
     return num_members, member_list, member_results
 
-def get_clan_members():
-    target_endpoint = '/GroupV2/{}/Members/'.format(CONFIG.Bungie.clan_group_id)
-    request_url = 'https://www.bungie.net/platform{}'.format(target_endpoint)
-    r = requests.get(request_url, headers={'X-API-Key': CONFIG.Bungie.api_key})
-    raw_json = r.json()
-    bungie_results = raw_json['Response']
-    member_list = bungie_results['results']
-    num_members = bungie_results['totalResults']
-    # logger.info('BUNGIE MEMBER LIST:\n{}'.format(member_list))
-    return num_members, member_list
 
-
-def get_bungie_member_list():  # TODO THIS ONE
-    member_list_url = "https://www.bungie.net/platform/GroupV2/{}/Members/".format(CONFIG.Bungie.clan_group_id)
-    r = requests.get(member_list_url, headers={'X-API-Key': CONFIG.Bungie.api_key})
-    raw_json = r.json()
+async def async_get_bungie_member_list():
+    target_endpoint = f'/GroupV2/{CONFIG.Bungie.clan_group_id}/Members/'
+    raw_json = await async_bungie_request_handler(target_endpoint)
     bungie_results = raw_json['Response']
     logger.info('BUNGIE MEMBER LIST:\n{}'.format(bungie_results))
     member_results = bungie_results['results']
@@ -223,10 +157,9 @@ def get_bungie_member_list():  # TODO THIS ONE
     return num_members, member_list, member_results
 
 
-def get_bungie_member_type_dict():
-    member_list_url = "https://www.bungie.net/platform/GroupV2/{}/Members/".format(CONFIG.Bungie.clan_group_id)
-    r = requests.get(member_list_url, headers={'X-API-Key': CONFIG.Bungie.api_key})
-    raw_json = r.json()
+async def async_get_bungie_member_type_dict():
+    target_endpoint = f'/GroupV2/{CONFIG.Bungie.clan_group_id}/Members/'
+    raw_json = await async_bungie_request_handler(target_endpoint)
     bungie_results = raw_json['Response']
     logger.info('BUNGIE MEMBER LIST:\n{}'.format(bungie_results))
     member_results = bungie_results['results']
@@ -252,10 +185,6 @@ def filter_members_by_field(member_dict, field_name):
     } for member_id, member_info in member_dict.items()}
 
 
-def filter_member_roles():
-    pass
-
-
 def get_members_attr_list_by_role(member_dict, role_name, attr):
     filtered_members = []
     for member_id, member_info in member_dict.items():
@@ -265,105 +194,18 @@ def get_members_attr_list_by_role(member_dict, role_name, attr):
             filtered_members.append(member_info[attr])
     return filtered_members
 
-# elif message.content.startswith('!members'):
-#     x = message.server.members
-#     for member in x:
-#         print(member.name)
 
-
-def bungie_search_users(player_name):
-    search_url = "https://www.bungie.net/platform/User/SearchUsers/?q={}".format(player_name)
-    r = requests.get(search_url, headers={'X-API-Key': CONFIG.Bungie.api_key})
-    raw_json = r.json()
+async def async_bungie_search_users(player_name):
+    search_url = f'/User/SearchUsers/?q={player_name}'
+    raw_json = await async_bungie_request_handler(search_url)
     bungie_results = raw_json['Response']
     logger.info('Bungie Search response:\n{}'.format(bungie_results))
-
     if len(bungie_results) == 0:
         endpoint_path = f'/Destiny2/SearchDestinyPlayer/{4}/{player_name}/'
-        target_url = f'https://www.bungie.net/platform{endpoint_path}'
-        r = requests.get(target_url, headers={'X-API-Key': CONFIG.Bungie.api_key})
-        raw_json = r.json()
+        raw_json = await async_bungie_request_handler(endpoint_path)
         bungie_results = raw_json['Response']
         logger.info(f'Destiny Search response:\n{bungie_results}')
-    '''
-    # [{'membershipId': '1595120', 'uniqueName': 'DESTROYRofWRLDS', 
-    # 'displayName': 'Mirage', 'profilePicture': 70655, 'profileTheme': 1101, 
-    # 'userTitle': 0, 'successMessageFlags': '16', 'isDeleted': False, 
-    # 'about': 'SEE YOU SPACE COWBOY...', 'firstAccess': '2010-09-20T09:36:17.91Z', 
-    # 'lastUpdate': '2018-09-04T21:10:12.901Z', 'psnDisplayName': 'Mirage_1337', 
-    # 'xboxDisplayName': 'D3STROYRofWRLDS', 'showActivity': False, 'locale': 'en', 
-    # 'localeInheritDefault': True, 'showGroupMessaging': True, 
-    # 'profilePicturePath': '/img/profile/avatars/cc25.jpg', 'profileThemeName': 'd2_01', 
-    # 'userTitleDisplay': 'Newbie', 'statusText': '', 'statusDate': '0001-01-01T00:00:00Z', 
-    # 'blizzardDisplayName': 'Mirage#1758'},
-    '''
-    #results = bungie_results['results']
-    #num_results = raw_json['Response']['totalResults']
-    #player_list = [member['destinyUserInfo']['displayName'] for member in member_results]
-    #return num_results, results
     return bungie_results
-
-
-def bungie_get_profile(player_name=None):
-    bungie_account_url = "http://www.bungie.net/platform/User/GetBungieAccount/{}/254/".format(
-        1595120
-    )
-    r = requests.get(bungie_account_url, headers={'X-API-Key': CONFIG.Bungie.api_key})
-    raw_json = r.json()
-    logger.info('RESPONSE ({}):\n{}'.format(bungie_account_url, raw_json))
-    # {'Response': {'destinyMemberships': [{'membershipType': 2, 'membershipId': '4611686018428895515',
-    # 'displayName': 'Mirage_1337'}, {'membershipType': 4, 'membershipId': '4611686018467468651',
-    # 'displayName': 'Mirage'}], 'bungieNetUser': {'membershipId': '1595120', 'uniqueName': 'DESTROYRofWRLDS',
-    # 'displayName': 'Mirage', 'profilePicture': 70655, 'profileTheme': 1101, 'userTitle': 0,
-    # 'successMessageFlags': '16', 'isDeleted': False, 'about': 'SEE YOU SPACE COWBOY...',
-    # 'firstAccess': '2010-09-20T09:36:17.91Z', 'lastUpdate': '2018-09-04T21:10:12.901Z',
-    # 'psnDisplayName': 'Mirage_1337', 'xboxDisplayName': 'D3STROYRofWRLDS', 'showActivity': False,
-    # 'locale': 'en', 'localeInheritDefault': True, 'showGroupMessaging': True,
-    # 'profilePicturePath': '/img/profile/avatars/cc25.jpg', 'profileThemeName': 'd2_01',
-    # 'userTitleDisplay': 'Newbie', 'statusText': '', 'statusDate': '0001-01-01T00:00:00Z',
-    # 'blizzardDisplayName': 'Mirage#1758'}}, 'ErrorCode': 1, 'ThrottleSeconds': 0,
-    # 'ErrorStatus': 'Success', 'Message': 'Ok', 'MessageData': {}}
-
-    # /User/GetBungieNetUserById/{id}/
-    bungie_net_user_url = "http://www.bungie.net/platform/User/GetBungieNetUserById/{id}/".format(
-        id=1595120
-    )
-    r = requests.get(bungie_net_user_url, headers={'X-API-Key': CONFIG.Bungie.api_key})
-    raw_json = r.json()
-    logger.info('RESPONSE ({}):\n{}'.format(bungie_net_user_url, raw_json))
-    # {'ErrorCode': 217, 'ThrottleSeconds': 0, 'ErrorStatus': 'UserCannotResolveCentralAccount',
-    # 'Message': "We couldn't find the account you're looking for. The account may not exist,
-    # or we may be experiencing technical difficulties.", 'MessageData': {}}
-
-    bungie_profile_url = "http://www.bungie.net/platform/Destiny2/{membershipType}/Profile/{membershipId}/LinkedProfiles/".format(
-        membershipType=4,
-        membershipId=4611686018467468651
-    )
-    r = requests.get(bungie_profile_url, headers={'X-API-Key': CONFIG.Bungie.api_key})
-    raw_json = r.json()
-    logger.info('RESPONSE ({}):\n{}'.format(bungie_profile_url, raw_json))
-
-    destiny_memberships = "http://www.bungie.net/platform/User/GetMembershipsById/{membershipId}/{membershipType}/".format(
-        membershipId=4611686018467468651,
-        membershipType=4
-    )
-    r = requests.get(destiny_memberships, headers={'X-API-Key': CONFIG.Bungie.api_key})
-    raw_json = r.json()
-    logger.info('RESPONSE ({}):\n{}'.format(destiny_memberships, raw_json))
-
-    # /Destiny/[MembershipType]/Stats/GetMembershipIdByDisplayName/[DisplayName]
-
-    profile_url = "https://www.bungie.net/platform/Destiny2/{}/Profile/{}/".format(
-        4,  # TigerBlizzard (PC)
-        1595120  # ME
-    )
-    r = requests.get(profile_url, headers={'X-API-Key': CONFIG.Bungie.api_key})
-    raw_json = r.json()
-    logger.info('RESPONSE:\n{}'.format(raw_json))
-    #bungie_results = raw_json['Response']
-    #logger.info('Bungie response:\n{}'.format(bungie_results))
-    #return bungie_results
-    return
 
 
 def get_discord_member_record(member):
@@ -401,7 +243,7 @@ class Members(commands.Cog):
 
             # This will only ever return max of 100 records, thus safe to do ahead of time
             bungie_num_members, bungie_member_list, bungie_members = await async_get_bungie_clan_members()
-            _, bungie_member_types_dict = get_bungie_member_type_dict()
+            _, bungie_member_types_dict = await async_get_bungie_member_type_dict()
             bungie_member_list_alpha_sorted = sorted(bungie_member_list, key=str.lower)
             # NOTE: bungie_member_list = [member['destinyUserInfo']['displayName'], ...]
 
@@ -495,10 +337,13 @@ class Members(commands.Cog):
     async def clan_stats(self, ctx, min_level: int = 0):
         async with ctx.typing():
             # platform_type = 4  # TODO MEH......
+            logger.info('Getting clan member list for stats...')
             num_members, member_list = await async_get_clan_members()
             destiny_members = [get_destiny_member_info(mem) for mem in member_list]
+            logger.info(f'Found records for {len(destiny_members)} member(s)')
             clan_characters = await filter_characters_from_members(destiny_members)
-            logger.info('clan_characters:\n{}\n'.format(clan_characters))
+            num_characters = sum([len(chars) for chars in clan_characters])
+            logger.info(f'Found records for {num_characters} character(s)')
             hunters, titans, warlocks, num_clan_chars = filter_character_types(clan_characters, min_level)
             num_filtered_chars = len(hunters) + len(titans) + len(warlocks)
             all_chars = hunters + titans + warlocks
@@ -522,8 +367,6 @@ class Members(commands.Cog):
                     await generate_char_stats_message(titans, num_filtered_chars, 'Titans'),
                     await generate_char_stats_message(warlocks, num_filtered_chars, 'Warlocks')
                 )
-        #await send_multipart_msg(ctx, msg_final)
-
             embed = default_embed(
                 title='Clan Character Stats',
                 description=result_msg
@@ -574,17 +417,12 @@ class Members(commands.Cog):
 
         await ctx.send(embed=result_embed)
 
-    # @bot.command(name='get-profile')
-    # async def get_player_profile(ctx, *, player_name):
-    #     bungie_get_profile()
-    #     return
-
     @commands.command(name='find-player', aliases=['fp'])
     @commands.guild_only()
     async def find_player(self, ctx, *, player_name):
         """Simple Bungie PC player search"""
         #num_players, results = bungie_search_users(player_name)
-        results = bungie_search_users(player_name)
+        results = await async_bungie_search_users(player_name)
         logger.info('>> Bungie Player Search Results: {}'.format(results))
         # TAKE FIRST ONLY FOR NOW
         await ctx.send(f'Found {len(results)} Matching Players{" , top result below." if len(results) > 0 else ""}')

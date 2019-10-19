@@ -47,7 +47,7 @@ class FunStuff(commands.Cog):
 
     @commands.command()
     async def random(self, ctx):
-        """Random things from the internet... :P"""
+        """Random things from the net..."""
         rand_quote = await random_quotes.get_random_quote()
         await ctx.send(rand_quote)
 
