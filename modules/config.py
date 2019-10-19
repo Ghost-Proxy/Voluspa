@@ -12,10 +12,18 @@ def read_yaml(yaml_file):
         return yaml.full_load(yfile)
 
 
+def bool_converter(value):
+    if value.lower() in ['true', 1, 'yes', 'on', 'y']:
+        return True
+    if value.lower() in ['false', 0, 'no', 'off', 'n']:
+        return False
+    raise TypeError
+
+
 def cast_to_native_type(value):
     if value is None:
         return value
-    supported_types = [int, bool, float]
+    supported_types = [int, float, bool_converter]  # haha, bool() is too greedy
     for _type in supported_types:
         try:
             return _type(value)
