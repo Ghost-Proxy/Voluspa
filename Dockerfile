@@ -1,8 +1,8 @@
 FROM ubuntu:16.04
 LABEL maintainer="Mirage"
-ENV PY_VER="3.7.3"
-ENV PY_VER_MAJOR="3.7"
-ENV DEBIAN_FRONTEND=noninteractive
+ENV PY_VER "3.7.4"
+ENV PY_VER_MAJOR "3.7"
+ENV DEBIAN_FRONTEND noninteractive
 
 RUN apt-get update && \
     apt-get install -qq \
@@ -18,6 +18,7 @@ RUN apt-get update && \
         apt-utils \
         build-essential \
         curl \
+        libbz2-dev \
         libffi-dev \
         libgdbm-dev \
         libncurses5-dev \
@@ -38,6 +39,10 @@ RUN cd /opt && \
 
 RUN python${PY_VER_MAJOR} --version && \
     python${PY_VER_MAJOR} -m pip install -U pip
+
+RUN apt-get update && \
+    apt-get install -qq \
+        vim
 
 RUN mkdir -p /app/voluspa
 COPY . /app/voluspa/
