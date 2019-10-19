@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """Voluspa Ghost Proxy Discord Bot"""
-VOLUSPA_VERSION = 'v0.0.8b'
+VOLUSPA_VERSION = 'v0.0.9'
 # Bot Example: https://gist.github.com/EvieePy/d78c061a4798ae81be9825468fe146be
 
 import datetime
@@ -27,7 +27,10 @@ from discord.ext import commands
 
 # Caches
 from aiocache import caches
-caches.set_config(CONFIG.cache)
+caches.set_config(CONFIG.Voluspa.cache)
+
+print(f'>>>>>> CACHE TEST: {caches}')
+# loop.run_until_complete(cache.close())
 
 # Setup Initial Stuff
 VOLUSPA_SHA = CONFIG.Voluspa.sha[:10]
@@ -44,6 +47,7 @@ cog_extensions = [
     'cogs.members',
     'cogs.destinyart',
     'cogs.utilities',
+    'cogs.cache',
 ]
 
 
