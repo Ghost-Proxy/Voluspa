@@ -53,7 +53,7 @@ def read_config():
             },
         }
 
-        voluspa_config = ['VOLUSPA_PREFIX']
+        voluspa_config = ['VOLUSPA_PREFIX', 'VOLUSPA_FEEDBACK_CHANNEL_ID']
         for ve in voluspa_config:
             if os.getenv(ve):
                 secrets['Voluspa'] = {ve.split('_')[1].lower(): os.getenv(ve)}
