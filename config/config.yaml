@@ -11,5 +11,5 @@ Resources:
 
 Voluspa:
   prefix: '$'
-  redis_path: ''
-  memcache_path: ''
+  cache: {}
+
