@@ -21,6 +21,7 @@ RUN apt-get update && \
         libbz2-dev \
         libffi-dev \
         libgdbm-dev \
+        liblzma-dev \
         libncurses5-dev \
         libnss3-dev \
         libreadline-dev \
@@ -58,5 +59,5 @@ RUN pip3 install -r requirements.txt
     # Mac/Nix
     # docker run -it -v $(pwd):/app/voluspa:ro voluspa:local python3 ./voluspa.py
 
-    # Powershell
+    # Powershell (mounting won't work without share settings beforehand...)
     # docker run -it -v ${$pwd.Path}:/app/voluspa:ro voluspa:local python3 ./voluspa.py
