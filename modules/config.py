@@ -56,7 +56,7 @@ def read_config():
         voluspa_config = ['VOLUSPA_PREFIX', 'VOLUSPA_FEEDBACK_CHANNEL_ID']
         for ve in voluspa_config:
             if os.getenv(ve):
-                secrets['Voluspa'] = {ve.split('_')[1].lower(): os.getenv(ve)}
+                secrets['Voluspa'] = {ve.split('_', maxsplit=1)[1].lower(): os.getenv(ve)}
 
     merged_config_2 = merge_dicts(merged_config_1, secrets)
 
