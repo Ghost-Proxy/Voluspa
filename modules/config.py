@@ -19,7 +19,7 @@ def cast_to_native_type(value):
     for _type in supported_types:
         try:
             return _type(value)
-        except TypeError:
+        except (TypeError, ValueError):
             pass
     return value
 
