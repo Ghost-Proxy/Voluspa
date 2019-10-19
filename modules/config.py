@@ -15,6 +15,30 @@ def read_yaml(yaml_file):
         return yaml.full_load(yfile)
 
 
+def bool_converter(value):
+    if value.lower() in ['true', 1, 'yes', 'on', 'y']:
+        return True
+    if value.lower() in ['false', 0, 'no', 'off', 'n']:
+        return False
+    raise TypeError
+
+
+def cast_to_native_type(value):
+    if value is None:
+        return value
+    supported_types = [int, float, bool_converter]  # haha, bool() is too greedy
+    for _type in supported_types:
+        try:
+            return _type(value)
+        except (TypeError, ValueError):
+            pass
+    return value
+
+
+def getenv_cast(env_var, default=None):
+    return cast_to_native_type(os.getenv(env_var, default))
+
+
 # TODO CLEANUP
 def read_config():
     """
@@ -47,22 +71,22 @@ def read_config():
     print('Pulling secrets from Env Vars...')
     env_secrets = {
         'Bungie': {
-            'api_key': os.environ['BUNGIE_API_KEY'],
-            'clan_group_id': os.environ['BUNGIE_CLAN_GROUP_ID'],
-            'oauth_client_id': os.environ['BUNGIE_OAUTH_ID']
+            'api_key': getenv_cast('BUNGIE_API_KEY'),
+            'clan_group_id': getenv_cast('BUNGIE_CLAN_GROUP_ID'),
+            'oauth_client_id': getenv_cast('BUNGIE_OAUTH_ID')
         },
         'Discord': {
-            'api_key': os.environ['DISCORD_API_KEY']
+            'api_key': getenv_cast('DISCORD_API_KEY')
         },
     }
 
     secrets = merge_dicts(secrets_file, env_secrets, skip_none=True)
 
     # Pick up Voluspa named Env Vars
-    voluspa_config = ['VOLUSPA_PREFIX']
+    voluspa_config = ['VOLUSPA_PREFIX', 'VOLUSPA_FEEDBACK_CHANNEL_ID']
     for ve in voluspa_config:
         if os.getenv(ve):
-            secrets['Voluspa'] = {ve.split('_')[1].lower(): os.getenv(ve)}
+            secrets['Voluspa'] = {ve.split('_', maxsplit=1)[1].lower(): getenv_cast(ve)}
 
     # ADDITIONAL CONFIG
     # Handle cache

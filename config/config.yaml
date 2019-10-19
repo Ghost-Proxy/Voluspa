@@ -12,4 +12,4 @@ Resources:
 Voluspa:
   prefix: '$'
   cache: {}
-
+  feedback_channel_id: 0
