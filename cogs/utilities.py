@@ -335,10 +335,10 @@ class Utilities(commands.Cog):
         await feedback_channel.send("Incoming message for the Vanguard:\n>>> " + message)
         
         if isinstance(ctx.message.channel, discord.abc.GuildChannel):
-            await ctx.send("Your message has been forwarded to the Vanguard. These messages will self-destruct in one minute.", delete_after=60)
+            await ctx.send("Your feedback has been sent. These messages will self-destruct in one minute.", delete_after=60)
             await ctx.message.delete(delay=60)
         else:
-            await ctx.send("Your message has been forwarded to the Vanguard.")
+            await ctx.send("Your feedback has been sent.")
 
 def setup(bot):
     bot.add_cog(Utilities(bot))
