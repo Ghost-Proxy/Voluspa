@@ -1,43 +1,11 @@
 import logging
 
-from voluspa import CONFIG
+from modules.cache import CACHE_NAME, write_cache, read_cache
 from modules.custom_embed import default_embed
 
 from discord.ext import commands
-from aiocache import caches
 
 logger = logging.getLogger('voluspa.cog.cache')
-
-if CONFIG.Voluspa.cache.get('redis', None):
-    CACHE_NAME = 'redis'
-else:
-    CACHE_NAME = 'default'
-CACHE_TYPE = CONFIG.Voluspa.cache[CACHE_NAME].cache
-logger.info(f'Using "{CACHE_NAME}" cache ({CACHE_TYPE})')
-
-
-async def write_cache(key, value, cache_name=CACHE_NAME):
-    cache = caches.get(cache_name)
-    await cache.set(key, value)
-    result = await cache.get(key) == value
-    # assert await cache.get(key) == value
-    if result:
-        logger.info(f'(cache: {cache_name}) - SUCCESS wrote k/v [{key}]:[{value}]!')
-        return result
-    else:
-        logger.warning(f'(cache: {cache_name}) - ERROR writing k/v [{key}]:[{value}]!')
-        return result
-
-
-async def read_cache(key, cache_name=CACHE_NAME):
-    cache = caches.get(cache_name)
-    value = await cache.get(key)
-    if value:
-        logger.info(f'(cache: {cache_name}) - SUCCESS read k/v [{key}]:[{value}]')
-        return value
-    else:
-        logger.warning(f'(cache: {cache_name}) - ERROR reading k/v [{key}]:[{value}]!')
-        return None
 
 
 class Cache(commands.Cog):
@@ -54,7 +22,6 @@ class Cache(commands.Cog):
             cache_name = cache_key.split('cache_name=')[1]
             cache_key, cache_value = cache_value.split(' ')
         await write_cache(cache_key, cache_value, cache_name=cache_name)
-        # await ctx.send(f'Wrote the following to cache:\nkey: {cache_key}\nvalue: {cache_value}')
         embed = default_embed(
             title='Cache Write (K/V)',
             description=f'Wrote the following Key/Value to "{cache_name}" cache'
@@ -75,7 +42,6 @@ class Cache(commands.Cog):
             cache_name, cache_key = cache_key.split(' ')
             cache_name = cache_name.split('cache_name=')[1]
         cache_value = await read_cache(cache_key, cache_name=cache_name)
-        # await ctx.send(f'Read the following from cache:\nkey: {cache_key}\nvalue: {cache_value}')
         embed = default_embed(
             title='Cache Read (K/V)',
             description=f'Read the following Key/Value from "{cache_name}" cache'
