@@ -210,9 +210,39 @@ async def on_command_error(ctx, error):
 #     print('Ignoring exception in command {}:'.format(ctx.command), file=sys.stderr)
 #     traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
 
+def start_webapp():
+    from threading import Thread
+    from quart import Quart, websocket
+    from functools import partial
+
+    app = Quart(__name__)
+
+    @app.route('/')
+    async def hello():
+        app.logger.info('Responding to http root request!')
+        return 'hello from Völuspá...'
+
+    @app.websocket('/ws')
+    async def websock():
+        app.logger.info('Responding to websocket request!')
+        while True:
+            await websocket.send('hello from Völuspá...')
+
+    partial_run = partial(
+        app.run,
+        host="0.0.0.0",
+        port=5337,
+        debug=True,
+        use_reloader=False
+    )
+    t = Thread(target=partial_run, daemon=True)
+    t.start()
+
 
 def main():
     logger.info('// Völuspá / Booting...')
+    logger.info('Starting web app...')
+    start_webapp()
 
     logger.info('Starting bot...')
     for extension in cog_extensions:
