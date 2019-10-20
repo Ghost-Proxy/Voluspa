@@ -4,6 +4,21 @@ from unittest import TestCase
 new_line = "\n"
 voluspa_raw_txt_logo = '--\\\\\\\\´//--'
 
+
+def memoize(func):
+    # Guarantees that the initial call to config is the same config over the lifetime of the app, in theory
+    cache = dict()
+
+    def memoized_func(*args):
+        if args in cache:
+            return cache[args]
+        result = func(*args)
+        cache[args] = result
+        return result
+
+    return memoized_func
+
+
 # https://stackoverflow.com/questions/38034377/object-like-attribute-access-for-nested-dictionary
 class AttrDict(dict):
     """ Dictionary subclass whose entries can be accessed by attributes

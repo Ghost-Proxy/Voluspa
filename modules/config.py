@@ -4,7 +4,7 @@ import datetime
 # import functools
 # @functools.lru_cache()
 
-from modules.misc import merge_dicts, AttrDict
+from modules.misc import merge_dicts, AttrDict, memoize
 from config.cache_config import CACHE_CONFIG
 
 
@@ -105,21 +105,6 @@ def read_config():
     print(f'Voluspa merged config -- Voluspa:\n{nested_config.Voluspa}')
 
     return nested_config
-
-
-def memoize(func):
-    # Guarantees that the initial call to config is the same config over the lifetime of the app, in theory
-    cache = dict()
-
-    def memoized_func(*args):
-        if args in cache:
-            return cache[args]
-        result = func(*args)
-        cache[args] = result
-        return result
-
-    return memoized_func
-
 
 memozied_config = memoize(read_config)
 CONFIG = memozied_config()
