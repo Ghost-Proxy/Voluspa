@@ -212,6 +212,9 @@ async def on_command_error(ctx, error):
 
 
 def main():
+    logger.info('// Völuspá / Booting...')
+
+    logger.info('Starting bot...')
     for extension in cog_extensions:
         bot.load_extension(extension)
     bot.run(CONFIG.Discord.api_key)
