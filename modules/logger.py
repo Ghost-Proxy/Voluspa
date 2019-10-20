@@ -5,22 +5,15 @@ from logging.handlers import RotatingFileHandler
 from modules.config import CONFIG
 
 
-class Archivist(object):
-    def __init__(self):
-        self.logger = None
-        if self.logger is None:
-            self.logger = _setup_logging()
-
-    def get_logger(self):
-        if self.logger is None:
-            self.logger = _setup_logging()
-        return self.logger
+def log_to_channel(log_channel, log_msg):
+    """For logging messages to a Discord channel also... WIP"""
+    pass
 
 
-def _setup_logging():
+def _setup_logging(log_level=logging.DEBUG):
     logging.getLogger().handlers.clear()
     root_logger = logging.getLogger()
-    root_logger.setLevel(logging.DEBUG)
+    root_logger.setLevel(log_level)
     log_formatter = logging.Formatter('%(asctime)s [%(levelname)s] %(name)s:  %(message)s')
 
     # TODO if on heroku, don't run file logger?
@@ -32,18 +25,18 @@ def _setup_logging():
         maxBytes=1024*1024*10,
         backupCount=10
     )
-    file_handler.setLevel(logging.DEBUG)
+    file_handler.setLevel(log_level)
     file_handler.setFormatter(log_formatter)
 
     stream_handler = logging.StreamHandler()
-    stream_handler.setLevel(logging.DEBUG)
+    stream_handler.setLevel(log_level)
     stream_handler.setFormatter(log_formatter)
 
     root_logger.addHandler(file_handler)
     root_logger.addHandler(stream_handler)
 
     discord_logger = logging.getLogger('discord')
-    discord_logger.setLevel(logging.DEBUG)
+    discord_logger.setLevel(log_level)
     discord_log_file_path = os.path.join(CONFIG.Voluspa.app_cwd, 'logs/discord.log')
     discord_file_handler = RotatingFileHandler(
         filename=discord_log_file_path,
@@ -62,7 +55,7 @@ def _setup_logging():
         maxBytes=1024*1024*10,
         backupCount=10
     )
-    voluspa_file_handler.setLevel(logging.DEBUG)
+    voluspa_file_handler.setLevel(log_level)
     voluspa_file_handler.setFormatter(log_formatter)
 
     voluspa_logger.info('Logging online!')
@@ -71,3 +64,12 @@ def _setup_logging():
     voluspa_logger.info(f'Log file [{"exists" if os.path.isfile(voluspa_log_file_path) else "does NOT exist"}] at: [{voluspa_log_file_path}]')
     return voluspa_logger
 
+
+class Archivist(object):
+    logger = _setup_logging()
+
+    def __init__(self):
+        self.logger = Archivist.logger
+
+    def get_logger(self):
+        return self.logger
