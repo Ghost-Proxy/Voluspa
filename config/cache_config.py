@@ -1,55 +1,57 @@
 import os
+from urllib.parse import urlparse
+
+from modules.misc import memoize
 
 
-def redis_config(env_var):
-    user, address, port = env_var.replace('redis://', '').split(':')
-    password, ip = address.split('@')
+def url_config(raw_url):
+    url = urlparse(raw_url)
     return {
-        'endpoint': ip,
-        'port': port,
-        'password': password
+        'endpoint': url.hostname,
+        'port': url.port,
+        'username': url.username,
+        'password': url.password,
+        'scheme': url.scheme
     }
 
 
-REDIS_URL = os.getenv('REDIS_URL')
-REDIS_CONFIG = {}
-if REDIS_URL:
-    REDIS_CONFIG = redis_config(REDIS_URL)
+REDIS_URL = os.getenv('REDIS_URL', None)
 
-CACHE_CONFIG = {
-    'default': {
-            'cache': "aiocache.SimpleMemoryCache",
-            'serializer': {
-                'class': "aiocache.serializers.StringSerializer"
-            }
-        },
-    # 'memcache': {
-    #     'cache': "aiocache.MemcachedCache",
-    #     'endpoint': os.getenv('MEMCACHE_ENDPOINT', "127.0.0.1"),
-    #     'port': 6379,
-    #     'timeout': 1,
-    #     'serializer': {
-    #         'class': "aiocache.serializers.PickleSerializer"
-    #     },
-    #     'plugins': [
-    #         {'class': "aiocache.plugins.HitMissRatioPlugin"},
-    #         {'class': "aiocache.plugins.TimingPlugin"}
-    #     ]
-    # },
-    'redis': {
-            'cache': "aiocache.RedisCache",
-            'endpoint': REDIS_CONFIG.get('endpoint', "127.0.0.1"),
-            'port': REDIS_CONFIG.get('port', 6379),
-            'timeout': 1,
-            'serializer': {
-                'class': "aiocache.serializers.PickleSerializer"
+
+def read_config():
+    # 'memcache': { },  # TODO: Once this gets properly supported...
+    cache_config = {
+        'default': {
+                'cache': "aiocache.SimpleMemoryCache",
+                'serializer': {
+                    'class': "aiocache.serializers.StringSerializer"
+                }
             },
-            'plugins': [
-                {'class': "aiocache.plugins.HitMissRatioPlugin"},
-                {'class': "aiocache.plugins.TimingPlugin"}
-            ]
-        }
-}
+    }
 
-if REDIS_CONFIG.get('password', None):
-    CACHE_CONFIG['redis']['password'] = REDIS_CONFIG['password']
+    if REDIS_URL:
+        redis_info = url_config(REDIS_URL)
+        redis_config = {
+            'redis': {
+                    'cache': "aiocache.RedisCache",
+                    'endpoint': redis_info.get('endpoint', "127.0.0.1"),
+                    'port': redis_info.get('port', 6379),
+                    'timeout': 1,
+                    'serializer': {
+                        'class': "aiocache.serializers.PickleSerializer"
+                    },
+                    'plugins': [
+                        {'class': "aiocache.plugins.HitMissRatioPlugin"},
+                        {'class': "aiocache.plugins.TimingPlugin"}
+                    ]
+                }
+        }
+        cache_config['redis'] = redis_config['redis']
+        if redis_config.get('password', None):
+            cache_config['redis']['password'] = redis_config['password']
+
+    return cache_config
+
+
+memozied_config = memoize(read_config)
+CACHE_CONFIG = memozied_config()
