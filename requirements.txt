@@ -1,9 +1,35 @@
+# MISC
 PyYAML==5.1.1
+
+# HTTP
 requests==2.22.0
-asyncpg==0.18.3
 aiohttp==3.5.4
+
+# SEARCH
 fuzzywuzzy[speedup]==0.17.0
-discord.py[voice]==1.2.3
+
+# API's
+discord.py[voice]==1.2.4
+
+# CHARTS
 matplotlib==3.1.1
 pandas==0.25.1
 emoji==0.5.4
+
+# TESTING
+# tox==3.13.2
+
+# DATABASE
+asyncpg==0.18.3
+# aiopg==1.0.0
+
+# CACHE
+# https://github.com/argaen/aiocache
+ujson==1.35
+msgpack==0.6.2
+# aiocache[redis,memcached]==0.10.1
+aiocache[redis,memcached]==0.11.1
+
+# https://github.com/aio-libs
+# aioredis==1.2.0
+# aiomcache==0.6.0

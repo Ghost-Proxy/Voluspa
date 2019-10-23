@@ -1,8 +1,11 @@
 import os
 import yaml
 import datetime
+# import functools
+# @functools.lru_cache()
 
-from modules.misc import merge_dicts, AttrDict
+from modules.misc import merge_dicts, AttrDict, memoize
+from config.cache_config import CACHE_CONFIG
 
 
 # Load in our secrets and config files
@@ -42,7 +45,7 @@ def read_config():
     Returns a nested config object for convenience
 
     Reads in ./config/secrets.yml in the format of config.yml for local dev env
-    If ./config/secrets.yml is not present, they are pulled from env vars
+    If ENV VARS are present, they will override secrets.yml
     """
     # TODO: This is convoluted...
     file_config = read_yaml('./config/config.yaml')
@@ -62,25 +65,33 @@ def read_config():
     secrets_path = os.path.join(os.getcwd(), './config/secrets.yaml')
     print(f'Attempting to load secrets from: {secrets_path}')
     if os.path.isfile(secrets_path):
-        print('Found secrets.yml, using local overrides...')
-        secrets = read_yaml('./config/secrets.yaml')
-    else:
-        print('Local secrets.yml not found, pulling secrets from Env Vars...')
-        secrets = {
-            'Bungie': {
-                'api_key': getenv_cast('BUNGIE_API_KEY'),
-                'clan_group_id': getenv_cast('BUNGIE_CLAN_GROUP_ID'),
-                'oauth_client_id': getenv_cast('BUNGIE_OAUTH_ID')
-            },
-            'Discord': {
-                'api_key': getenv_cast('DISCORD_API_KEY')
-            },
-        }
+        print('Found secrets.yml loading...')
+        secrets_file = read_yaml('./config/secrets.yaml')
 
-        voluspa_config = ['VOLUSPA_PREFIX', 'VOLUSPA_FEEDBACK_CHANNEL_ID']
-        for ve in voluspa_config:
-            if os.getenv(ve):
-                secrets['Voluspa'] = {ve.split('_', maxsplit=1)[1].lower(): getenv_cast(ve)}
+    print('Pulling secrets from Env Vars...')
+    env_secrets = {
+        'Bungie': {
+            'api_key': getenv_cast('BUNGIE_API_KEY'),
+            'clan_group_id': getenv_cast('BUNGIE_CLAN_GROUP_ID'),
+            'oauth_client_id': getenv_cast('BUNGIE_OAUTH_ID')
+        },
+        'Discord': {
+            'api_key': getenv_cast('DISCORD_API_KEY')
+        },
+    }
+
+    secrets = merge_dicts(secrets_file, env_secrets, skip_none=True)
+
+    # Pick up Voluspa named Env Vars
+    voluspa_config = ['VOLUSPA_PREFIX', 'VOLUSPA_FEEDBACK_CHANNEL_ID']
+    for ve in voluspa_config:
+        if os.getenv(ve):
+            secrets['Voluspa'] = {ve.split('_', maxsplit=1)[1].lower(): getenv_cast(ve)}
+
+    # ADDITIONAL CONFIG
+    # Handle cache
+    secrets['Voluspa']['fancy_name'] = 'Völuspá'
+    secrets['Voluspa']['cache'] = CACHE_CONFIG
 
     merged_config_2 = merge_dicts(merged_config_1, secrets)
 
@@ -95,5 +106,5 @@ def read_config():
 
     return nested_config
 
-
-CONFIG = read_config()
+memozied_config = memoize(read_config)
+CONFIG = memozied_config()
