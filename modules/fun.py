@@ -105,6 +105,10 @@ class Quotes(object):
                 'fight the curse!',
                 'search for the Nine.',
                 'with the shadows.',
+                'learn new moves...',
+                'help Eris Morn...',
+                'analyzing Nightmares.',
+                '\\\\ [REDACTED]',
                 'consult with the Queen.',
                 'find Pulled Pork!',
                 'with Ghost Proxy!!',
@@ -112,7 +116,11 @@ class Quotes(object):
                 'chess with Zavala.',
                 'with the Colonel!',
                 'MTG with Ikora...',
+                'pew pew pew',
                 'make Vex milkshakes.',
+                'with timelines',
+                'scanning EMF fields...',
+                'with paracausal forces',
                 'paradoxes with Saint-14',
                 'with Braytech Databases...',
                 "Char's Firewall",
@@ -152,6 +160,7 @@ class Quotes(object):
         return quote
 
 
+# TODO: Replace with async http....
 class RandomQuotes(object):
     def __init__(self):
         self.quote_funcs = [

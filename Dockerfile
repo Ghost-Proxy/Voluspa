@@ -1,8 +1,8 @@
-FROM ubuntu:16.04
+FROM ubuntu:18.04
 LABEL maintainer="Mirage"
-ENV PY_VER="3.7.3"
-ENV PY_VER_MAJOR="3.7"
-ENV DEBIAN_FRONTEND=noninteractive
+ENV PY_VER "3.7.4"
+ENV PY_VER_MAJOR "3.7"
+ENV DEBIAN_FRONTEND noninteractive
 
 RUN apt-get update && \
     apt-get install -qq \
@@ -18,8 +18,10 @@ RUN apt-get update && \
         apt-utils \
         build-essential \
         curl \
+        libbz2-dev \
         libffi-dev \
         libgdbm-dev \
+        liblzma-dev \
         libncurses5-dev \
         libnss3-dev \
         libreadline-dev \
@@ -39,6 +41,12 @@ RUN cd /opt && \
 RUN python${PY_VER_MAJOR} --version && \
     python${PY_VER_MAJOR} -m pip install -U pip
 
+RUN apt-get update && \
+    apt-get install -qq \
+        vim
+
+EXPOSE 5337
+
 RUN mkdir -p /app/voluspa
 COPY . /app/voluspa/
 WORKDIR /app/voluspa
@@ -51,7 +59,9 @@ RUN pip3 install -r requirements.txt
 # Running the container
 
     # Mac/Nix
-    # docker run -it -v $(pwd):/app/voluspa:ro voluspa:local python3 ./voluspa.py
+    # docker run -it -v $(pwd):/app/voluspa:ro voluspa python3 ./voluspa.py
 
-    # Powershell
+    # Powershell (mounting won't work without share settings beforehand...)
     # docker run -it -v ${$pwd.Path}:/app/voluspa:ro voluspa:local python3 ./voluspa.py
+
+    # docker run -p 5337:5337 -it voluspa python3 ./voluspa.py

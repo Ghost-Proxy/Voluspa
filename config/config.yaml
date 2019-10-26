@@ -1,10 +1,15 @@
 Bungie:
   clan_group_id: 0
   oauth_client_id: 0
-  api_key: ""
+  api_key: ''
 
 Discord:
-  api_key: ""
+  api_key: ''
 
 Resources:
   image_bucket_root_url: ''
+
+Voluspa:
+  prefix: '$'
+  cache: {}
+  feedback_channel_id: 0

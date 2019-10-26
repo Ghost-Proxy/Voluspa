@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """Voluspa Ghost Proxy Discord Bot"""
-VOLUSPA_VERSION = 'v0.0.7a'
+VOLUSPA_VERSION = 'v0.0.10e'
 # Bot Example: https://gist.github.com/EvieePy/d78c061a4798ae81be9825468fe146be
 
 import datetime
@@ -19,10 +19,15 @@ logger = archivist.get_logger()
 from modules.fun import Quotes
 from modules.database import Database
 from modules.discord_utils import get_prefix, update_status_task
+from modules.exceptions import VoluspaError, BungieAPIError, BungieAPIOffline
 
 # Third-Party Imports
 import discord
 from discord.ext import commands
+
+# Caches
+from aiocache import caches
+caches.set_config(CONFIG.Voluspa.cache)
 
 # Setup Initial Stuff
 VOLUSPA_SHA = CONFIG.Voluspa.sha[:10]
@@ -39,10 +44,16 @@ cog_extensions = [
     'cogs.members',
     'cogs.destinyart',
     'cogs.utilities',
+    'cogs.cache',
 ]
 
-# bot = commands.AutoShardedBot()
-bot = commands.Bot(command_prefix=get_prefix, description='Völuspá the Ghost Proxy Proto-Warmind AI')
+
+# Note: AutoShard when guilds > 1000 bot = commands.AutoShardedBot()
+bot = commands.Bot(
+    command_prefix=get_prefix,
+    description='Völuspá the Ghost Proxy Proto-Warmind AI',
+    case_insensitive=True
+)
 
 
 @bot.event
@@ -138,7 +149,7 @@ async def on_command_error(ctx, error):
 
     if isinstance(error, commands.UserInputError):
         await ctx.send("Invalid input.")
-        await ctx.command.send_command_help(ctx)
+        await ctx.send_help(ctx.command)
         return
 
     if isinstance(error, commands.NoPrivateMessage):
@@ -150,6 +161,14 @@ async def on_command_error(ctx, error):
 
     if isinstance(error, commands.CheckFailure):
         await ctx.send("You do not have permission to use this command.")
+        return
+
+    if isinstance(error, BungieAPIError):
+        await ctx.send("There was an error with the Bungie API.")
+        return
+
+    if isinstance(error, BungieAPIOffline):
+        await ctx.send("Bungie API appears to be currently offline. :(")
         return
 
     # ignore all other exception types, but print them to stderr
@@ -193,6 +212,9 @@ async def on_command_error(ctx, error):
 
 
 def main():
+    logger.info('// Völuspá / Booting...')
+
+    logger.info('Starting bot...')
     for extension in cog_extensions:
         bot.load_extension(extension)
     bot.run(CONFIG.Discord.api_key)

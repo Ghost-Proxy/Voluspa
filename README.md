@@ -1,18 +1,20 @@
 # voluspa
+> **// Ghost Proxy** / Proto-Warmind AI  
+> _Destiny 2 Discord Bot_
 
-![Voluspa Logo](https://github.com/RecursiveHook/voluspa-public/raw/master/images/voluspa_black_icon_100.png)
-
-> **Ghost Proxy** _Proto-Warmind AI_  
-> [_Destiny 2 Discord Bot_]
+![Voluspa Logo](imgs/voluspa/Voluspa_icon_100x133_black.png)
 
 ---
 
 ### Requirements
 ```ini
-PyYAML==3.13
-requests==2.19.1
-asyncpg==0.18.2
-aiohttp==3.3.2
-git+https://github.com/Rapptz/discord.py@rewrite#egg=discord.py[voice]
-git+https://github.com/axiak/fuzzyset.git#egg=fuzzyset --install-option="--pure-python"
+PyYAML==5.1.1
+requests==2.22.0
+asyncpg==0.18.3
+aiohttp==3.5.4
+fuzzywuzzy[speedup]==0.17.0
+discord.py[voice]==1.2.3
+matplotlib==3.1.1
+pandas==0.25.1
+emoji==0.5.4
 ```
