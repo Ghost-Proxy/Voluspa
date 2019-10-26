@@ -30,12 +30,12 @@ def read_config():
     }
 
     if REDIS_URL:
-        redis_info = url_config(REDIS_URL)
+        redis_url_info = url_config(REDIS_URL)
         redis_config = {
             'redis': {
                     'cache': "aiocache.RedisCache",
-                    'endpoint': redis_info.get('endpoint', "127.0.0.1"),
-                    'port': redis_info.get('port', 6379),
+                    'endpoint': redis_url_info.get('endpoint', "127.0.0.1"),
+                    'port': redis_url_info.get('port', 6379),
                     'timeout': 1,
                     'serializer': {
                         'class': "aiocache.serializers.PickleSerializer"
@@ -47,8 +47,8 @@ def read_config():
                 }
         }
         cache_config['redis'] = redis_config['redis']
-        if redis_config.get('password', None):
-            cache_config['redis']['password'] = redis_config['password']
+        if redis_url_info.get('password', None):
+            cache_config['redis']['password'] = redis_url_info['password']
 
     return cache_config
 
