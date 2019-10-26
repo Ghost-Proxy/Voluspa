@@ -7,7 +7,7 @@
 ---
 
 ### Requirements
-```
+```ini
 PyYAML==5.1.1
 requests==2.22.0
 asyncpg==0.18.3
