@@ -63,6 +63,7 @@ def read_config():
     print(f'Merged Config:\n{merged_config_1}')
 
     secrets_path = os.path.join(os.getcwd(), './config/secrets.yaml')
+    secrets_file = None
     print(f'Attempting to load secrets from: {secrets_path}')
     if os.path.isfile(secrets_path):
         print('Found secrets.yml loading...')
@@ -80,7 +81,10 @@ def read_config():
         },
     }
 
-    secrets = merge_dicts(secrets_file, env_secrets, skip_none=True)
+    if secrets_file:
+        secrets = merge_dicts(secrets_file, env_secrets, skip_none=True)
+    else:
+        secrets = env_secrets
 
     # Pick up Voluspa named Env Vars
     voluspa_config = ['VOLUSPA_PREFIX', 'VOLUSPA_FEEDBACK_CHANNEL_ID']
