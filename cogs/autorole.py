@@ -71,7 +71,8 @@ class Autorole(commands.Cog):
             },
             'raid_leads': {
                 'sherpa-active': ['on', 'active', 'true', 'enable', 'yes', '1'],
-                'sherpa-inactive': ['off', 'inactive', 'false', 'disable', 'no', '0']
+                'sherpa-inactive': ['off', 'inactive', 'false', 'disable', 'no', '0'],
+                'sherpa': ['sherpa', 'teach']
             },
             'rythm_dj': {
                 'DJ': ['dj', 'rythm', 'rhythm']
@@ -93,6 +94,7 @@ class Autorole(commands.Cog):
                 # Same with sherpa
                 'sherpa-active': ['sherpa-active'],
                 'sherpa-inactive': ['sherpa-inactive'],
+                'sherpa': ['sherpa']
             },  # TODO: Figure out what the plan was with the below...
             'ghost_proxy_elevated_roles': {
                 'ghost-proxy-vanguard': ['vanguard', 'gp-vanguard', 'ghost-proxy-vanguard'],
@@ -482,44 +484,27 @@ class Autorole(commands.Cog):
             allow_all=True
         )
 
-    @commands.command(name='sherpa-on')
-    @commands.has_role('raid-lead')
+    @commands.command(name='sherpa')
+    @commands.has_role('ghost-proxy-member')
     @commands.guild_only()
     async def sherpa_on(self, ctx):
-        """Sets Sherpa status to Active
+        """Toggles the Sherpa role
 
-        Can only be used by Raid Leads.
+        Can only be used by Ghost Proxy Members.
         """
-        await self.update_roles(ctx, 'raid_leads', ['active'])
-        await self.update_roles(
-            ctx,
-            'raid_leads',
-            ['inactive'],
-            options={
-                'update_message': 'removed',
-                'action': 'remove',
-                'confirm': False
-            })
-
-    @commands.command(name='sherpa-off')
-    @commands.has_role('raid-lead')
-    @commands.guild_only()
-    async def sherpa_off(self, ctx):
-        """Sets Sherpa status to Inactive
-
-        Can only be used by Raid Leads.
-        """
-        await self.update_roles(ctx, 'raid_leads', ['inactive'])
-        await self.update_roles(
-            ctx,
-            'raid_leads',
-            ['active'],
-            options={
-                'update_message': 'removed',
-                'action': 'remove',
-                'confirm': False
-            }
-        )
+        # ctx.message.guild?
+        sherpa_role = discord.utils.get(ctx.message.guild.roles, name='sherpa')
+        if sherpa_role not in ctx.message.author.roles:
+            await self.update_roles(ctx, 'raid_leads', ['sherpa'])
+        else:
+            await self.update_roles(
+                ctx,
+                'raid_leads',
+                ['sherpa'],
+                options={
+                    'update_message': 'removed',
+                    'action': 'remove',
+                })
 
     @commands.command(name='dj')
     @commands.has_any_role('ghost-proxy-member', 'ghost-proxy-envoy')
