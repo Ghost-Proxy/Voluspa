@@ -480,7 +480,7 @@ class Autorole(commands.Cog):
             allow_all=True
         )
 
-    @commands.command(name='sherpa')
+    @commands.command(name='sherpa', aliases=['s'])
     @commands.has_role('ghost-proxy-member')
     @commands.guild_only()
     async def sherpa_on(self, ctx):
