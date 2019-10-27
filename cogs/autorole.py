@@ -70,8 +70,6 @@ class Autorole(commands.Cog):
                 # 'og-wow': ['world of warcraft', 'wow', 'warcraft'],
             },
             'raid_leads': {
-                'sherpa-active': ['on', 'active', 'true', 'enable', 'yes', '1'],
-                'sherpa-inactive': ['off', 'inactive', 'false', 'disable', 'no', '0'],
                 'sherpa': ['sherpa', 'teach']
             },
             'rythm_dj': {
@@ -92,8 +90,6 @@ class Autorole(commands.Cog):
                 # And Div2 admins
                 'div2-admin': ['div2-admin'],
                 # Same with sherpa
-                'sherpa-active': ['sherpa-active'],
-                'sherpa-inactive': ['sherpa-inactive'],
                 'sherpa': ['sherpa']
             },  # TODO: Figure out what the plan was with the below...
             'ghost_proxy_elevated_roles': {
@@ -492,7 +488,6 @@ class Autorole(commands.Cog):
 
         Can only be used by Ghost Proxy Members.
         """
-        # ctx.message.guild?
         sherpa_role = discord.utils.get(ctx.message.guild.roles, name='sherpa')
         if sherpa_role not in ctx.message.author.roles:
             await self.update_roles(ctx, 'raid_leads', ['sherpa'])
