@@ -36,3 +36,14 @@ async def read_cache(key, cache_name=CACHE_NAME):
     else:
         logger.warning(f'(cache: {cache_name}) - ERROR reading k/v [{key}]:[{value}]!')
         return None
+
+
+async def delete_cache(key, cache_name=CACHE_NAME):
+    cache = caches.get(cache_name)
+    result = await cache.delete(key)
+    if result:
+        logger.info(f'(cache: {cache_name}) - SUCCESS deleted k/v [{key}]!')
+        return result
+    else:
+        logger.warning(f'(cache: {cache_name}) - ERROR deleting k/v [{key}]!')
+        return result
