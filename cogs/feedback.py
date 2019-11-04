@@ -9,7 +9,7 @@ logger = logging.getLogger('voluspa.cog.feedback')
 
 
 class Feedback(commands.Cog):
-    """Helpful utility functions"""
+    """Feedback System"""
     def __init__(self, bot):
         self.bot = bot
 

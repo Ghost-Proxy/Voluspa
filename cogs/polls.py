@@ -65,7 +65,7 @@ def trunc_label(label, num_opts=None, max_lines=None, max_length=25):
 
 
 class Polls(commands.Cog):
-    """Helpful utility functions"""
+    """Poll/Survey creation and viewing"""
     def __init__(self, bot):
         self.bot = bot
 
