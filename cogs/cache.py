@@ -55,7 +55,7 @@ class Cache(commands.Cog):
         )
         await ctx.send(embed=embed)
 
-    @commands.command(name='cache-delete', aliases=['cd', 'cr', 'cache-remove'])
+    @commands.command(name='cache-delete', aliases=['cd'])  # , 'cr', 'cache-remove'])
     @commands.has_any_role('founder', 'ghost-proxy-vanguard', 'ghost-proxy-gatekeeper')
     async def cache_delete(self, ctx, *, cache_key: str):
         """Reads value for key from cache"""
