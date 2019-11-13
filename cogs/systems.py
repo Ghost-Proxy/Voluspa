@@ -49,7 +49,7 @@ class Systems(commands.Cog):
         # Shows the number of servers the bot is member of.
         embed.add_field(name="Warsats", value=f"{len(self.bot.guilds)}")
         embed.add_field(name='Version', value=CONFIG.Voluspa.version, inline=False)
-        embed.add_field(name='SHA', value=CONFIG.Voluspa.sha, inline=False)
+        # embed.add_field(name='SHA', value=CONFIG.Voluspa.sha, inline=False)
         embed.add_field(name='Boot Time', value=CONFIG.Voluspa.boot_time)
         embed.add_field(name='Uptime', value=f'{get_bot_uptime(self.bot)}', inline=False)
 
