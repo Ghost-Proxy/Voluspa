@@ -9,6 +9,7 @@ from discord.ext import commands
 
 from modules.custom_embed import default_embed, format_list
 from modules.styles import STYLES
+from cogs.config.roles import ROLES
 
 logger = logging.getLogger('voluspa.cog.autorole')
 
@@ -44,64 +45,7 @@ class Autorole(commands.Cog):
     # TODO: Break it down into a simple set of funcs/rules
     def __init__(self, bot):
         self.bot = bot
-        self.roles_dicts = {
-            'game_modes': {
-                'crucible': ['c', 'crucible'],
-                'gambit': ['g', 'gambit'],
-                'raid': ['r', 'raid'],
-                'strike-nf-pve': ['s', 'nf', 'pve', 'strike', 'nightfall', 'strike-nf-pve']
-            },
-            'other_games': {
-                # 'og-ant': ['anthem', 'ant'],
-                # 'og-apex': ['apex legends', 'apex', 'apex: legends'],
-                'og-bl': ['borderlands', 'bl', 'borderlands 2', 'borderlands 3'],
-                'og-div2': ['division 2', 'div2', 'td2', 'division', 'the division 2'],
-                'og-dota': ['dota 2', 'dota', 'defense of the ancients 2'],
-                'og-gr': ['ghost recon', 'gr', 'grw', 'grb', 'ghost recon wildlands', 'ghost recon breakpoint'],
-                'og-lol': ['league of legends', 'lol', 'league'],
-                'og-mc': ['minecraft', 'mc'],
-                'og-mhw': ['monster hunter world', 'mh', 'mhw', 'monster', 'monster hunter'],
-                'og-osu': ['osu'],
-                'og-ow': ['overwatch', 'ow'],
-                # 'og-rage': ['rage 2', 'rage'],
-                'og-r6s': ['rainbow six siege', 'r6s', 'rss', 'rainbow', 'siege', 'rainbow six', 'rainbow six: siege'],
-                'og-steep': ['steep'],
-                'og-warf': ['warframe', 'wf', 'warf']
-                # 'og-wow': ['world of warcraft', 'wow', 'warcraft'],
-            },
-            'raid_leads': {
-                'sherpa': ['sherpa', 'teach']
-            },
-            'rythm_dj': {
-                'DJ': ['dj', 'rythm', 'rhythm']
-            },
-            'ghost_proxy_roles': {
-                'ghost-proxy-friend': ['gpf', 'gp-friend', 'ghost-proxy-friend'],
-                'ghost-proxy-member': ['gpm', 'gp-member', 'ghost-proxy-member'],
-                'ghost-proxy-legacy': ['gpl', 'gp-legacy', 'ghost-proxy-legacy'],
-                'ghost-proxy-envoy': ['gpe', 'gp-envoy', 'ghost-proxy-envoy'],
-                'ghost-proxy-veteran': ['gpv', 'gp-veteran', 'ghost-proxy-veteran'],
-                'ghost-proxy-archivist': ['gpa', 'gp-archivist', 'ghost-proxy-archivist'],
-                # Include lead roles for reset
-                'raid-lead': ['raid-lead'],
-                'gambit-lead': ['gambit-lead'],
-                'crucible-lead': ['crucible-lead'],
-                'strike-nf-pve-lead': ['strike-nf-pve-lead'],
-                # And Div2 admins
-                'div2-admin': ['div2-admin'],
-                # Same with sherpa
-                'sherpa': ['sherpa']
-            },  # TODO: Figure out what the plan was with the below...
-            'ghost_proxy_elevated_roles': {
-                'ghost-proxy-vanguard': ['vanguard', 'gp-vanguard', 'ghost-proxy-vanguard'],
-                'ghost-proxy-veteran': ['gpv', 'gp-veteran', 'ghost-proxy-veteran'],
-                'ghost-proxy-archivist': ['gpa', 'gp-archivist', 'ghost-proxy-archivist']
-            },
-            'ghost_proxy_protected_roles': {
-                'founder': ['founder', 'gp-founder', 'ghost-proxy-founder'],  # 'ghost-proxy-founder'
-                'ghost-proxy-gatekeeper': ['gatekeeper', 'gp-gatekeeper', 'ghost-proxy-gatekeeper']
-            }
-        }
+        self.roles_dicts = ROLES
 
     async def update_roles(self,
                            ctx,
