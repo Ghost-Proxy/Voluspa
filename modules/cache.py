@@ -14,7 +14,21 @@ CACHE_TYPE = CONFIG.Voluspa.cache[CACHE_NAME].cache
 logger.info(f'Using "{CACHE_NAME}" cache ({CACHE_TYPE})')
 
 
-async def write_cache(key, value, cache_name=CACHE_NAME):
+async def add(key, value, cache_name=CACHE_NAME):
+    # This will fail if the key already exists
+    cache = caches.get(cache_name)
+    await cache.add(key, value)
+    result = await cache.get(key) == value
+    if result:
+        logger.info(f'(cache: {cache_name}) - SUCCESS wrote k/v [{key}]:[{value}]!')
+        return result
+    else:
+        logger.warning(f'(cache: {cache_name}) - ERROR writing k/v [{key}]:[{value}]!')
+        return result
+
+
+async def write(key, value, cache_name=CACHE_NAME):
+    # This also implies add -- AND is a forced overwrite
     cache = caches.get(cache_name)
     await cache.set(key, value)
     result = await cache.get(key) == value
@@ -27,7 +41,7 @@ async def write_cache(key, value, cache_name=CACHE_NAME):
         return result
 
 
-async def read_cache(key, cache_name=CACHE_NAME):
+async def read(key, cache_name=CACHE_NAME):
     cache = caches.get(cache_name)
     value = await cache.get(key)
     if value:
@@ -38,7 +52,7 @@ async def read_cache(key, cache_name=CACHE_NAME):
         return None
 
 
-async def delete_cache(key, cache_name=CACHE_NAME):
+async def delete(key, cache_name=CACHE_NAME):
     cache = caches.get(cache_name)
     result = await cache.delete(key)
     if result:
