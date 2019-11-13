@@ -9,6 +9,7 @@ ROLES = {
                 # 'og-ant': ['anthem', 'ant'],
                 # 'og-apex': ['apex legends', 'apex', 'apex: legends'],
                 'og-bl': ['borderlands', 'bl', 'borderlands 2', 'borderlands 3'],
+                'og-cod': ['call of duty', 'cod', 'mw', 'modern warfare'],
                 'og-div2': ['division 2', 'div2', 'td2', 'division', 'the division 2'],
                 'og-dota': ['dota 2', 'dota', 'defense of the ancients 2'],
                 'og-gr': ['ghost recon', 'gr', 'grw', 'grb', 'ghost recon wildlands', 'ghost recon breakpoint'],
@@ -19,6 +20,7 @@ ROLES = {
                 'og-ow': ['overwatch', 'ow'],
                 # 'og-rage': ['rage 2', 'rage'],
                 'og-r6s': ['rainbow six siege', 'r6s', 'rss', 'rainbow', 'siege', 'rainbow six', 'rainbow six: siege'],
+                'og-rdo': ['red dead online', 'rdo', 'red dead redemption 2', 'red dead'],
                 'og-steep': ['steep'],
                 'og-warf': ['warframe', 'wf', 'warf']
                 # 'og-wow': ['world of warcraft', 'wow', 'warcraft'],
