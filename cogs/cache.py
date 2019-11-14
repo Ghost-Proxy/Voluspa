@@ -37,7 +37,7 @@ class Cache(commands.Cog):
         )
         await ctx.send(embed=embed)
 
-    @commands.command(name='cache-overwrite', aliases=['cwo', 'cache-update'])
+    @commands.command(name='cache-overwrite', aliases=['cow', 'cache-update'])
     @commands.has_any_role('founder', 'ghost-proxy-vanguard', 'ghost-proxy-gatekeeper')
     async def cache_overwrite(self, ctx, cache_key: str, *, cache_value: str):
         """Writes key/value to cache (CAUTION!)
