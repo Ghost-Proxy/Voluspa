@@ -424,6 +424,27 @@ class Autorole(commands.Cog):
             allow_all=True
         )
 
+    @commands.command(name='nsfw')
+    @commands.has_any_role('ghost-proxy-member', 'ghost-proxy-friend')
+    @commands.guild_only()
+    async def nsfw_toggle(self, ctx):
+        """Toggles the NSFW role
+
+        Can only be used by Ghost Proxy Members or Friends.
+        """
+        sherpa_role = discord.utils.get(ctx.message.guild.roles, name='nsfw')
+        if sherpa_role not in ctx.message.author.roles:
+            await self.update_roles(ctx, 'nsfw', ['nsfw'])
+        else:
+            await self.update_roles(
+                ctx,
+                'nsfw',
+                ['nsfw'],
+                options={
+                    'update_message': 'removed',
+                    'action': 'remove',
+                })
+
     @commands.command(name='sherpa', aliases=['s'])
     @commands.has_role('ghost-proxy-member')
     @commands.guild_only()

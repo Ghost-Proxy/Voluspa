@@ -31,6 +31,9 @@ ROLES = {
             'rythm_dj': {  # Based on Function String
                 'DJ': ['dj', 'rythm', 'rhythm']
             },
+            'nsfw': {
+                'nsfw': ['nsfw']
+            },
             'ghost_proxy_roles': {  # Based on Function String
                 'ghost-proxy-friend': ['gpf', 'gp-friend', 'ghost-proxy-friend'],
                 'ghost-proxy-member': ['gpm', 'gp-member', 'ghost-proxy-member'],
