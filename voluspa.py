@@ -44,6 +44,8 @@ cog_extensions = [
     'cogs.cache',
     'cogs.polls',
     'cogs.feedback',
+    'cogs.kudos',
+    #'cogs.roster',
 ]
 
 
