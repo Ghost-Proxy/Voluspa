@@ -9,7 +9,7 @@ logger = logging.getLogger('voluspa.cog.kudos')
 
 
 class Kudos(commands.Cog):
-    """Test of Caches"""
+    """Test of Kudos :)"""
     def __init__(self, bot):
         self.bot = bot
 
