@@ -15,14 +15,15 @@ class Kudos(commands.Cog):
 
     @commands.group(aliases=['k', 'kudo'])
     async def kudos(self, ctx):
+        """Kudos! View help for more info..."""
         if ctx.invoked_subcommand is None:
             await ctx.send('Invalid _kudos_ command.')
 
-    @kudos.command(name='view-player', aliases=['view player', 'vp'])
+    @kudos.command(name='view-player', aliases=['vp'])
     async def view_player_kudos(self, ctx):
         await ctx.send('view_player_kudos')
 
-    @kudos.command(name='view-leaderboard', aliases=['view leaderboard', 'vl'])
+    @kudos.command(name='view-leaderboard', aliases=['vl'])
     async def view_kudos_leaderboard(self, ctx):
         await ctx.send('view_kudos_leaderboard')
 
