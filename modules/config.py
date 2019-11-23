@@ -111,5 +111,6 @@ def read_config():
 
     return nested_config
 
+
 memozied_config = memoize(read_config)
 CONFIG = memozied_config()
