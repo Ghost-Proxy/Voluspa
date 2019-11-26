@@ -1,9 +1,11 @@
 import io
 import datetime
 import logging
+import re
 
 import discord
 from discord.ext import commands
+from discord.utils import escape_markdown
 
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -14,6 +16,23 @@ from modules.custom_embed import default_embed
 
 logger = logging.getLogger('voluspa.cog.polls')
 
+# A bit of DRYing given the pattern makes sense for both $pr and $plr
+async def get_poll_context_channel(ctx, poll_ids):
+    if len(poll_ids) > 0 and poll_ids[0][0] == 'c':
+        id_fetch_point = ctx.bot.get_channel(int(poll_ids[0][1:]))
+        if id_fetch_point is None:
+            await ctx.send(f'Sorry, `{poll_ids[0][1:]}` is not a valid channel id.')
+            return None, None
+
+        poll_ids = poll_ids[1:]
+    else:
+        id_fetch_point = ctx.channel
+
+    if len(poll_ids) < 1:
+        await ctx.send('Sorry, I need a poll reference to collate!')
+        return None, None
+    
+    return id_fetch_point, poll_ids
 
 def generate_poll_embed(poll_args):
     desc_str = ""
@@ -91,6 +110,64 @@ class Polls(commands.Cog):
             for arg_iter in range(1, len(poll_args)):
                 await result_msg.add_reaction(react_char)
                 react_char = chr(ord(react_char) + 1)
+    
+    @commands.command(name='poll-list-respondents', aliases=['plr'])
+    async def poll_list_respondents_by_option(self, ctx, *poll_ids: str):
+        """Lists a poll's respondents by the options they chose"""
+        
+        logger.info(f'Tabulating {len(poll_ids)} polls')
+        
+        id_fetch_point, poll_ids = await get_poll_context_channel(ctx, poll_ids)
+        if id_fetch_point == None:
+            return
+        
+        async with ctx.typing():
+            for pid in poll_ids:
+                try:
+                    try:
+                        poll = await id_fetch_point.fetch_message(pid)
+                    except discord.NotFound:
+                        await ctx.send(f'Sorry, I couldn\'t find poll `{pid}`')
+                        continue
+                    except discord.HTTPException:
+                        await ctx.send(f'Sorry, `{pid}` is not a valid poll id')
+                        continue
+
+                    if len(poll.embeds) < 1:
+                        await ctx.send(f'Sorry, I couldn\'t find the embed for poll `{pid}`')
+                        continue
+                    
+                    result_embed = default_embed(
+                        title=poll.embeds[0].title
+                    )
+                    
+                    # This is a bit obtuse, but prevents any reactions that aren't a part of the poll being detected
+                    for option in poll.embeds[0].description.split("\n"):
+                        key = emoji.emojize(option[:option.find(' ')], use_aliases=True)
+
+                        # If polls options don't match reactions, list has been messed with
+                        reaction = next((r for r in poll.reactions if r.emoji == key), None)
+                        if reaction is None:
+                            raise KeyError()
+                        
+                        respondents = []
+                        async for user in reaction.users():
+                            if not user.bot:
+                                user_line = escape_markdown(user.name) + "#" + user.discriminator
+                                if user.nick:
+                                    user_line += " _" + escape_markdown(user.nick) + "_"
+                                respondents.append(user_line)
+                        
+                        if len(respondents) == 0:
+                            respondents = "None"
+                        else:
+                            respondents = "\n".join(respondents)
+                        
+                        result_embed.add_field(name=reaction.emoji, value=respondents, inline=False)
+                    
+                    await ctx.send(embed=result_embed)
+                except KeyError:
+                    await ctx.send(f'Uh oh, I was unable to process poll `{pid}`. Sorry!')
 
     @commands.command(name='poll-results', aliases=['pr', 'prd', 'poll-results-dark'])
     async def collate_poll(self, ctx, *poll_ids: str):
@@ -103,18 +180,8 @@ class Polls(commands.Cog):
 
         logger.info(f'Collating {len(poll_ids)} polls')
 
-        if len(poll_ids) > 0 and poll_ids[0][0] == 'c':
-            id_fetch_point = ctx.bot.get_channel(int(poll_ids[0][1:]))
-            if id_fetch_point is None:
-                await ctx.send(f'Sorry, `{poll_ids[0][1:]}` is not a valid channel id.')
-                return
-
-            poll_ids = poll_ids[1:]
-        else:
-            id_fetch_point = ctx.channel
-
-        if len(poll_ids) < 1:
-            await ctx.send('Sorry, I need a poll reference to collate!')
+        id_fetch_point = await get_poll_context_channel(ctx, poll_ids)
+        if id_fetch_point == None:
             return
 
         async with ctx.typing():
@@ -203,7 +270,7 @@ class Polls(commands.Cog):
                     png_wrapper.close()
                     plt.close()
                 except KeyError:
-                    await ctx.send(f'Uh oh, I was unable to collate poll `{pid}`. Sorry!')
+                    await ctx.send(f'Uh oh, I was unable to process poll `{pid}`. Sorry!')
 
 
 def setup(bot):
