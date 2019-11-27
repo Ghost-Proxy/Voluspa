@@ -37,7 +37,8 @@ def generate_poll_embed(poll_args):
     desc_str = ""
     react_char = '\U0001f1e6'
     for arg_iter in range(1, len(poll_args)):
-        desc_str += f'{react_char} {poll_args[arg_iter]}\n'
+        poll_arg_lf_sanitised = poll_args[arg_iter].replace("\n", " ")
+        desc_str += f'{react_char} {poll_arg_lf_sanitised}\n'
         react_char = chr(ord(react_char) + 1)
 
     return default_embed(
@@ -94,6 +95,7 @@ class Polls(commands.Cog):
         $poll "title" "opt-a" "opt-b" ...
         """
         logger.info(f'New poll requested by {ctx.message.author.name}')
+        
         if len(poll_args) < 3:
             await ctx.send('Sorry, your poll needs at least 2 options!')
         elif len(poll_args) > 21:
@@ -117,7 +119,7 @@ class Polls(commands.Cog):
         logger.info(f'Tabulating {len(poll_ids)} polls')
         
         id_fetch_point, poll_ids = await get_poll_context_channel(ctx, poll_ids)
-        if id_fetch_point == None:
+        if id_fetch_point is None:
             return
         
         async with ctx.typing():
@@ -180,7 +182,7 @@ class Polls(commands.Cog):
         logger.info(f'Collating {len(poll_ids)} polls')
 
         id_fetch_point = await get_poll_context_channel(ctx, poll_ids)
-        if id_fetch_point == None:
+        if id_fetch_point is None:
             return
 
         async with ctx.typing():
