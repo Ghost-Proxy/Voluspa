@@ -45,7 +45,7 @@ def gen_poll_options(poll):
         
         yield key, desc, reaction
 
-def generate_poll_embed(poll_args):
+def gen_poll_embed(poll_args):
     desc_str = ""
     react_char = '\U0001f1e6'
     for arg_iter in range(1, len(poll_args)):
@@ -116,7 +116,7 @@ class Polls(commands.Cog):
             await ctx.send('Sorry, `$poll` only supports 20 options!')
         else:
             async with ctx.typing():
-                poll_embed=generate_poll_embed(poll_args)
+                poll_embed=gen_poll_embed(poll_args)
                 result_msg = await ctx.send(embed=poll_embed)
                 poll_embed.add_field(name="Poll Reference", value=result_msg.id)
                 await result_msg.edit(embed=poll_embed)
