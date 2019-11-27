@@ -93,6 +93,8 @@ class Polls(commands.Cog):
         """Creates a new poll
 
         $poll "title" "opt-a" "opt-b" ...
+        
+        Note that line breaks will be replaced with spaces
         """
         logger.info(f'New poll requested by {ctx.message.author.name}')
         
@@ -145,6 +147,7 @@ class Polls(commands.Cog):
                     # This is a bit obtuse, but prevents any reactions that aren't a part of the poll being detected
                     for option in poll.embeds[0].description.split("\n"):
                         key = emoji.emojize(option[:option.find(' ')], use_aliases=True)
+                        desc = option[option.find(' ') + 1:]
 
                         # If polls options don't match reactions, list has been messed with
                         reaction = next((r for r in poll.reactions if r.emoji == key), None)
@@ -164,7 +167,8 @@ class Polls(commands.Cog):
                         else:
                             respondents = "\n".join(respondents)
                         
-                        result_embed.add_field(name=reaction.emoji, value=respondents, inline=False)
+                        field_title = reaction.emoji + " " + desc
+                        result_embed.add_field(name=field_title, value=respondents, inline=False)
                     
                     await ctx.send(embed=result_embed)
                 except KeyError:
