@@ -33,6 +33,18 @@ async def get_poll_context_channel(ctx, poll_ids):
     
     return id_fetch_point, poll_ids
 
+def gen_poll_options(poll):
+    for option in poll.embeds[0].description.split("\n"):
+        key = emoji.emojize(option[:option.find(' ')], use_aliases=True)
+        desc = option[option.find(' ') + 1:]
+
+        # If polls options don't match reactions, list has been messed with
+        reaction = next((r for r in poll.reactions if r.emoji == key), None)
+        if reaction is None:
+            raise KeyError()
+        
+        yield key, desc, reaction
+
 def generate_poll_embed(poll_args):
     desc_str = ""
     react_char = '\U0001f1e6'
@@ -144,16 +156,8 @@ class Polls(commands.Cog):
                         title=poll.embeds[0].title
                     )
                     
-                    # This is a bit obtuse, but prevents any reactions that aren't a part of the poll being detected
-                    for option in poll.embeds[0].description.split("\n"):
-                        key = emoji.emojize(option[:option.find(' ')], use_aliases=True)
-                        desc = option[option.find(' ') + 1:]
-
-                        # If polls options don't match reactions, list has been messed with
-                        reaction = next((r for r in poll.reactions if r.emoji == key), None)
-                        if reaction is None:
-                            raise KeyError()
-                        
+                    # DRYed up
+                    for _, desc, reaction in gen_poll_options(poll):
                         respondents = []
                         async for user in reaction.users():
                             if not user.bot:
@@ -185,7 +189,7 @@ class Polls(commands.Cog):
 
         logger.info(f'Collating {len(poll_ids)} polls')
 
-        id_fetch_point = await get_poll_context_channel(ctx, poll_ids)
+        id_fetch_point, poll_ids = await get_poll_context_channel(ctx, poll_ids)
         if id_fetch_point is None:
             return
 
@@ -209,17 +213,8 @@ class Polls(commands.Cog):
                     poll_results = []
                     poll_title = trunc_label(poll.embeds[0].title, max_lines=2, max_length=50)
 
-                    for option in poll.embeds[0].description.split("\n"):
-                        key = emoji.emojize(option[:option.find(' ')], use_aliases=True)
-                        desc = option[option.find(' ') + 1:]
-
+                    for _, desc, reaction in gen_poll_options(poll):
                         poll_labels.append(trunc_label(desc, len(poll.reactions)))
-
-                        # If polls options don't match reactions, list has been messed with
-                        # Else get count for option
-                        reaction = next((r for r in poll.reactions if r.emoji == key), None)
-                        if reaction is None:
-                            raise KeyError()
                         poll_results.append(reaction.count - 1)
 
                     data = pd.Series(poll_results, index=poll_labels)
