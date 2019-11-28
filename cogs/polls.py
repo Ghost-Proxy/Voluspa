@@ -15,7 +15,6 @@ from modules.custom_embed import default_embed
 
 logger = logging.getLogger('voluspa.cog.polls')
 
-# A bit of DRYing given the pattern makes sense for both $pr and $plr
 async def get_poll_context_channel(ctx, poll_ids):
     if len(poll_ids) > 0 and poll_ids[0][0] == 'c':
         id_fetch_point = ctx.bot.get_channel(int(poll_ids[0][1:]))
@@ -32,6 +31,26 @@ async def get_poll_context_channel(ctx, poll_ids):
         return None, None
     
     return id_fetch_point, poll_ids
+
+async def gen_polls_from_ids(ctx, poll_ids, id_fetch_point):
+    for pid in poll_ids:
+        try:
+            poll = await id_fetch_point.fetch_message(pid)
+        except discord.NotFound:
+            await ctx.send(f'Sorry, I couldn\'t find poll `{pid}`')
+            yield None, None
+            continue
+        except discord.HTTPException:
+            await ctx.send(f'Sorry, `{pid}` is not a valid poll id')
+            yield None, None
+            continue
+            
+        if len(poll.embeds) < 1:
+            await ctx.send(f'Sorry, I couldn\'t find the embed for poll `{pid}`')
+            yield None, None
+            continue
+        
+        yield poll, pid
 
 def gen_poll_options(poll):
     for option in poll.embeds[0].description.split("\n"):
@@ -137,26 +156,15 @@ class Polls(commands.Cog):
             return
         
         async with ctx.typing():
-            for pid in poll_ids:
+            async for poll, pid in gen_polls_from_ids(ctx, poll_ids, id_fetch_point):
+                if poll is None:
+                    continue
+                
+                result_embed = default_embed(
+                    title=poll.embeds[0].title
+                )
+                
                 try:
-                    try:
-                        poll = await id_fetch_point.fetch_message(pid)
-                    except discord.NotFound:
-                        await ctx.send(f'Sorry, I couldn\'t find poll `{pid}`')
-                        continue
-                    except discord.HTTPException:
-                        await ctx.send(f'Sorry, `{pid}` is not a valid poll id')
-                        continue
-
-                    if len(poll.embeds) < 1:
-                        await ctx.send(f'Sorry, I couldn\'t find the embed for poll `{pid}`')
-                        continue
-                    
-                    result_embed = default_embed(
-                        title=poll.embeds[0].title
-                    )
-                    
-                    # DRYed up
                     for _, desc, reaction in gen_poll_options(poll):
                         respondents = []
                         async for user in reaction.users():
@@ -173,10 +181,11 @@ class Polls(commands.Cog):
                         
                         field_title = reaction.emoji + " " + desc
                         result_embed.add_field(name=field_title, value=respondents, inline=False)
-                    
-                    await ctx.send(embed=result_embed)
                 except KeyError:
                     await ctx.send(f'Uh oh, I was unable to process poll `{pid}`. Sorry!')
+                    continue
+                
+                await ctx.send(embed=result_embed)
 
     @commands.command(name='poll-results', aliases=['pr', 'prd', 'poll-results-dark'])
     async def collate_poll(self, ctx, *poll_ids: str):
