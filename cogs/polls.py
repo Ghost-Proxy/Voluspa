@@ -38,16 +38,13 @@ async def gen_polls_from_ids(ctx, poll_ids, id_fetch_point):
             poll = await id_fetch_point.fetch_message(pid)
         except discord.NotFound:
             await ctx.send(f'Sorry, I couldn\'t find poll `{pid}`')
-            yield None, None
             continue
         except discord.HTTPException:
             await ctx.send(f'Sorry, `{pid}` is not a valid poll id')
-            yield None, None
             continue
             
         if len(poll.embeds) < 1:
             await ctx.send(f'Sorry, I couldn\'t find the embed for poll `{pid}`')
-            yield None, None
             continue
         
         yield poll, pid
@@ -157,9 +154,6 @@ class Polls(commands.Cog):
         
         async with ctx.typing():
             async for poll, pid in gen_polls_from_ids(ctx, poll_ids, id_fetch_point):
-                if poll is None:
-                    continue
-                
                 result_embed = default_embed(
                     title=poll.embeds[0].title
                 )
@@ -203,84 +197,71 @@ class Polls(commands.Cog):
             return
 
         async with ctx.typing():
-            for pid in poll_ids:
+            async for poll, pid in gen_polls_from_ids(ctx, poll_ids, id_fetch_point):
+                poll_labels = []
+                poll_results = []
+                poll_title = trunc_label(poll.embeds[0].title, max_lines=2, max_length=50)
+
                 try:
-                    try:
-                        poll = await id_fetch_point.fetch_message(pid)
-                    except discord.NotFound:
-                        await ctx.send(f'Sorry, I couldn\'t find poll `{pid}`')
-                        continue
-                    except discord.HTTPException:
-                        await ctx.send(f'Sorry, `{pid}` is not a valid poll id')
-                        continue
-
-                    if len(poll.embeds) < 1:
-                        await ctx.send(f'Sorry, I couldn\'t find the embed for poll `{pid}`')
-                        continue
-
-                    poll_labels = []
-                    poll_results = []
-                    poll_title = trunc_label(poll.embeds[0].title, max_lines=2, max_length=50)
-
                     for _, desc, reaction in gen_poll_options(poll):
                         poll_labels.append(trunc_label(desc, len(poll.reactions)))
                         poll_results.append(reaction.count - 1)
-
-                    data = pd.Series(poll_results, index=poll_labels)
-
-                    axes = data.plot.bar(title=poll_title, x='options', color=plt.cm.tab10(range(len(data))))
-                    axes.set_ylabel('Respondents')
-
-                    if ctx.invoked_with in ['prd', 'poll-results-dark']:
-                        line_colors = "#FFFFFF"
-
-                        axes.spines['bottom'].set_color(line_colors)
-                        axes.spines['top'].set_color(line_colors)
-                        axes.spines['left'].set_color(line_colors)
-                        axes.spines['right'].set_color(line_colors)
-
-                        axes.tick_params(colors=line_colors)
-
-                        axes.yaxis.label.set_color(line_colors)
-                        axes.xaxis.label.set_color(line_colors)
-
-                        axes.title.set_color(line_colors)
-
-                        axes.set_facecolor("#2C2F33")
-
-                        bg_color = "#2C2F33"
-                        bar_top_color = line_colors
-                    else:
-                        bg_color = "#FFFFFF"
-                        bar_top_color = "k"  # aka black
-
-                    # New padding technique for top of chart and bar text
-                    _, top_ylim = plt.ylim()
-                    top_ylim *= 1.02
-                    plt.ylim(bottom=0, top=top_ylim)
-
-                    plt.yticks(gen_yticks(max(poll_results)))  # Appropriate tick spacing for number of respondents
-                    plt.xticks(rotation=45)
-
-                    # Adds number of respondents at top of bars
-                    for x, y in enumerate(poll_results):
-                        axes.text(x, y, str(y), ha='center', va='bottom', color=bar_top_color)
-
-                    plt.tight_layout()  # Ensures label text is not cut off
-
-                    png_wrapper = io.BytesIO()
-                    plt.savefig(png_wrapper, format='png', facecolor=bg_color)
-                    png_wrapper.seek(0)
-
-                    dt = datetime.datetime
-                    filename = "gp-poll-" + pid + "-" + dt.strftime(dt.utcnow(), "%Y-%m-%d-%H-%M-%S") + ".png"
-                    await ctx.send(file=discord.File(png_wrapper, filename=filename))
-
-                    png_wrapper.close()
-                    plt.close()
                 except KeyError:
                     await ctx.send(f'Uh oh, I was unable to process poll `{pid}`. Sorry!')
+                    continue
+                    
+                data = pd.Series(poll_results, index=poll_labels)
 
+                axes = data.plot.bar(title=poll_title, x='options', color=plt.cm.tab10(range(len(data))))
+                axes.set_ylabel('Respondents')
+
+                if ctx.invoked_with in ['prd', 'poll-results-dark']:
+                    line_colors = "#FFFFFF"
+
+                    axes.spines['bottom'].set_color(line_colors)
+                    axes.spines['top'].set_color(line_colors)
+                    axes.spines['left'].set_color(line_colors)
+                    axes.spines['right'].set_color(line_colors)
+
+                    axes.tick_params(colors=line_colors)
+
+                    axes.yaxis.label.set_color(line_colors)
+                    axes.xaxis.label.set_color(line_colors)
+
+                    axes.title.set_color(line_colors)
+
+                    axes.set_facecolor("#2C2F33")
+
+                    bg_color = "#2C2F33"
+                    bar_top_color = line_colors
+                else:
+                    bg_color = "#FFFFFF"
+                    bar_top_color = "k"  # aka black
+
+                # New padding technique for top of chart and bar text
+                _, top_ylim = plt.ylim()
+                top_ylim *= 1.02
+                plt.ylim(bottom=0, top=top_ylim)
+
+                plt.yticks(gen_yticks(max(poll_results)))  # Appropriate tick spacing for number of respondents
+                plt.xticks(rotation=45)
+
+                # Adds number of respondents at top of bars
+                for x, y in enumerate(poll_results):
+                    axes.text(x, y, str(y), ha='center', va='bottom', color=bar_top_color)
+
+                plt.tight_layout()  # Ensures label text is not cut off
+
+                png_wrapper = io.BytesIO()
+                plt.savefig(png_wrapper, format='png', facecolor=bg_color)
+                png_wrapper.seek(0)
+
+                dt = datetime.datetime
+                filename = "gp-poll-" + pid + "-" + dt.strftime(dt.utcnow(), "%Y-%m-%d-%H-%M-%S") + ".png"
+                await ctx.send(file=discord.File(png_wrapper, filename=filename))
+
+                png_wrapper.close()
+                plt.close()
 
 def setup(bot):
     bot.add_cog(Polls(bot))
