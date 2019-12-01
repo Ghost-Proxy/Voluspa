@@ -164,8 +164,9 @@ class Polls(commands.Cog):
                         async for user in reaction.users():
                             if not user.bot:
                                 user_line = escape_markdown(user.name) + "#" + user.discriminator
-                                if user.nick:
-                                    user_line += " _" + escape_markdown(user.nick) + "_"
+                                user_nick = getattr(user, 'nick', None)
+                                if user_nick is not None:
+                                    user_line += " _" + escape_markdown(user_nick) + "_"
                                 respondents.append(user_line)
                         
                         if len(respondents) == 0:
