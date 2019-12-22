@@ -12,6 +12,8 @@ ROLES = {
                 'og-cod': ['call of duty', 'cod', 'mw', 'modern warfare'],
                 'og-div2': ['division 2', 'div2', 'td2', 'division', 'the division 2'],
                 'og-dota': ['dota 2', 'dota', 'defense of the ancients 2'],
+                'og-eft': ['escape from tarkov', 'eft', 'tarkov'],
+                'og-hunt': ['hunt showdown', 'hunt', 'the hunt'],
                 'og-gr': ['ghost recon', 'gr', 'grw', 'grb', 'ghost recon wildlands', 'ghost recon breakpoint'],
                 'og-lol': ['league of legends', 'lol', 'league'],
                 'og-mc': ['minecraft', 'mc'],
