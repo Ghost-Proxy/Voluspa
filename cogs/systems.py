@@ -3,7 +3,7 @@ import logging
 import datetime
 import statistics
 
-from voluspa import CONFIG, VOLUSPA_VERSION
+from voluspa import CONFIG
 from modules.custom_embed import default_embed, format_list
 
 import discord
@@ -48,15 +48,14 @@ class Systems(commands.Cog):
 
         # Shows the number of servers the bot is member of.
         embed.add_field(name="Warsats", value=f"{len(self.bot.guilds)}")
-
-        embed.add_field(name='Version', value=VOLUSPA_VERSION, inline=False)
-        # embed.add_field(name='SHA', value=VOLUSPA_SHA, inline=False)
+        embed.add_field(name='Version', value=CONFIG.Voluspa.version, inline=False)
+        # embed.add_field(name='SHA', value=CONFIG.Voluspa.sha, inline=False)
         embed.add_field(name='Boot Time', value=CONFIG.Voluspa.boot_time)
+        embed.add_field(name='Uptime', value=f'{get_bot_uptime(self.bot)}', inline=False)
 
         # give info about you here
         # embed.add_field(name='_ _', value="_Discovered by Mirage ,'}_")
         # embed.add_field(name='_ _', value="<:ghost_proxy:455130405398380564>")
-        embed.add_field(name='Uptime', value=f'{get_bot_uptime(self.bot)}', inline=False)
 
         # Logo
         embed.set_image(url=f"{CONFIG.Resources.image_bucket_root_url}/voluspa/Voluspa_icon_64x48.png")
