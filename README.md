@@ -18,3 +18,17 @@ matplotlib==3.1.1
 pandas==0.25.1
 emoji==0.5.4
 ```
+
+---
+
+### Local Docker for development
+
+#### Dockerfile Build
+```
+docker build . -t voluspa
+```
+
+#### Running the container
+```
+docker run -it voluspa:latest python3 ./voluspa.py
+```
