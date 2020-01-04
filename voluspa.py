@@ -15,7 +15,7 @@ archivist = Archivist()
 logger = archivist.get_logger()
 
 from modules.fun import Quotes
-from modules.database import Database
+#from modules.database import Database
 from modules.discord_utils import get_prefix, update_status_task
 from modules.exceptions import VoluspaError, BungieAPIError, BungieAPIOffline
 
@@ -32,7 +32,7 @@ client = discord.Client()
 
 # These should perhaps be cogs..?
 quotes = Quotes()
-db = Database()
+#db = Database()
 
 cog_extensions = [
     'cogs.autorole',
