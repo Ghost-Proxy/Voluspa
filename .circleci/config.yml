@@ -5,9 +5,6 @@ jobs:
       - image: circleci/python:3.7.3
     steps:
       - checkout
-      - run: echo "A first hello"
       - run:
           name: Run unittests
           command: python -m unittest discover
-      - store_test_results:
-          path: test-reports/
