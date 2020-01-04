@@ -119,33 +119,3 @@ class Cache(commands.Cog):
 
 def setup(bot):
     bot.add_cog(Cache(bot))
-
-
-
-'''
-
-2019-11-14T00:06:34.893853+00:00 app[worker.1]: Ignoring exception in command cache-add:
-2019-11-14T00:06:34.894347+00:00 app[worker.1]: Traceback (most recent call last):
-2019-11-14T00:06:34.894521+00:00 app[worker.1]: File "/app/.heroku/python/lib/python3.7/site-packages/discord/ext/commands/core.py", line 79, in wrapped
-2019-11-14T00:06:34.894524+00:00 app[worker.1]: ret = await coro(*args, **kwargs)
-2019-11-14T00:06:34.894606+00:00 app[worker.1]: File "/app/cogs/cache.py", line 28, in cache_add
-2019-11-14T00:06:34.894610+00:00 app[worker.1]: await cache.add(cache_key, cache_value, cache_name=cache_name)
-2019-11-14T00:06:34.894653+00:00 app[worker.1]: File "/app/modules/cache.py", line 20, in add
-2019-11-14T00:06:34.894656+00:00 app[worker.1]: await cache.add(key, value)
-2019-11-14T00:06:34.894702+00:00 app[worker.1]: File "/app/.heroku/python/lib/python3.7/site-packages/aiocache/base.py", line 61, in _enabled
-2019-11-14T00:06:34.894706+00:00 app[worker.1]: return await func(*args, **kwargs)
-2019-11-14T00:06:34.894822+00:00 app[worker.1]: File "/app/.heroku/python/lib/python3.7/site-packages/aiocache/base.py", line 45, in _timeout
-2019-11-14T00:06:34.894825+00:00 app[worker.1]: return await asyncio.wait_for(func(self, *args, **kwargs), timeout)
-2019-11-14T00:06:34.894976+00:00 app[worker.1]: File "/app/.heroku/python/lib/python3.7/asyncio/tasks.py", line 442, in wait_for
-2019-11-14T00:06:34.894980+00:00 app[worker.1]: return fut.result()
-2019-11-14T00:06:34.895026+00:00 app[worker.1]: File "/app/.heroku/python/lib/python3.7/site-packages/aiocache/base.py", line 75, in _plugins
-2019-11-14T00:06:34.895031+00:00 app[worker.1]: ret = await func(self, *args, **kwargs)
-2019-11-14T00:06:34.895078+00:00 app[worker.1]: File "/app/.heroku/python/lib/python3.7/site-packages/aiocache/base.py", line 163, in add
-2019-11-14T00:06:34.895096+00:00 app[worker.1]: await self._add(ns_key, dumps(value), ttl=self._get_ttl(ttl), _conn=_conn)
-2019-11-14T00:06:34.895159+00:00 app[worker.1]: File "/app/.heroku/python/lib/python3.7/site-packages/aiocache/backends/redis.py", line 24, in wrapper
-2019-11-14T00:06:34.895163+00:00 app[worker.1]: return await func(self, *args, _conn=_conn, **kwargs)
-2019-11-14T00:06:34.895208+00:00 app[worker.1]: File "/app/.heroku/python/lib/python3.7/site-packages/aiocache/backends/redis.py", line 158, in _add
-2019-11-14T00:06:34.895212+00:00 app[worker.1]: raise ValueError("Key {} already exists, use .set to update the value".format(key))
-2019-11-14T00:06:34.895536+00:00 app[worker.1]: ValueError: Key test already exists, use .set to update the value
-
-'''
