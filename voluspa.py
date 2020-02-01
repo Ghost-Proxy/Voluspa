@@ -6,6 +6,7 @@ import datetime
 import math
 import sys
 import traceback
+import asyncio
 
 # Custom Imports
 from modules.config import CONFIG
@@ -22,6 +23,14 @@ from modules.exceptions import VoluspaError, BungieAPIError, BungieAPIOffline
 # Third-Party Imports
 import discord
 from discord.ext import commands
+
+# UVloop
+try:
+    import uvloop
+except ImportError:
+    pass
+else:
+    asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
 # Caches
 from aiocache import caches

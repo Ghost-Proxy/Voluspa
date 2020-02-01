@@ -1,6 +1,9 @@
 # MISC
 PyYAML==5.1.1
 
+# ASYNC
+uvloop==0.14.0
+
 # HTTP
 requests==2.22.0
 aiohttp<3.7.0,>=3.6.0
