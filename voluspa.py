@@ -56,7 +56,8 @@ cog_extensions = [
     'cogs.kudos',
     'cogs.cog_control',
     #'cogs.roster',
-    'jishaku',
+    #'jishaku',
+    'cogs.console'
 ]
 
 
