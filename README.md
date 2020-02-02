@@ -2,26 +2,28 @@
 > **// Ghost Proxy** / Proto-Warmind AI  
 > _Destiny 2 Discord Bot_
 
-![Voluspa Logo](imgs/voluspa/Voluspa_icon_100x133_black.png)
+![Voluspa Logo](images/voluspa/Voluspa_icon_100x133_black.png)
 
 ---
 
-### Requirements
-```ini
-PyYAML==5.1.1
-requests==2.22.0
-asyncpg==0.18.3
-aiohttp==3.5.4
-fuzzywuzzy[speedup]==0.17.0
-discord.py[voice]==1.2.3
-matplotlib==3.1.1
-pandas==0.25.1
-emoji==0.5.4
-```
+### Setup
+- Uses Python 3.8.1
 
----
+1. Install Python 3.8.1
+2. Grab [virtualenv](https://virtualenv.pypa.io/en/latest/installation/): `pip install --user virtualenv`
+3. Clone _Voluspa_ source `git clone https://github.com/Ghost-Proxy/Voluspa.git`
+4. Create a virtualenv: `virtualenv venv`
+5. Activate the virtual env (depends on OS): 
+  - linux (sh): `source ./venv/bin/activate` 
+  - windows (ps): `./venv/Scripts/activate.ps1`
+6. Install pip requirements: `pip install -r requirements.txt`
+7. Happy coding and have fun!
+
+(_To deactivate a virtualenv, just type_ `deactivate`)
+
 
 ### Local Docker for development
+Additionally, a **Dockerfile** is provided that will also automagically setup a bot environment for local running and debug.
 
 #### Dockerfile Build
 ```
