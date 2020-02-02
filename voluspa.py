@@ -56,8 +56,8 @@ cog_extensions = [
     'cogs.kudos',
     'cogs.cog_control',
     #'cogs.roster',
-    #'jishaku',
-    'cogs.console'
+    'jishaku',
+    #'cogs.console' # https://github.com/Gorialis/jishaku/issues/55
 ]
 
 
