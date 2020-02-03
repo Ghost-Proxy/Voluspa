@@ -716,11 +716,13 @@ class Autorole(commands.Cog):
             formatted_role_stats = [f'{r_mems:<8}{r_name}' for r_name, r_mems in reversed(role_stats.items())]
 
             split_formatted_stats = format_list(formatted_role_stats, surround='').split('\n')
-            for page in chunk_list(split_formatted_stats, 1024 - (len(split_formatted_stats) * 2) - 100):
+            pages = chunk_list(split_formatted_stats, 1024 - (len(split_formatted_stats) * 2) - 100)
+            for page_num, page in enumerate(pages, start=1):
                 page = "\n".join(page)
                 embed = default_embed(
                     title='Role Stats',
-                    description='List of Roles and number of associated Users'
+                    description='List of Roles and number of associated Users',
+                    footer_notes=f'Page {page_num} of {len(pages)}'
                 )
                 embed.add_field(
                     name='Number of Roles',
