@@ -715,7 +715,8 @@ class Autorole(commands.Cog):
                 role_stats[role.name] = len(role.members)
             formatted_role_stats = [f'{r_mems:<8}{r_name}' for r_name, r_mems in reversed(role_stats.items())]
 
-            for page in chunk_list(formatted_role_stats, 1024):
+            for page in chunk_list(format_list(formatted_role_stats).split('\n'), 1024):
+                page = "\n".join(page)
                 embed = default_embed(
                     title='Role Stats',
                     description='List of Roles and number of associated Users'
@@ -727,7 +728,7 @@ class Autorole(commands.Cog):
                 )
                 embed.add_field(
                     name='Roles and number of Users',
-                    value=f'{format_list(page)}',
+                    value=f'{page}',
                     inline=False
                 )
                 await ctx.send(embed=embed)
