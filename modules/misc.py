@@ -1,4 +1,5 @@
 import collections.abc
+from typing import Any, List
 
 new_line = "\n"
 voluspa_raw_txt_logo = '--\\\\\\\\´//--'
@@ -16,6 +17,28 @@ def memoize(func):
         return result
 
     return memoized_func
+
+
+def chunk_list(chonk_list: List[Any], chunk_size: int = 1024):
+    """Casts elements to str"""
+    chunks = {}
+    current_chunk = 0
+    for item in chonk_list:
+        item = str(item)
+        if len(item) > chunk_size:
+            # need to chunk item itself, naive
+            new_chunks = [item[i:i + chunk_size] for i in range(0, len(item), chunk_size)]
+            for nc in new_chunks:
+                current_chunk += 1
+                chunks[current_chunk] = [nc]
+        elif len(str(item)) + len(''.join(chunks.get(current_chunk, ''))) > chunk_size:
+            # need to make a new chunk
+            current_chunk += 1
+            chunks[current_chunk] = [item]
+        else:
+            # add to current chunk
+            chunks.setdefault(current_chunk, []).append(item)
+    return [v for k, v in chunks.items()]
 
 
 # https://stackoverflow.com/questions/38034377/object-like-attribute-access-for-nested-dictionary

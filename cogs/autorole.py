@@ -10,6 +10,7 @@ from discord.ext import commands
 from modules.custom_embed import default_embed, format_list
 from modules.styles import STYLES
 from cogs.config.roles import ROLES
+from modules.misc import chunk_list
 
 logger = logging.getLogger('voluspa.cog.autorole')
 
@@ -714,22 +715,22 @@ class Autorole(commands.Cog):
                 role_stats[role.name] = len(role.members)
             formatted_role_stats = [f'{r_mems:<8}{r_name}' for r_name, r_mems in reversed(role_stats.items())]
 
-            embed = default_embed(
-                title='Role Stats',
-                description='List of Roles and number of associated Users'
-            )
-            embed.add_field(
-                name='Number of Roles',
-                value=num_roles,
-                inline=False
-            )
-            embed.add_field(
-                name='Roles and number of Users',
-                value=f'{format_list(formatted_role_stats)}',
-                inline=False
-            )
-
-        await ctx.send(embed=embed)
+            for page in chunk_list(formatted_role_stats, 1024):
+                embed = default_embed(
+                    title='Role Stats',
+                    description='List of Roles and number of associated Users'
+                )
+                embed.add_field(
+                    name='Number of Roles',
+                    value=num_roles,
+                    inline=False
+                )
+                embed.add_field(
+                    name='Roles and number of Users',
+                    value=f'{format_list(page)}',
+                    inline=False
+                )
+                await ctx.send(embed=embed)
 
     # async def get_members_by_roles(self, roles: List[str], include_bots=False):
     #     # TODO: WIP
