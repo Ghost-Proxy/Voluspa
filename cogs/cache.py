@@ -102,7 +102,8 @@ class Cache(commands.Cog):
             cache_value
         )
         original_value = await cache.read(cache_key, cache_name=cache_name)
-        cache_value = f'{original_value}\n{cache_value}'
+        if original_value is not None:
+            cache_value = f'{original_value}\n{cache_value}'
         await cache.write(cache_key, cache_value, cache_name=cache_name)
         embed = default_embed(
             title='Cache Append (K/V)',
