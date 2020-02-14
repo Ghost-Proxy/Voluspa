@@ -29,7 +29,7 @@ async def get_poll_context_channel(ctx, poll_ids):
     if len(poll_ids) < 1:
         await ctx.send('Sorry, I need a poll reference to collate!')
         return None, None
-    
+
     return id_fetch_point, poll_ids
 
 async def gen_polls_from_ids(ctx, poll_ids, id_fetch_point):
@@ -42,11 +42,11 @@ async def gen_polls_from_ids(ctx, poll_ids, id_fetch_point):
         except discord.HTTPException:
             await ctx.send(f'Sorry, `{pid}` is not a valid poll id')
             continue
-            
+
         if len(poll.embeds) < 1:
             await ctx.send(f'Sorry, I couldn\'t find the embed for poll `{pid}`')
             continue
-        
+
         yield poll, pid
 
 def gen_poll_options(poll):
@@ -58,7 +58,7 @@ def gen_poll_options(poll):
         reaction = next((r for r in poll.reactions if r.emoji == key), None)
         if reaction is None:
             raise KeyError()
-        
+
         yield key, desc, reaction
 
 def gen_poll_embed(poll_args):
@@ -121,13 +121,13 @@ class Polls(commands.Cog):
         """Creates a new poll
 
         $poll "title" "opt-a" "opt-b" ...
-        
+
         Note that line breaks will be replaced with spaces
         """
         logger.info(f'New poll requested by {ctx.message.author.name}')
-        
-        if len(poll_args) < 3:
-            await ctx.send('Sorry, your poll needs at least 2 options!')
+
+        if len(poll_args) < 2:
+            await ctx.send('Sorry, your poll needs at least 1 option!')
         elif len(poll_args) > 21:
             await ctx.send('Sorry, `$poll` only supports 20 options!')
         else:
@@ -141,23 +141,23 @@ class Polls(commands.Cog):
             for arg_iter in range(1, len(poll_args)):
                 await result_msg.add_reaction(react_char)
                 react_char = chr(ord(react_char) + 1)
-    
+
     @commands.command(name='poll-list-respondents', aliases=['plr'])
     async def poll_list_respondents_by_option(self, ctx, *poll_ids: str):
         """Lists a poll's respondents by the options they chose"""
-        
+
         logger.info(f'Tabulating {len(poll_ids)} polls')
-        
+
         id_fetch_point, poll_ids = await get_poll_context_channel(ctx, poll_ids)
         if id_fetch_point is None:
             return
-        
+
         async with ctx.typing():
             async for poll, pid in gen_polls_from_ids(ctx, poll_ids, id_fetch_point):
                 result_embed = default_embed(
                     title=poll.embeds[0].title
                 )
-                
+
                 try:
                     for _, desc, reaction in gen_poll_options(poll):
                         respondents = []
@@ -168,18 +168,18 @@ class Polls(commands.Cog):
                                 if user_nick is not None:
                                     user_line += " _" + escape_markdown(user_nick) + "_"
                                 respondents.append(user_line)
-                        
+
                         if len(respondents) == 0:
                             respondents = "None"
                         else:
                             respondents = "\n".join(respondents)
-                        
+
                         field_title = reaction.emoji + " " + desc
                         result_embed.add_field(name=field_title, value=respondents, inline=False)
                 except KeyError:
                     await ctx.send(f'Uh oh, I was unable to process poll `{pid}`. Sorry!')
                     continue
-                
+
                 await ctx.send(embed=result_embed)
 
     @commands.command(name='poll-results', aliases=['pr', 'prd', 'poll-results-dark'])
@@ -210,7 +210,7 @@ class Polls(commands.Cog):
                 except KeyError:
                     await ctx.send(f'Uh oh, I was unable to process poll `{pid}`. Sorry!')
                     continue
-                    
+
                 data = pd.Series(poll_results, index=poll_labels)
 
                 axes = data.plot.bar(title=poll_title, x='options', color=plt.cm.tab10(range(len(data))))

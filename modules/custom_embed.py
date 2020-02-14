@@ -1,9 +1,10 @@
-from discord import Embed
-# from discord.ext import commands
+from typing import Any, List, Dict, Tuple, Sequence, Iterable
 
 from voluspa import CONFIG
+from modules.styles import STYLES
 
-from typing import Any, List, Dict, Tuple, Sequence, Iterable
+from discord import Embed
+# from discord.ext import commands
 
 
 # TODO:
@@ -11,6 +12,29 @@ from typing import Any, List, Dict, Tuple, Sequence, Iterable
 #  - Paging support
 #  - Automatic cleanup
 #  - built in "theme" handling (conv funcs/wrappers)
+
+def remove_color_kwarg(kwargs):
+    try:
+        kwargs.pop('color')
+    except KeyError:
+        pass
+    return kwargs
+
+
+def success_embed(*args, **kwargs):
+    return default_embed(*args, color=STYLES.colors.success, **remove_color_kwarg(kwargs))
+
+
+def info_embed(*args, **kwargs):
+    return default_embed(*args, color=STYLES.colors.info, **remove_color_kwarg(kwargs))
+
+
+def warning_embed(*args, **kwargs):
+    return default_embed(*args, color=STYLES.colors.warning, **remove_color_kwarg(kwargs))
+
+
+def error_embed(*args, **kwargs):
+    return default_embed(*args, color=STYLES.colors.error, **remove_color_kwarg(kwargs))
 
 
 def default_embed(title='Völuspá', description='', color=0x009933, footer_notes=None, **kwargs):

@@ -6,6 +6,7 @@ import datetime
 import math
 import sys
 import traceback
+import asyncio
 
 # Custom Imports
 from modules.config import CONFIG
@@ -15,13 +16,21 @@ archivist = Archivist()
 logger = archivist.get_logger()
 
 from modules.fun import Quotes
-from modules.database import Database
+#from modules.database import Database
 from modules.discord_utils import get_prefix, update_status_task
 from modules.exceptions import VoluspaError, BungieAPIError, BungieAPIOffline
 
 # Third-Party Imports
 import discord
 from discord.ext import commands
+
+# UVloop
+try:
+    import uvloop
+except ImportError:
+    pass
+else:
+    asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
 # Caches
 from aiocache import caches
@@ -32,7 +41,7 @@ client = discord.Client()
 
 # These should perhaps be cogs..?
 quotes = Quotes()
-db = Database()
+#db = Database()
 
 cog_extensions = [
     'cogs.autorole',
@@ -45,7 +54,10 @@ cog_extensions = [
     'cogs.polls',
     'cogs.feedback',
     'cogs.kudos',
+    'cogs.cog_control',
     #'cogs.roster',
+    'jishaku',
+    #'cogs.console' # https://github.com/Gorialis/jishaku/issues/55
 ]
 
 
