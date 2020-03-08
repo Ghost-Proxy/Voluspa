@@ -17,6 +17,7 @@ ROLES = {
                 'og-gr': ['ghost recon', 'gr', 'grw', 'grb', 'ghost recon wildlands', 'ghost recon breakpoint'],
                 'og-gtao': ['grand theft auto online', 'gtao', 'gtav', 'gta'],
                 'og-gtfo': ['gtfo'],
+                'og-halo': ['halo'],
                 'og-hunt': ['hunt showdown', 'hunt', 'the hunt'],
                 'og-lol': ['league of legends', 'lol', 'league'],
                 'og-mc': ['minecraft', 'mc'],
