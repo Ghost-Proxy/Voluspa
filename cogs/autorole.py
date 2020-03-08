@@ -96,7 +96,7 @@ class Autorole(commands.Cog):
 
             role_results = roles_to_update
             if use_role_label:
-                role_results = [f'{role}: {titlecase(role_dict[role][0])}' for role in roles_to_update]
+                role_results = [f'{role:<12} {titlecase(role_dict[role][0])}' for role in roles_to_update]
 
             # TODO: Add check if roles are already applied and avoid doing it again?
 
