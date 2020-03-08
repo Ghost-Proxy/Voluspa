@@ -458,7 +458,7 @@ class Autorole(commands.Cog):
     @commands.command(name='sherpa', aliases=['s'])
     @commands.has_role('ghost-proxy-member')
     @commands.guild_only()
-    async def sherpa_on(self, ctx):
+    async def sherpa_toggle(self, ctx):
         """Toggles the Sherpa role
 
         Can only be used by Ghost Proxy Members.
