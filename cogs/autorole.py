@@ -12,6 +12,8 @@ from modules.styles import STYLES
 from cogs.config.roles import ROLES
 from modules.misc import chunk_list
 
+from titlecase import titlecase
+
 logger = logging.getLogger('voluspa.cog.autorole')
 
 
@@ -54,7 +56,8 @@ class Autorole(commands.Cog):
                            roles: Sequence[str],
                            user_id: int = None,
                            options: Dict = None,
-                           allow_all=False):
+                           allow_all=False,
+                           use_role_label=False):
         # TODO: Make it so that if the roles list is not supplied, the entire roles_dict is used?
         async with ctx.typing():
             # Set options and values
@@ -91,6 +94,10 @@ class Autorole(commands.Cog):
             # elif:  # if 'DJ' in [role.name for role in ctx.message.author.roles]:
             # pass
 
+            role_results = roles_to_update
+            if use_role_label:
+                role_results = [f'{role}: {titlecase(role_dict[role][0])}' for role in roles_to_update]
+
             # TODO: Add check if roles are already applied and avoid doing it again?
 
             print(f'"Updating Roles (action: {action}): {updated_roles}')
@@ -110,7 +117,7 @@ class Autorole(commands.Cog):
             if confirm:
                 confirm_embed = default_embed(
                     title='Role Update',
-                    description=f'\n{update_message.capitalize()} role(s):{format_list(roles_to_update)}',
+                    description=f'\n{update_message.capitalize()} role(s):{format_list(role_results)}',
                     color=STYLES.colors.success
                 )
                 await ctx.send(f'{ctx.message.author.mention}', embed=confirm_embed)
@@ -395,7 +402,8 @@ class Autorole(commands.Cog):
             'other_games',
             games,
             options={'update_message': 'added Other Game(s)'},
-            allow_all=True
+            allow_all=True,
+            use_role_label=True
         )
 
     @commands.command(name='og-remove', aliases=['other-game-remove'])
@@ -422,7 +430,8 @@ class Autorole(commands.Cog):
                 'update_message': 'removed Other Game(s)',
                 'action': 'remove'
             },
-            allow_all=True
+            allow_all=True,
+            use_role_label=True
         )
 
     @commands.command(name='nsfw')
