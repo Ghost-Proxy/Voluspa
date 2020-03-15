@@ -129,8 +129,8 @@ def get_destiny_member_info(member):
         'LastSeenDisplayName': member['destinyUserInfo']['LastSeenDisplayName'],
         'LastSeenDisplayNameType': member['destinyUserInfo']['LastSeenDisplayNameType'],
         'crossSaveOverride': member['destinyUserInfo']['crossSaveOverride'],
-        'supplementalDisplayName': member['bungieNetUserInfo']['supplementalDisplayName'],
-        'bungieNetDisplayName': member['bungieNetUserInfo']['displayName'],
+        'supplementalDisplayName': member.get('bungieNetUserInfo', {}).get('supplementalDisplayName'),
+        'bungieNetDisplayName': member.get('bungieNetUserInfo', {}).get('displayName'),
     }
 
 
