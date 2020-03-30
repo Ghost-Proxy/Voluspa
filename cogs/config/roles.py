@@ -28,8 +28,9 @@ ROLES = {
                 'og-r6s': ['rainbow six siege', 'r6s', 'rss', 'rainbow', 'siege', 'rainbow six', 'rainbow six: siege'],
                 'og-rdo': ['red dead online', 'rdo', 'red dead redemption 2', 'red dead'],
                 'og-steep': ['steep'],
-                'og-warf': ['warframe', 'wf', 'warf']
-                # 'og-wow': ['world of warcraft', 'wow', 'warcraft'],
+                'og-sts': ['slay the spire', 'sts'],
+                'og-warf': ['warframe', 'wf', 'warf'],
+                'og-wow': ['world of warcraft', 'wow', 'warcraft'],
             },
             'raid_leads': {  # Based on Function String
                 'sherpa': ['sherpa', 'teach']
