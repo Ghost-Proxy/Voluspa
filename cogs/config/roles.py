@@ -6,6 +6,7 @@ ROLES = {
                 'strike-nf-pve': ['s', 'nf', 'pve', 'strike', 'nightfall', 'strike-nf-pve']
             },
             'other_games': {  # Based on User Input
+                'og-ac': ['animal crossing', 'ac', 'animal crossing new horizons'],
                 # 'og-ant': ['anthem', 'ant'],
                 # 'og-apex': ['apex legends', 'apex', 'apex: legends'],
                 'og-bl': ['borderlands', 'bl', 'borderlands 2', 'borderlands 3'],
