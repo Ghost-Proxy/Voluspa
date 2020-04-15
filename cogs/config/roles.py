@@ -30,6 +30,7 @@ ROLES = {
                 'og-rdo': ['red dead online', 'rdo', 'red dead redemption 2', 'red dead'],
                 'og-steep': ['steep'],
                 'og-sts': ['slay the spire', 'sts'],
+                'og-va': ['valorant', 'va'],
                 'og-warf': ['warframe', 'wf', 'warf'],
                 'og-wow': ['world of warcraft', 'wow', 'warcraft'],
             },
