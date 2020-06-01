@@ -455,7 +455,7 @@ class Autorole(commands.Cog):
                     'action': 'remove',
                 })
 
-    @commands.command(name='current-events')
+    @commands.command(name='current-events', aliases=['ce'])
     @commands.has_any_role('ghost-proxy-member', 'ghost-proxy-friend')
     @commands.guild_only()
     async def current_events_toggle(self, ctx):
