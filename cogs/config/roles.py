@@ -47,6 +47,9 @@ ROLES = {
             'nsfw': {
                 'nsfw': ['nsfw']
             },
+            'topics': {
+                'current-events': ['current events', 'ce', 'current-events', 'politics', 'news']
+            },
             'ghost_proxy_roles': {  # Based on Function String
                 'ghost-proxy-friend': ['gpf', 'gp-friend', 'ghost-proxy-friend'],
                 'ghost-proxy-member': ['gpm', 'gp-member', 'ghost-proxy-member'],
