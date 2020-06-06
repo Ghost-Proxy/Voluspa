@@ -6,15 +6,22 @@ ROLES = {
                 'strike-nf-pve': ['s', 'nf', 'pve', 'strike', 'nightfall', 'strike-nf-pve']
             },
             'other_games': {  # Based on User Input
+                'og-ac': ['animal crossing', 'ac', 'animal crossing new horizons'],
                 # 'og-ant': ['anthem', 'ant'],
                 # 'og-apex': ['apex legends', 'apex', 'apex: legends'],
                 'og-bl': ['borderlands', 'bl', 'borderlands 2', 'borderlands 3'],
                 'og-cod': ['call of duty', 'cod', 'mw', 'modern warfare'],
                 'og-div2': ['division 2', 'div2', 'td2', 'division', 'the division 2'],
+                'og-dl': ['dying light', 'dl'],
                 'og-dota': ['dota 2', 'dota', 'defense of the ancients 2'],
                 'og-eft': ['escape from tarkov', 'eft', 'tarkov'],
-                'og-hunt': ['hunt showdown', 'hunt', 'the hunt'],
+                'og-f76': ['fallout 76', 'f76', 'fallout', 'fallout online'],
                 'og-gr': ['ghost recon', 'gr', 'grw', 'grb', 'ghost recon wildlands', 'ghost recon breakpoint'],
+                'og-gtao': ['grand theft auto online', 'gtao', 'gtav', 'gta'],
+                'og-gtfo': ['gtfo'],
+                'og-halo': ['halo'],
+                'og-hunt': ['hunt showdown', 'hunt', 'the hunt'],
+                'og-kart': ['mario kart 8', 'kart', 'mario kart'],
                 'og-lol': ['league of legends', 'lol', 'league'],
                 'og-mc': ['minecraft', 'mc'],
                 'og-mhw': ['monster hunter world', 'mh', 'mhw', 'monster', 'monster hunter'],
@@ -23,9 +30,13 @@ ROLES = {
                 # 'og-rage': ['rage 2', 'rage'],
                 'og-r6s': ['rainbow six siege', 'r6s', 'rss', 'rainbow', 'siege', 'rainbow six', 'rainbow six: siege'],
                 'og-rdo': ['red dead online', 'rdo', 'red dead redemption 2', 'red dead'],
+                'og-smash': ['super smash bros', 'smash', 'ssb', 'ssbu'],
                 'og-steep': ['steep'],
-                'og-warf': ['warframe', 'wf', 'warf']
-                # 'og-wow': ['world of warcraft', 'wow', 'warcraft'],
+                'og-sts': ['slay the spire', 'sts'],
+                'og-switch': ['nintendo switch', 'switch'],
+                'og-va': ['valorant', 'va'],
+                'og-warf': ['warframe', 'wf', 'warf'],
+                'og-wow': ['world of warcraft', 'wow', 'warcraft'],
             },
             'raid_leads': {  # Based on Function String
                 'sherpa': ['sherpa', 'teach']
@@ -35,6 +46,9 @@ ROLES = {
             },
             'nsfw': {
                 'nsfw': ['nsfw']
+            },
+            'topics': {
+                'current-events': ['current events', 'ce', 'current-events', 'politics', 'news']
             },
             'ghost_proxy_roles': {  # Based on Function String
                 'ghost-proxy-friend': ['gpf', 'gp-friend', 'ghost-proxy-friend'],

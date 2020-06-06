@@ -19,6 +19,9 @@ matplotlib==3.1.1
 pandas==1.0.0
 emoji==0.5.4
 
+# TEXT FORMATTING
+titlecase==0.12.0
+
 # Discord.py DEBUG
 jishaku==1.17.1.181
 
