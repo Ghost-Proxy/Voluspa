@@ -1,13 +1,14 @@
-import discord
-from discord.ext import tasks, commands
 import logging
 import asyncio
+
 from modules.external_services.bungie import async_bungie_request_handler
 from modules.config import CONFIG
 from modules.custom_embed import default_embed
 
-logger = logging.getLogger('voluspa.cog.reminder')
+import discord
+from discord.ext import tasks, commands
 
+logger = logging.getLogger('voluspa.cog.reminder')
 
 async def get_pending_applications():
     raw_json = await async_bungie_request_handler(f'/GroupV2/{CONFIG.Bungie.clan_group_id}/Members/Pending/')
@@ -42,17 +43,18 @@ class RosterReminder(commands.Cog):
 
                     await feedback_channel.send(embed=embed)
 
-                await asyncio.sleep(14400)
+                await asyncio.sleep(14400) # 4 hrs
         except asyncio.CancelledError:
             raise
         except (OSError, discord.ConnectionClosed):
             self.reminder_task.cancel()
             self.reminder_task = self.bot.loop.create_task(self.roster_reminder())
 
-    @commands.command(name='restart-reminder')
-    async def task_restart(self, ctx):
-        self.reminder_task.cancel()
-        self.reminder_task = self.bot.loop.create_task(self.roster_reminder())
+    # DEBUG: Should only be required for debugging
+    # @commands.command(name='restart-reminder')
+    # async def task_restart(self, ctx):
+    #     self.reminder_task.cancel()
+    #     self.reminder_task = self.bot.loop.create_task(self.roster_reminder())
 
 def setup(bot):
     bot.add_cog(RosterReminder(bot))
