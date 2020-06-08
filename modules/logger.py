@@ -10,7 +10,7 @@ def log_to_channel(log_channel, log_msg):
     pass
 
 
-def _setup_logging(log_level=logging.DEBUG):
+def _setup_logging(log_level=logging.INFO):
     logging.getLogger().handlers.clear()
     root_logger = logging.getLogger()
     root_logger.setLevel(log_level)
