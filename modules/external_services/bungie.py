@@ -9,7 +9,7 @@ logger = logging.getLogger('voluspa.bungie_requests')
 
 
 async def async_bungie_request_handler(target_endpoint, request_url=None, params=None, response_handler=None):
-    bungie_platform_url = 'https://www.bungie.net/platform'
+    bungie_platform_url = 'https://www.bungie.net/Platform'
     _request_url = request_url if request_url else bungie_platform_url
     resp = await async_request_handler(_request_url,
                                        target_endpoint,
