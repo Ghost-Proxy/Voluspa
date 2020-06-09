@@ -1,5 +1,5 @@
 import logging
-from asyncio import TimeoutError
+import asyncio
 
 from cogs.config.roles import ROLES
 from modules.custom_embed import default_embed
@@ -49,7 +49,7 @@ async def set_page(current_page_dict, menu_msg, current_page_num, num_pages):
 def page_dict_as_lines(d, max_lines=EMBED_MAX_LINES):
     if max_lines > 17:
         max_lines = 17
-    else if max_lines < 2:
+    elif max_lines < 2:
         max_lines = 2
 
     pages = []
@@ -140,7 +140,7 @@ class Gaminator(commands.Cog):
                         await autorole.other_game_add(ctx, *[role['qualified-name'] for role in roles_to_add])
                         await autorole.other_game_remove(ctx, *[role['qualified-name'] for role in roles_to_remove])
                         break
-        except TimeoutError:
+        except asyncio.TimeoutError:
             logger.info(f'{ctx.message.author} timed out.')
         finally:
             await ctx.message.delete()
