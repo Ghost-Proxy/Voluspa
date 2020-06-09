@@ -80,6 +80,9 @@ class Gaminator(commands.Cog):
         role_msg = await ctx.send(embed=role_embed)
         await set_page(current_page_dict, menu_msg, current_page_num, num_pages)
 
+        roles_to_add = []
+        roles_to_remove = []
+
         while True:
             payload = await self.bot.wait_for('reaction_add', timeout=60.0)
 
@@ -93,6 +96,18 @@ class Gaminator(commands.Cog):
                 await set_page(current_page_dict, menu_msg, current_page_num, num_pages)
             elif payload[0].emoji in [e for e in ri_alphabet(len(current_page_dict))]:
                 await payload[0].remove(payload[1])
+
+                if current_page_dict[payload[0].emoji]['role-name'] in [role.name for role in payload[1].roles]:
+                    if current_page_dict[payload[0].emoji] not in roles_to_remove:
+                        roles_to_remove.append(current_page_dict[payload[0].emoji])
+                    else:
+                        roles_to_remove.remove(current_page_dict[payload[0].emoji])
+                        
+                else:
+                    if current_page_dict[payload[0].emoji] not in roles_to_add:
+                        roles_to_add.append(current_page_dict[payload[0].emoji])
+                    else:
+                        roles_to_add.remove(current_page_dict[payload[0].emoji])
 
 def setup(bot):
     bot.add_cog(Gaminator(bot))
