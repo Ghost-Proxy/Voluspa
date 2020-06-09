@@ -84,6 +84,7 @@ class Gaminator(commands.Cog):
         role_embed.add_field(name='Adding', value='None')
         role_embed.add_field(name='Removing', value='None')
 
+        await ctx.message.delete()
         role_msg = await ctx.send(embed=role_embed)
         menu_msg = await ctx.send(embed=menu_embed)
         await set_page(current_page_dict, menu_msg, current_page_num, num_pages)
@@ -94,35 +95,42 @@ class Gaminator(commands.Cog):
         while True:
             payload = await self.bot.wait_for('reaction_add', timeout=60.0)
 
-            if payload[0].emoji == '\u2b05' and current_page_num > 0:
-                current_page_num -= 1
-                current_page_dict = get_current_page_dict(pages[current_page_num])
-                await set_page(current_page_dict, menu_msg, current_page_num, num_pages)
-            elif payload[0].emoji == '\u27a1' and current_page_num < num_pages - 1:
-                current_page_num += 1
-                current_page_dict = get_current_page_dict(pages[current_page_num])
-                await set_page(current_page_dict, menu_msg, current_page_num, num_pages)
-            elif payload[0].emoji in [e for e in ri_alphabet(len(current_page_dict))]:
-                await payload[0].remove(payload[1])
+            if not payload[1].bot:
+                if payload[0].emoji == '\u2b05' and current_page_num > 0:
+                    current_page_num -= 1
+                    current_page_dict = get_current_page_dict(pages[current_page_num])
+                    await set_page(current_page_dict, menu_msg, current_page_num, num_pages)
+                elif payload[0].emoji == '\u27a1' and current_page_num < num_pages - 1:
+                    current_page_num += 1
+                    current_page_dict = get_current_page_dict(pages[current_page_num])
+                    await set_page(current_page_dict, menu_msg, current_page_num, num_pages)
+                elif payload[0].emoji in [e for e in ri_alphabet(len(current_page_dict))]:
+                    await payload[0].remove(payload[1])
 
-                if current_page_dict[payload[0].emoji]['role-name'] in [role.name for role in payload[1].roles]:
-                    if current_page_dict[payload[0].emoji] not in roles_to_remove:
-                        roles_to_remove.append(current_page_dict[payload[0].emoji])
+                    if current_page_dict[payload[0].emoji]['role-name'] in [role.name for role in payload[1].roles]:
+                        if current_page_dict[payload[0].emoji] not in roles_to_remove:
+                            roles_to_remove.append(current_page_dict[payload[0].emoji])
+                        else:
+                            roles_to_remove.remove(current_page_dict[payload[0].emoji])
+
+                        roles_to_remove_field = '\n'.join(role_dict_list_to_role_ping_list(roles_to_remove))
+                        role_embed.set_field_at(1, name='Removing', value=('None' if len(roles_to_remove) == 0 else roles_to_remove_field))
+                        await role_msg.edit(embed=role_embed)
                     else:
-                        roles_to_remove.remove(current_page_dict[payload[0].emoji])
+                        if current_page_dict[payload[0].emoji] not in roles_to_add:
+                            roles_to_add.append(current_page_dict[payload[0].emoji])
+                        else:
+                            roles_to_add.remove(current_page_dict[payload[0].emoji])
 
-                    roles_to_remove_field = "\n".join(role_dict_list_to_role_ping_list(roles_to_remove))
-                    role_embed.set_field_at(1, name='Removing', value=('None' if len(roles_to_remove) == 0 else roles_to_remove_field))
-                    await role_msg.edit(embed=role_embed)
-                else:
-                    if current_page_dict[payload[0].emoji] not in roles_to_add:
-                        roles_to_add.append(current_page_dict[payload[0].emoji])
-                    else:
-                        roles_to_add.remove(current_page_dict[payload[0].emoji])
-
-                    roles_to_add_field = "\n".join(role_dict_list_to_role_ping_list(roles_to_add))
-                    role_embed.set_field_at(0, name='Adding', value=('None' if len(roles_to_add) == 0 else roles_to_add_field))
-                    await role_msg.edit(embed=role_embed)
+                        roles_to_add_field = '\n'.join(role_dict_list_to_role_ping_list(roles_to_add))
+                        role_embed.set_field_at(0, name='Adding', value=('None' if len(roles_to_add) == 0 else roles_to_add_field))
+                        await role_msg.edit(embed=role_embed)
+                elif payload[0].emoji == '\u2705':
+                    await menu_msg.delete()
+                    await role_msg.delete()
+                    autorole = self.bot.get_cog('Autorole')
+                    await autorole.other_game_add(ctx, *[role['qualified-name'] for role in roles_to_remove])
+                    await autorole.other_game_remove(ctx, *[role['qualified-name'] for role in roles_to_add])
 
 def setup(bot):
     bot.add_cog(Gaminator(bot))
