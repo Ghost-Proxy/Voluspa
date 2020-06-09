@@ -9,6 +9,14 @@ from discord.ext import commands
 EMBED_MAX_LINES = 7
 logger = logging.getLogger('voluspa.cog.gaminator')
 
+def role_dict_list_to_role_ping_list(role_dict_list):
+    role_names = []
+
+    for d in role_dict_list:
+        role_names.append('`@' + d['role-name'] + '`')
+
+    return role_names
+
 def get_current_page_dict(page):
     ret = {}
     for i in range(len(page)):
@@ -76,8 +84,8 @@ class Gaminator(commands.Cog):
         role_embed.add_field(name='Adding', value='None')
         role_embed.add_field(name='Removing', value='None')
 
-        menu_msg = await ctx.send(embed=menu_embed)
         role_msg = await ctx.send(embed=role_embed)
+        menu_msg = await ctx.send(embed=menu_embed)
         await set_page(current_page_dict, menu_msg, current_page_num, num_pages)
 
         roles_to_add = []
@@ -102,12 +110,19 @@ class Gaminator(commands.Cog):
                         roles_to_remove.append(current_page_dict[payload[0].emoji])
                     else:
                         roles_to_remove.remove(current_page_dict[payload[0].emoji])
-                        
+
+                    roles_to_remove_field = "\n".join(role_dict_list_to_role_ping_list(roles_to_remove))
+                    role_embed.set_field_at(1, name='Removing', value=('None' if len(roles_to_remove) == 0 else roles_to_remove_field))
+                    await role_msg.edit(embed=role_embed)
                 else:
                     if current_page_dict[payload[0].emoji] not in roles_to_add:
                         roles_to_add.append(current_page_dict[payload[0].emoji])
                     else:
                         roles_to_add.remove(current_page_dict[payload[0].emoji])
+
+                    roles_to_add_field = "\n".join(role_dict_list_to_role_ping_list(roles_to_add))
+                    role_embed.set_field_at(0, name='Adding', value=('None' if len(roles_to_add) == 0 else roles_to_add_field))
+                    await role_msg.edit(embed=role_embed)
 
 def setup(bot):
     bot.add_cog(Gaminator(bot))
