@@ -47,6 +47,11 @@ async def set_page(current_page_dict, menu_msg, current_page_num, num_pages):
     await menu_msg.add_reaction('\u2705') # Check mark
 
 def page_dict_as_lines(d, max_lines=EMBED_MAX_LINES):
+    if max_lines > 17:
+        max_lines = 17
+    else if max_lines < 2:
+        max_lines = 2
+
     pages = []
     current_page = {}
     current_line = 0
