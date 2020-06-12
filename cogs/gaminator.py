@@ -9,7 +9,7 @@ from discord.ext import commands
 
 logger = logging.getLogger('voluspa.cog.gaminator')
 
-EMBED_MAX_LINES = 8
+EMBED_MAX_LINES = 7
 LEFT_ARROW = '\u2b05'
 CHECK_MARK = '\u2705'
 RIGHT_ARROW = '\u27a1'
