@@ -3,20 +3,60 @@ import asyncio
 
 from cogs.config.roles import ROLES
 from modules.custom_embed import default_embed
-from modules.emoji_utils import ri_at_index, ri_alphabet
+from modules.emoji_utils import ri_alphabet, ri_at_index
 
 from discord.ext import commands
 
-EMBED_MAX_LINES = 7
 logger = logging.getLogger('voluspa.cog.gaminator')
 
-def role_dict_list_to_role_ping_list(role_dict_list):
-    role_names = []
+EMBED_MAX_LINES = 8
+LEFT_ARROW = '\u2b05'
+CHECK_MARK = '\u2705'
+RIGHT_ARROW = '\u27a1'
 
-    for d in role_dict_list:
-        role_names.append('`@' + d['role-name'] + '`')
+def get_menu_field(current_page_dict):
+    menu_field = ''
+    for k, v in current_page_dict.items():
+        menu_field += k + ' - `@' + v['role-name'] + '` - ' + v['qualified-name'] + '\n'
 
-    return role_names
+    return menu_field
+
+async def set_page(ctx, current_page_dict, menu_embed, num_pages, current_page_num, menu_msg):
+    menu_field = get_menu_field(current_page_dict)
+    menu_embed.set_field_at(2, name=f'Page {current_page_num + 1}/{num_pages}', value=menu_field, inline=False)
+    await menu_msg.edit(embed=menu_embed)
+
+    menu_msg = await ctx.fetch_message(menu_msg.id)
+
+    last_index = len(current_page_dict) - 1 + 3
+    current_index = len(menu_msg.reactions) - 1
+    if current_index < last_index:
+        current_index += 1
+        while current_index <= last_index:
+            await menu_msg.add_reaction(ri_at_index(current_index - 3))
+            current_index += 1
+    elif current_index > last_index:
+        while current_index > last_index:
+            await menu_msg.remove_reaction(ri_at_index(current_index - 3), ctx.bot.user)
+            current_index -= 1
+
+async def init_menu(ctx, current_page_dict, menu_embed, num_pages):
+    menu_field = get_menu_field(current_page_dict)
+
+    menu_embed.add_field(name='Adding', value='None')
+    menu_embed.add_field(name='Removing', value='None')
+    menu_embed.add_field(name=f'Page 1/{num_pages}', value=menu_field, inline=False)
+
+    menu_msg = await ctx.send(embed=menu_embed)
+
+    await menu_msg.add_reaction(LEFT_ARROW)
+    await menu_msg.add_reaction(CHECK_MARK)
+    await menu_msg.add_reaction(RIGHT_ARROW)
+
+    for k in current_page_dict.keys():
+        await menu_msg.add_reaction(k)
+
+    return menu_msg
 
 def get_current_page_dict(page):
     ret = {}
@@ -24,27 +64,6 @@ def get_current_page_dict(page):
         ret[ri_at_index(i)] = {'role-name': list(page)[i], 'qualified-name': page[list(page)[i]]}
 
     return ret
-
-async def set_page(current_page_dict, menu_msg, current_page_num, num_pages):
-    menu_description = ''
-    for k, v in current_page_dict.items():
-        menu_description += k + ' - `@' + v['role-name'] + '` - ' + v['qualified-name'] + '\n'
-
-    menu_embed = default_embed(title=f'Other Games {current_page_num + 1}/{num_pages}', description=menu_description)
-
-    await menu_msg.clear_reactions()
-    await menu_msg.edit(embed=menu_embed)
-
-    if current_page_num > 0:
-        await menu_msg.add_reaction('\u2b05') # Left arrow
-
-    for k in current_page_dict.keys():
-        await menu_msg.add_reaction(k)
-
-    if current_page_num < num_pages - 1:
-        await menu_msg.add_reaction('\u27a1') # Right arrow
-
-    await menu_msg.add_reaction('\u2705') # Check mark
 
 def page_dict_as_lines(d, max_lines=EMBED_MAX_LINES):
     if max_lines > 17:
@@ -81,22 +100,15 @@ class Gaminator(commands.Cog):
 
     @commands.command(name='other-games')
     async def other_games(self, ctx):
-        logger.info(f'{ctx.message.author} called other_games')
         formatted_roles_dict = format_roles_dict(ROLES['other_games'])
         pages = page_dict_as_lines(formatted_roles_dict)
+        num_pages = len(pages)
 
         current_page_num = 0
-        num_pages = len(pages)
         current_page_dict = get_current_page_dict(pages[current_page_num]) # Gets a dict indexed by emoji
 
-        menu_embed = default_embed(title=f'Other Games {current_page_num + 1}/{num_pages}')
-        role_embed = default_embed(title='Your Roles')
-        role_embed.add_field(name='Adding', value='None')
-        role_embed.add_field(name='Removing', value='None')
-
-        role_msg = await ctx.send(embed=role_embed)
-        menu_msg = await ctx.send(embed=menu_embed)
-        await set_page(current_page_dict, menu_msg, current_page_num, num_pages)
+        menu_embed = default_embed(title=f'Other Games')
+        menu_msg = await init_menu(ctx, current_page_dict, menu_embed, num_pages)
 
         roles_to_add = []
         roles_to_remove = []
@@ -104,47 +116,28 @@ class Gaminator(commands.Cog):
         try:
             while True:
                 payload = await self.bot.wait_for('reaction_add', timeout=60.0)
+                reaction, user = payload
 
-                if payload[1] == ctx.message.author:
-                    if payload[0].emoji == '\u2b05' and current_page_num > 0:
-                        current_page_num -= 1
+                if user == ctx.message.author:
+                    if reaction.emoji == LEFT_ARROW or reaction.emoji == RIGHT_ARROW:
+                        await reaction.remove(user)
+                        i = -1 if reaction.emoji == LEFT_ARROW else 1
+                        current_page_num = (current_page_num + i) % num_pages
                         current_page_dict = get_current_page_dict(pages[current_page_num])
-                        await set_page(current_page_dict, menu_msg, current_page_num, num_pages)
-                    elif payload[0].emoji == '\u27a1' and current_page_num < num_pages - 1:
-                        current_page_num += 1
-                        current_page_dict = get_current_page_dict(pages[current_page_num])
-                        await set_page(current_page_dict, menu_msg, current_page_num, num_pages)
-                    elif payload[0].emoji in [e for e in ri_alphabet(len(current_page_dict))]:
-                        await payload[0].remove(payload[1])
-
-                        if current_page_dict[payload[0].emoji]['role-name'] in [role.name for role in payload[1].roles]:
-                            if current_page_dict[payload[0].emoji] not in roles_to_remove:
-                                roles_to_remove.append(current_page_dict[payload[0].emoji])
-                            else:
-                                roles_to_remove.remove(current_page_dict[payload[0].emoji])
-
-                            roles_to_remove_field = '\n'.join(role_dict_list_to_role_ping_list(roles_to_remove))
-                            role_embed.set_field_at(1, name='Removing', value=('None' if len(roles_to_remove) == 0 else roles_to_remove_field))
-                            await role_msg.edit(embed=role_embed)
-                        else:
-                            if current_page_dict[payload[0].emoji] not in roles_to_add:
-                                roles_to_add.append(current_page_dict[payload[0].emoji])
-                            else:
-                                roles_to_add.remove(current_page_dict[payload[0].emoji])
-
-                            roles_to_add_field = '\n'.join(role_dict_list_to_role_ping_list(roles_to_add))
-                            role_embed.set_field_at(0, name='Adding', value=('None' if len(roles_to_add) == 0 else roles_to_add_field))
-                            await role_msg.edit(embed=role_embed)
-                    elif payload[0].emoji == '\u2705':
+                        await set_page(ctx, current_page_dict, menu_embed, num_pages, current_page_num, menu_msg)
+                    elif reaction.emoji == CHECK_MARK:
                         autorole = self.bot.get_cog('Autorole')
                         await autorole.other_game_add(ctx, *[role['qualified-name'] for role in roles_to_add])
                         await autorole.other_game_remove(ctx, *[role['qualified-name'] for role in roles_to_remove])
                         break
+                    elif reaction.emoji in [e for e in ri_alphabet(len(current_page_dict))]:
+                        await reaction.remove(user) # Placeholder
+                elif not user.bot:
+                    await reaction.remove(user)
         except asyncio.TimeoutError:
             logger.info(f'{ctx.message.author} timed out.')
         finally:
             await ctx.message.delete()
-            await role_msg.delete()
             await menu_msg.delete()
 
 def setup(bot):
