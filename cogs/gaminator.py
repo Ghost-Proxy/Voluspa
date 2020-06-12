@@ -14,6 +14,30 @@ LEFT_ARROW = '\u2b05'
 CHECK_MARK = '\u2705'
 RIGHT_ARROW = '\u27a1'
 
+def role_dict_list_to_role_ping_list(role_dict_list):
+    role_names = []
+
+    for d in role_dict_list:
+        role_names.append('`@' + d['role-name'] + '`')
+
+    return role_names
+
+async def update_roles_to_add(reaction, user, current_page_dict, roles_to_add):
+    if current_page_dict[reaction.emoji] not in roles_to_add:
+        roles_to_add.append(current_page_dict[reaction.emoji])
+    else:
+        roles_to_add.remove(current_page_dict[reaction.emoji])
+
+    return roles_to_add, 0
+
+async def update_roles_to_remove(reaction, user, current_page_dict, roles_to_remove):
+    if current_page_dict[reaction.emoji] not in roles_to_remove:
+        roles_to_remove.append(current_page_dict[reaction.emoji])
+    else:
+        roles_to_remove.remove(current_page_dict[reaction.emoji])
+
+    return roles_to_remove, 1
+
 def get_menu_field(current_page_dict):
     menu_field = ''
     for k, v in current_page_dict.items():
@@ -100,6 +124,8 @@ class Gaminator(commands.Cog):
 
     @commands.command(name='other-games')
     async def other_games(self, ctx):
+        logger.info(f'{ctx.message.author} called other_games')
+
         formatted_roles_dict = format_roles_dict(ROLES['other_games'])
         pages = page_dict_as_lines(formatted_roles_dict)
         num_pages = len(pages)
@@ -115,8 +141,7 @@ class Gaminator(commands.Cog):
 
         try:
             while True:
-                payload = await self.bot.wait_for('reaction_add', timeout=60.0)
-                reaction, user = payload
+                reaction, user = await self.bot.wait_for('reaction_add', timeout=60.0)
 
                 if user == ctx.message.author:
                     if reaction.emoji == LEFT_ARROW or reaction.emoji == RIGHT_ARROW:
@@ -131,7 +156,14 @@ class Gaminator(commands.Cog):
                         await autorole.other_game_remove(ctx, *[role['qualified-name'] for role in roles_to_remove])
                         break
                     elif reaction.emoji in [e for e in ri_alphabet(len(current_page_dict))]:
-                        await reaction.remove(user) # Placeholder
+                        await reaction.remove(user)
+                        if current_page_dict[reaction.emoji]['role-name'] not in [role.name for role in user.roles]:
+                            update_list, field_index = await update_roles_to_add(reaction, user, current_page_dict, roles_to_add)
+                        else:
+                            update_list, field_index = await update_roles_to_remove(reaction, user, current_page_dict, roles_to_remove)
+                        update_field = '\n'.join(role_dict_list_to_role_ping_list(update_list))
+                        menu_embed.set_field_at(field_index, name=('Adding' if field_index == 1 else 'Removing'), value=('None' if len(update_list) == 0 else update_field))
+                        await menu_msg.edit(embed=menu_embed)
                 elif not user.bot:
                     await reaction.remove(user)
         except asyncio.TimeoutError:
