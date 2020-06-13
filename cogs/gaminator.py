@@ -162,7 +162,7 @@ class Gaminator(commands.Cog):
 
                     elif reaction.emoji == CHECK_MARK:
 
-                        if len(roles_to_add) > 0 and len(roles_to_remove) > 0:
+                        if len(roles_to_add) > 0 or len(roles_to_remove) > 0:
                             autorole = self.bot.get_cog('Autorole')
                             if len(roles_to_add) > 0:
                                 await autorole.other_game_add(ctx, *[role['qualified-name'] for role in roles_to_add])
