@@ -19,7 +19,8 @@ def role_dict_list_to_role_ping_list(role_dict_list):
     role_names = []
 
     for d in role_dict_list:
-        role_names.append('`@' + d['role-name'] + '`')
+        role_name = d['role-name']
+        role_names.append(f'`@{role_name}`')
 
     return role_names
 
@@ -42,7 +43,10 @@ async def update_roles_to_remove(reaction, user, current_page_dict, roles_to_rem
 def get_menu_field(current_page_dict):
     menu_field = ''
     for k, v in current_page_dict.items():
-        menu_field += k + ' - `@' + v['role-name'] + '` - ' + v['qualified-name'] + '\n'
+        role_name = v['role-name']
+        qualified_name = v['qualified-name']
+        padding = (10 - len(role_name)) * '\u2000' # EN QUAD space
+        menu_field += f'{k}\u2000\u2000\u2000`@{role_name}`{padding} {qualified_name}\n'
 
     return menu_field
 
