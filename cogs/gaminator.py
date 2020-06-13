@@ -127,6 +127,7 @@ class Gaminator(commands.Cog):
         self.bot = bot
 
     @commands.command(name='other-games')
+    @commands.cooldown(1, 1800, commands.BucketType.user)
     async def other_games(self, ctx):
         logger.info(f'{ctx.message.author} called other_games')
 
@@ -190,6 +191,7 @@ class Gaminator(commands.Cog):
         finally:
             await ctx.message.delete()
             await menu_msg.delete()
+            self.bot.get_command('other-games').reset_cooldown(ctx)
 
 def setup(bot):
     bot.add_cog(Gaminator(bot))
