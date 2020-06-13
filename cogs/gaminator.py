@@ -149,9 +149,12 @@ class Gaminator(commands.Cog):
         roles_to_add = []
         roles_to_remove = []
 
+        def check_in_ctx(reaction, user):
+            return reaction.message.id == menu_msg.id
+
         try:
             while True:
-                reaction, user = await self.bot.wait_for('reaction_add', timeout=60.0)
+                reaction, user = await self.bot.wait_for('reaction_add', timeout=60.0, check=check_in_ctx)
 
                 if user == ctx.message.author: # Respond to reactions made by the command caller
 
