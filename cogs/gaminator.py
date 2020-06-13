@@ -177,7 +177,7 @@ class Gaminator(commands.Cog):
                             update_list, field_index = await update_roles_to_remove(reaction, user, current_page_dict, roles_to_remove)
 
                         update_field = '\n'.join(role_dict_list_to_role_ping_list(update_list))
-                        menu_embed.set_field_at(field_index, name=('Adding' if field_index == 1 else 'Removing'), value=('None' if len(update_list) == 0 else update_field))
+                        menu_embed.set_field_at(field_index, name=('Adding' if field_index == 0 else 'Removing'), value=('None' if len(update_list) == 0 else update_field))
 
                         await menu_msg.edit(embed=menu_embed)
 
