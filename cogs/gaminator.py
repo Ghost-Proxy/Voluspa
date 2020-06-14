@@ -152,12 +152,12 @@ class Gaminator(commands.Cog):
 
                     if reaction.emoji == LEFT_ARROW or reaction.emoji == RIGHT_ARROW:
 
-                        await reaction.remove(user)
-
                         i = -1 if reaction.emoji == LEFT_ARROW else 1
                         current_page_num = (current_page_num + i) % num_pages
                         current_page_dict = get_current_page_dict(pages[current_page_num])
+
                         await set_page(ctx, current_page_dict, menu_embed, num_pages, current_page_num, menu_msg)
+                        await reaction.remove(user)
 
                     elif reaction.emoji == CHECK_MARK:
 
@@ -172,8 +172,6 @@ class Gaminator(commands.Cog):
 
                     elif reaction.emoji in [e for e in ri_alphabet(len(current_page_dict))]: # If reaction is a valid and applicable regional indicator
 
-                        await reaction.remove(user)
-
                         if current_page_dict[reaction.emoji]['role-name'] not in [role.name for role in user.roles]: # If user doesn't already have role
                             field_index = 0
                             update_list = update_roles_list(reaction, user, current_page_dict, roles_to_add) # field_index: 0 is 'Adding' field; 1 is 'Removing' field
@@ -185,6 +183,7 @@ class Gaminator(commands.Cog):
                         menu_embed.set_field_at(field_index, name=('Adding' if field_index == 0 else 'Removing'), value=('None' if len(update_list) == 0 else update_field))
 
                         await menu_msg.edit(embed=menu_embed)
+                        await reaction.remove(user)
 
                     else: # Disregard impertinent reactions
 
