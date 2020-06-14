@@ -24,7 +24,7 @@ def role_dict_list_to_role_ping_list(role_dict_list):
 
     return role_names
 
-async def update_roles_list(reaction, user, current_page_dict, roles_list):
+def update_roles_list(reaction, user, current_page_dict, roles_list):
     if current_page_dict[reaction.emoji] not in roles_list:
         roles_list.append(current_page_dict[reaction.emoji])
     else:
@@ -176,10 +176,10 @@ class Gaminator(commands.Cog):
 
                         if current_page_dict[reaction.emoji]['role-name'] not in [role.name for role in user.roles]: # If user doesn't already have role
                             field_index = 0
-                            update_list = await update_roles_list(reaction, user, current_page_dict, roles_to_add) # field_index: 0 is 'Adding' field; 1 is 'Removing' field
+                            update_list = update_roles_list(reaction, user, current_page_dict, roles_to_add) # field_index: 0 is 'Adding' field; 1 is 'Removing' field
                         else:
                             field_index = 1
-                            update_list = await update_roles_list(reaction, user, current_page_dict, roles_to_remove)
+                            update_list = update_roles_list(reaction, user, current_page_dict, roles_to_remove)
 
                         update_field = '\n'.join(role_dict_list_to_role_ping_list(update_list))
                         menu_embed.set_field_at(field_index, name=('Adding' if field_index == 0 else 'Removing'), value=('None' if len(update_list) == 0 else update_field))
