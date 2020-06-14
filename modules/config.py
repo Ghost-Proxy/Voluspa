@@ -88,8 +88,9 @@ def read_config():
         secrets = env_secrets
 
     # Pick up Voluspa named Env Vars
+    if 'Voluspa' not in secrets:
+        secrets['Voluspa'] = {}
     voluspa_config = ['VOLUSPA_PREFIX', 'VOLUSPA_FEEDBACK_CHANNEL_ID']
-    secrets['Voluspa'] = {}
     for ve in voluspa_config:
         if os.getenv(ve):
             secrets['Voluspa'][ve.split('_', maxsplit=1)[1].lower()] = getenv_cast(ve)
