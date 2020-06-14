@@ -24,21 +24,13 @@ def role_dict_list_to_role_ping_list(role_dict_list):
 
     return role_names
 
-async def update_roles_to_add(reaction, user, current_page_dict, roles_to_add):
-    if current_page_dict[reaction.emoji] not in roles_to_add:
-        roles_to_add.append(current_page_dict[reaction.emoji])
+async def update_roles_list(reaction, user, current_page_dict, roles_list):
+    if current_page_dict[reaction.emoji] not in roles_list:
+        roles_list.append(current_page_dict[reaction.emoji])
     else:
-        roles_to_add.remove(current_page_dict[reaction.emoji])
+        roles_list.remove(current_page_dict[reaction.emoji])
 
-    return roles_to_add, 0
-
-async def update_roles_to_remove(reaction, user, current_page_dict, roles_to_remove):
-    if current_page_dict[reaction.emoji] not in roles_to_remove:
-        roles_to_remove.append(current_page_dict[reaction.emoji])
-    else:
-        roles_to_remove.remove(current_page_dict[reaction.emoji])
-
-    return roles_to_remove, 1
+    return roles_list
 
 def get_menu_field(current_page_dict):
     menu_field = ''
@@ -149,7 +141,7 @@ class Gaminator(commands.Cog):
         roles_to_add = []
         roles_to_remove = []
 
-        def check_in_ctx(reaction, user):
+        def check_in_ctx(reaction, user): # Ensure reaction is to menu_msg
             return reaction.message.id == menu_msg.id
 
         try:
@@ -183,14 +175,20 @@ class Gaminator(commands.Cog):
                         await reaction.remove(user)
 
                         if current_page_dict[reaction.emoji]['role-name'] not in [role.name for role in user.roles]: # If user doesn't already have role
-                            update_list, field_index = await update_roles_to_add(reaction, user, current_page_dict, roles_to_add) # field_index: 0 is 'Adding' field; 1 is 'Removing' field
+                            field_index = 0
+                            update_list = await update_roles_list(reaction, user, current_page_dict, roles_to_add) # field_index: 0 is 'Adding' field; 1 is 'Removing' field
                         else:
-                            update_list, field_index = await update_roles_to_remove(reaction, user, current_page_dict, roles_to_remove)
+                            field_index = 1
+                            update_list = await update_roles_list(reaction, user, current_page_dict, roles_to_remove)
 
                         update_field = '\n'.join(role_dict_list_to_role_ping_list(update_list))
                         menu_embed.set_field_at(field_index, name=('Adding' if field_index == 0 else 'Removing'), value=('None' if len(update_list) == 0 else update_field))
 
                         await menu_msg.edit(embed=menu_embed)
+
+                    else: # Disregard impertinent reactions
+
+                        await reaction.remove(user)
 
                 elif not user.bot: # Disregard reactions made by third parties
 
