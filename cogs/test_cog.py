@@ -1,4 +1,4 @@
-from modules.paging import Menu
+from modules.paging import MenuWithOptions
 
 from discord.ext import commands
 
@@ -6,8 +6,8 @@ class TestCog(commands.Cog):
     @commands.command()
     async def menutest(self, ctx):
         title = 'Generic Paging Test'
-        raw = 'I\'m baby vaporware biodiesel prism mlkshk bespoke helvetica raw denim. Ugh selfies williamsburg farm-to-table, craft beer meggings health goth next level offal locavore. Semiotics prism cloud bread salvia sustainable hot chicken gluten-free migas tote bag. Pinterest food truck offal snackwave flannel tote bag hell of palo santo art party air plant umami bushwick roof party hexagon mixtape. Viral trust fund gochujang, taiyaki wolf offal chartreuse YOLO flexitarian hell of. Meh heirloom offal microdosing. Cloud bread humblebrag pinterest squid vinyl, selvage franzen whatever fanny pack yuccie shoreditch taiyaki williamsburg try-hard butcher. Fanny pack messenger bag thundercats PBR&B kitsch, skateboard succulents man bun. Everyday carry yuccie kombucha activated charcoal leggings. Shoreditch hammock pork belly, green juice before they sold out organic church-key copper mug chambray. Post-ironic distillery YOLO venmo gastropub VHS ennui banh mi hexagon lumbersexual sriracha, vegan kickstarter kogi trust fund. Cliche fingerstache selvage gastropub etsy, meh unicorn put a bird on it. Banjo af shoreditch jean shorts fingerstache forage gentrify pok pok. Post-ironic normcore cray gluten-free mustache vape edison bulb raw denim. Cronut neutra stumptown food truck, activated charcoal portland migas prism truffaut raw denim. Meggings kinfolk pug hexagon la croix raw denim seitan banh mi poutine pok pok four loko everyday carry kickstarter. Hexagon scenester microdosing lumbersexual. Bushwick ramps meditation organic umami. Sartorial bitters food truck, banh mi adaptogen flannel 8-bit yuccie normcore. Blog lumbersexual subway tile, church-key whatever photo booth flannel succulents organic. Keytar quinoa put a bird on it, gastropub ennui whatever intelligentsia gluten-free live-edge plaid 8-bit cred man bun listicle. Williamsburg cornhole bitters prism swag, craft beer af kitsch pinterest artisan gochujang beard farm-to-table unicorn kinfolk. Flexitarian taxidermy ennui venmo forage four dollar toast ramps hoodie small batch. Chillwave occupy flannel church-key. DIY affogato typewriter cornhole schlitz snackwave bicycle rights migas. Irony whatever wolf vice, cred forage air plant hot chicken unicorn gluten-free. Tofu palo santo street art etsy waistcoat flannel. Succulents keytar messenger bag chartreuse fam DIY green juice 8-bit bushwick you probably haven\'t heard of them cardigan venmo meggings chicharrones. Art party tbh slow-carb small batch YOLO cray. Shoreditch DIY XOXO tumeric +1 live-edge, fashion axe selvage. Blog four dollar toast palo santo vexillologist. Dummy text? More like dummy thicc text, amirite?'
-        menu = Menu(ctx, title, raw=raw)
+        options = ['Option 1', 'Option 2', 'Option 3']
+        menu = MenuWithOptions(ctx, title, options=options, max_lines_per_page=2)
         await menu.run()
 
 def setup(bot):
