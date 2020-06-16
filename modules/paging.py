@@ -1,4 +1,5 @@
 import logging
+from textwrap import wrap
 import asyncio
 
 from modules.custom_embed import default_embed
@@ -65,3 +66,34 @@ class _MenuBase:
         self._menu_embed.set_field_at(self._menu_field_index, name=f'Page {self._current_page_index + 1}/{len(self._pages)}', value=menu_field)
 
         await self._menu_msg.edit(embed=self._menu_embed)
+
+class Menu(_MenuBase):
+    def __init__(self, ctx, title, raw=None, pages=None, max_chars_per_line=64, max_lines_per_page=16, timeout=60.0):
+        logger.info(f'{ctx.message.author} created a menu.')
+
+        super().__init__(ctx, title, timeout)
+
+        if raw:
+            self._pages = self._split(raw, max_chars_per_line, max_lines_per_page)
+        else:
+            self._pages = pages
+
+    async def _init_reactions(self):
+        await self._menu_msg.add_reaction(_MenuBase.LEFT_ARROW)
+        await self._menu_msg.add_reaction(_MenuBase.RIGHT_ARROW)
+
+    def _get_menu_field(self):
+        return self._pages[self._current_page_index]
+
+    def _split(self, raw, max_chars_per_line, max_lines_per_page):
+        i = 0
+        lines = wrap(raw, width=max_chars_per_line)
+        pages = []
+        while i + max_lines_per_page < len(lines):
+            pages.append("\n".join(lines[i:i + max_lines_per_page]))
+            i += max_lines_per_page
+
+        if i < len(lines):
+            pages.append("\n".join(lines[i:]))
+
+        return pages
