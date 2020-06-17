@@ -83,11 +83,11 @@ class _MenuBase:
         pass
 
 class Menu(_MenuBase):
-    def __init__(self, ctx, title, raw=None, pages=None, max_chars_per_line=64, max_lines_per_page=16, timeout=60.0):
+    def __init__(self, ctx, title, raw=None, lines=None, pages=None, max_chars_per_line=64, max_lines_per_page=16, timeout=60.0):
         super().__init__(ctx, title, timeout)
 
-        if raw:
-            self._pages = self._split(raw, max_chars_per_line, max_lines_per_page)
+        if raw or lines:
+            self._pages = self._split(raw, lines, max_chars_per_line, max_lines_per_page)
         else:
             self._pages = pages
 
@@ -99,9 +99,10 @@ class Menu(_MenuBase):
     def _get_menu_field(self):
         return self._pages[self._current_page_index]
 
-    def _split(self, raw, max_chars_per_line, max_lines_per_page):
+    def _split(self, raw, lines, max_chars_per_line, max_lines_per_page):
         i = 0
-        lines = wrap(raw, width=max_chars_per_line)
+        if not lines:
+            lines = wrap(raw, width=max_chars_per_line)
         pages = []
         while i + max_lines_per_page < len(lines):
             pages.append("\n".join(lines[i:i + max_lines_per_page]))
