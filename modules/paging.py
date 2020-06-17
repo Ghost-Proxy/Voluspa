@@ -110,10 +110,12 @@ class Menu(_MenuBase):
         return pages
 
 class MenuWithOptions(_MenuBase):
-    def __init__(self, ctx, title, options=None, pages=None, max_lines_per_page=5, timeout=60.0):
+    def __init__(self, ctx, title, options=None, pages=None, max_lines_per_page=5, option_padding=2, timeout=60.0):
         logger.info(f'{ctx.message.author} created a menu with options.')
 
         super().__init__(ctx, title, timeout)
+
+        self._padding = option_padding
 
         self._feedback_ui_field_indicies = []
         self._selected_options = []
@@ -162,7 +164,12 @@ class MenuWithOptions(_MenuBase):
 
     def _get_menu_field(self):
         option_strings = [self.option_to_string(o) for o in self._pages[self._current_page_index]]
-        return "\n".join(option_strings)
+        
+        for i in range(len(option_strings)):
+            padding = self._padding * '\u2000'
+            option_strings[i] = f'{ri_at_index(i)}{padding}{option_strings[i]}'
+
+        return '\n'.join(option_strings)
 
     async def _reaction_handler(self, reaction, user):
         if reaction.emoji == _MenuBase.CHECK_MARK:
