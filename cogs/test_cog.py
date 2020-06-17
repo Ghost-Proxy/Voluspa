@@ -21,7 +21,7 @@ class TestCog(commands.Cog):
     @commands.command()
     async def menutest(self, ctx):
         title = 'Generic Paging Test'
-        options = {'\U0001f44d': {'string': 'Option 1'}, 'thumbsdown': {'string': 'Option 2'}, 'raised_hand': {'string': 'Option 3'}}
+        options = {'\U0001f44d': {'string': 'Option 1'}, 'thumbsdown': {'string': 'Option 2'}, ':raised_hand:': {'string': 'Option 3'}}
         menu = TestMenu(ctx, title, options=options, max_lines_per_page=2)
         await menu.run()
         logger.info(menu.get_selected_options())
