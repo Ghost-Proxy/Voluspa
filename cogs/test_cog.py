@@ -1,8 +1,8 @@
-from modules.paging import MenuWithOptions
+from modules.paging import MenuWithCustomOptions
 
 from discord.ext import commands
 
-class TestMenu(MenuWithOptions):
+class TestMenu(MenuWithCustomOptions):
     def init_feedback_ui(self):
         self.add_feedback_ui_field(name='You Selected', value='None')
 
@@ -14,7 +14,7 @@ class TestCog(commands.Cog):
     @commands.command()
     async def menutest(self, ctx):
         title = 'Generic Paging Test'
-        options = ['Option 1', 'Option 2', 'Option 3']
+        options = {'thumbsup': 'Option 1', 'thumbsdown': 'Option 2', 'raised_hand': 'Option 3'}
         menu = TestMenu(ctx, title, options=options, max_lines_per_page=2)
         await menu.run()
 

@@ -3,7 +3,9 @@ import asyncio
 from textwrap import wrap
 
 from modules.custom_embed import default_embed
-from modules.emoji_utils import ri_at_index, ri_alphabet, index_of_ri
+from modules.emoji_utils import ri_at_index, ri_alphabet, index_of_ri, normalize
+
+from emoji import emojize
 
 logger = logging.getLogger('voluspa.module.paging')
 
@@ -13,6 +15,8 @@ class _MenuBase:
     RIGHT_ARROW = '\u27a1'
 
     def __init__(self, ctx, title, timeout):
+        logger.info(f'{ctx.message.author} created a menu.')
+
         # Paramaters
         self._ctx = ctx
         self._timeout = timeout
@@ -45,11 +49,10 @@ class _MenuBase:
             while True:
                 reaction, user = await self._ctx.bot.wait_for('reaction_add', check=check_in_ctx, timeout=self._timeout)
                 if user == self._ctx.message.author:
-                    if len(self._pages) > 1:
-                        if reaction.emoji == Menu.LEFT_ARROW:
-                            await self._set_page(self._current_page_index - 1)
-                        elif reaction.emoji == Menu.RIGHT_ARROW:
-                            await self._set_page(self._current_page_index + 1)
+                    if reaction.emoji == Menu.LEFT_ARROW and len(self._pages) > 1:
+                        await self._set_page(self._current_page_index - 1)
+                    elif reaction.emoji == Menu.RIGHT_ARROW and len(self._pages) > 1:
+                        await self._set_page(self._current_page_index + 1)
                     elif await self._reaction_handler(reaction):
                         break
                 if not user.bot:
@@ -73,7 +76,7 @@ class _MenuBase:
         await self._menu_msg.edit(embed=self._menu_embed)
         await self._set_reactions()
 
-    async def _reaction_handler(self, reaction, user):
+    async def _reaction_handler(self, reaction):
         pass
 
     async def _set_reactions(self):
@@ -81,8 +84,6 @@ class _MenuBase:
 
 class Menu(_MenuBase):
     def __init__(self, ctx, title, raw=None, pages=None, max_chars_per_line=64, max_lines_per_page=16, timeout=60.0):
-        logger.info(f'{ctx.message.author} created a menu.')
-
         super().__init__(ctx, title, timeout)
 
         if raw:
@@ -113,8 +114,6 @@ class Menu(_MenuBase):
 
 class MenuWithOptions(_MenuBase):
     def __init__(self, ctx, title, options=None, pages=None, max_lines_per_page=5, option_padding=2, timeout=60.0):
-        logger.info(f'{ctx.message.author} created a menu with options.')
-
         super().__init__(ctx, title, timeout)
 
         self._padding = option_padding
@@ -172,9 +171,9 @@ class MenuWithOptions(_MenuBase):
 
     def _get_menu_field(self):
         option_strings = [self.option_to_string(o) for o in self._pages[self._current_page_index]]
+        padding = self._padding * '\u2000'
 
         for i in range(len(option_strings)):
-            padding = self._padding * '\u2000'
             option_strings[i] = f'{ri_at_index(i)}{padding}{option_strings[i]}'
 
         return '\n'.join(option_strings)
@@ -225,22 +224,55 @@ class MenuWithOptions(_MenuBase):
         return pages
 
 class MenuWithCustomOptions(MenuWithOptions):
-    def __init__(self, ctx, title, options=None, pages=None, option_padding=2, timeout=60.0):
-        logger.info(f'{ctx.message.author} created a menu with options.')
-
+    def __init__(self, ctx, title, options=None, pages=None, max_lines_per_page=5, option_padding=2, timeout=60.0):
         super().__init__(ctx, title, options, pages, max_lines_per_page, option_padding, timeout)
 
+        for i in range(len(self._pages)):
+            temp = {}
+            for k, v in self._pages[i].items():
+                temp[emojize(normalize(k), use_aliases=True)] = v
+            self._pages[i] = temp
+
     async def _init_reactions(self):
-        pass
+        draw_arrows = False
+        if len(self._pages) > 1:
+            draw_arrows = True
+
+        if draw_arrows:
+            await self._menu_msg.add_reaction(_MenuBase.LEFT_ARROW)
+        await self._menu_msg.add_reaction(_MenuBase.CHECK_MARK)
+        if draw_arrows:
+            await self._menu_msg.add_reaction(_MenuBase.RIGHT_ARROW)
+
+        for k in self._pages[self._current_page_index].keys():
+            await self._menu_msg.add_reaction(k)
 
     def _get_menu_field(self):
-        pass
+        option_strings = []
+        padding = self._padding * '\u2000'
+
+        for k, v in self._pages[self._current_page_index].items():
+            option_strings.append(f'{k}{padding}{self.option_to_string(v)}')
+
+        return '\n'.join(option_strings)
 
     async def _reaction_handler(self, reaction):
-        pass
+        if reaction.emoji == _MenuBase.CHECK_MARK:
+            return True
+        elif reaction.emoji in [e for e in self._pages[self._current_page_index].keys()]:
+            if self._pages[self._current_page_index][reaction.emoji] not in self._selected_options:
+                self._selected_options.append(self._pages[self._current_page_index][reaction.emoji])
+            else:
+                self._selected_options.remove(self._pages[self._current_page_index][reaction.emoji])
+
+            self.update_feedback_ui()
+            await self._menu_msg.edit(embed=self._menu_embed)
+
+            return False
 
     async def _set_reactions(self):
-        pass
+        await self._menu_msg.clear_reactions()
+        await self._init_reactions()
 
     def _split(self, options, max_lines_per_page):
         current_line = 0
