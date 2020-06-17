@@ -45,10 +45,11 @@ class _MenuBase:
             while True:
                 reaction, user = await self._ctx.bot.wait_for('reaction_add', check=check_in_ctx, timeout=self._timeout)
                 if user == self._ctx.message.author:
-                    if reaction.emoji == Menu.LEFT_ARROW:
-                        await self._set_page(self._current_page_index - 1)
-                    elif reaction.emoji == Menu.RIGHT_ARROW:
-                        await self._set_page(self._current_page_index + 1)
+                    if len(self._pages) > 1:
+                        if reaction.emoji == Menu.LEFT_ARROW:
+                            await self._set_page(self._current_page_index - 1)
+                        elif reaction.emoji == Menu.RIGHT_ARROW:
+                            await self._set_page(self._current_page_index + 1)
                     elif await self._reaction_handler(reaction, user):
                         break
                 if not user.bot:
@@ -90,8 +91,9 @@ class Menu(_MenuBase):
             self._pages = pages
 
     async def _init_reactions(self):
-        await self._menu_msg.add_reaction(_MenuBase.LEFT_ARROW)
-        await self._menu_msg.add_reaction(_MenuBase.RIGHT_ARROW)
+        if len(self._pages) > 1:
+            await self._menu_msg.add_reaction(_MenuBase.LEFT_ARROW)
+            await self._menu_msg.add_reaction(_MenuBase.RIGHT_ARROW)
 
     def _get_menu_field(self):
         return self._pages[self._current_page_index]
@@ -155,16 +157,22 @@ class MenuWithOptions(_MenuBase):
         super()._init_menu_embed()
 
     async def _init_reactions(self):
-        await self._menu_msg.add_reaction(_MenuBase.LEFT_ARROW)
+        draw_arrows = False
+        if len(self._pages) > 1:
+            draw_arrows = True
+
+        if draw_arrows:
+            await self._menu_msg.add_reaction(_MenuBase.LEFT_ARROW)
         await self._menu_msg.add_reaction(_MenuBase.CHECK_MARK)
-        await self._menu_msg.add_reaction(_MenuBase.RIGHT_ARROW)
+        if draw_arrows:
+            await self._menu_msg.add_reaction(_MenuBase.RIGHT_ARROW)
 
         for i in range(len(self._pages[self._current_page_index])):
             await self._menu_msg.add_reaction(ri_at_index(i))
 
     def _get_menu_field(self):
         option_strings = [self.option_to_string(o) for o in self._pages[self._current_page_index]]
-        
+
         for i in range(len(option_strings)):
             padding = self._padding * '\u2000'
             option_strings[i] = f'{ri_at_index(i)}{padding}{option_strings[i]}'
