@@ -1,3 +1,5 @@
+from emoji import emojize
+
 def ri_alphabet(n):
     if n < 1:
         n = 1
@@ -27,6 +29,8 @@ def index_of_ri(ri):
 
 def normalize(name):
     if name[0] != ':' and name[-1] != ':':
-        name = f':{name}:'
+        temp = emojize(f':{name}:', use_aliases=True)
+        if temp != f':{name}:':
+            name = f':{name}:'
 
     return name
