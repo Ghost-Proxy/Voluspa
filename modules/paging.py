@@ -50,7 +50,7 @@ class _MenuBase:
                             await self._set_page(self._current_page_index - 1)
                         elif reaction.emoji == Menu.RIGHT_ARROW:
                             await self._set_page(self._current_page_index + 1)
-                    elif await self._reaction_handler(reaction, user):
+                    elif await self._reaction_handler(reaction):
                         break
                 if not user.bot:
                     await reaction.remove(user)
@@ -179,7 +179,7 @@ class MenuWithOptions(_MenuBase):
 
         return '\n'.join(option_strings)
 
-    async def _reaction_handler(self, reaction, user):
+    async def _reaction_handler(self, reaction):
         if reaction.emoji == _MenuBase.CHECK_MARK:
             return True
         elif reaction.emoji in [e for e in ri_alphabet(len(self._pages[self._current_page_index]))]:
@@ -217,6 +217,40 @@ class MenuWithOptions(_MenuBase):
                 pages.append(current_page)
                 current_page = []
             current_page.append(option)
+            current_line += 1
+
+        if len(current_page) > 0:
+            pages.append(current_page)
+
+        return pages
+
+class MenuWithCustomOptions(MenuWithOptions):
+    def __init__(self, ctx, title, options=None, pages=None, option_padding=2, timeout=60.0):
+        logger.info(f'{ctx.message.author} created a menu with options.')
+
+        super().__init__(ctx, title, options, pages, max_lines_per_page, option_padding, timeout)
+
+    async def _init_reactions(self):
+        pass
+
+    def _get_menu_field(self):
+        pass
+
+    async def _reaction_handler(self, reaction):
+        pass
+
+    async def _set_reactions(self):
+        pass
+
+    def _split(self, options, max_lines_per_page):
+        current_line = 0
+        pages = []
+        current_page = {}
+        for k, v in options.items():
+            if current_line % max_lines_per_page == 0 and current_line > 0:
+                pages.append(current_page)
+                current_page = {}
+            current_page[k] = v
             current_line += 1
 
         if len(current_page) > 0:
