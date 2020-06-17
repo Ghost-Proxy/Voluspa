@@ -21,3 +21,6 @@ def ri_at_index(i):
     a = '\U0001f1e6'
 
     return chr(ord(a) + i)
+
+def index_of_ri(ri):
+    return ord(ri) - ord('\U0001f1e6')
