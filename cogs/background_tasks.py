@@ -38,7 +38,7 @@ class BackgroundTasks(commands.Cog):
         try:
             while not self._bot.is_closed():
                 await nsfw_channel.send(COC_STRING)
-                await asyncio.sleep(5)
+                await asyncio.sleep(64800) # 18 Hours
         except asyncio.CancelledError:
             raise
         except (OSError, discord.ConnectionClosed):
