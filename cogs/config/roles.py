@@ -30,6 +30,7 @@ ROLES = {
                 # 'og-rage': ['rage 2', 'rage'],
                 'og-r6s': ['rainbow six siege', 'r6s', 'rss', 'rainbow', 'siege', 'rainbow six', 'rainbow six: siege'],
                 'og-rdo': ['red dead online', 'rdo', 'red dead redemption 2', 'red dead'],
+                'og-rem': ['remnant', 'rem'],
                 'og-smash': ['super smash bros', 'smash', 'ssb', 'ssbu'],
                 'og-steep': ['steep'],
                 'og-sts': ['slay the spire', 'sts'],
