@@ -14,11 +14,12 @@ class _MenuBase:
     CHECK_MARK = '\u2705'
     RIGHT_ARROW = '\u27a1'
 
-    def __init__(self, ctx, title, timeout):
+    def __init__(self, ctx, title, pages, timeout):
         logger.info(f'{ctx.message.author} created a menu.')
 
         # Paramaters
         self._ctx = ctx
+        self._pages = pages
         self._timeout = timeout
 
         # Internal
@@ -84,12 +85,10 @@ class _MenuBase:
 
 class Menu(_MenuBase):
     def __init__(self, ctx, title, raw=None, lines=None, pages=None, max_chars_per_line=64, max_lines_per_page=16, timeout=60.0):
-        super().__init__(ctx, title, timeout)
+        super().__init__(ctx, title, pages, timeout)
 
         if raw or lines:
             self._pages = self._split(raw, lines, max_chars_per_line, max_lines_per_page)
-        else:
-            self._pages = pages
 
     async def _init_reactions(self):
         if len(self._pages) > 1:
@@ -115,7 +114,7 @@ class Menu(_MenuBase):
 
 class MenuWithOptions(_MenuBase):
     def __init__(self, ctx, title, options=None, pages=None, max_lines_per_page=5, option_padding=2, timeout=60.0):
-        super().__init__(ctx, title, timeout)
+        super().__init__(ctx, title, pages, timeout)
 
         self._padding = option_padding
 
@@ -124,8 +123,6 @@ class MenuWithOptions(_MenuBase):
 
         if options:
             self._pages = self._split(options, max_lines_per_page)
-        else:
-            self._pages = pages
 
     # Overrides
     def init_feedback_ui(self):
