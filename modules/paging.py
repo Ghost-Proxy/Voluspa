@@ -84,7 +84,21 @@ class _MenuBase:
         pass
 
 class Menu(_MenuBase):
+    """Create a menu from a raw string, a list of lines or a list of pages."""
     def __init__(self, ctx, title, raw=None, lines=None, pages=None, max_chars_per_line=64, max_lines_per_page=16, timeout=60.0):
+        """
+        PARAMS
+        ------
+        ctx                   - message ctx
+        title                 - title of embed
+        raw=None              - raw string input, broken up automatically, takes precedence over pages
+        lines=None            - list of strings, each index will be a line automatically broken up into pages,
+                                takes precedence over raw
+        pages=None            - list of strings, each index will be a page
+        max_chars_per_line=64 - maximum characters per line
+        max_lines_per_page=16 - maximum lines per page
+        timeout=60.0          - menu timeout in seconds
+        """
         super().__init__(ctx, title, pages, timeout)
 
         if raw or lines:
@@ -113,7 +127,33 @@ class Menu(_MenuBase):
         return pages
 
 class MenuWithOptions(_MenuBase):
+    """
+    Create a menu with options from a list of options or a list of pages.
+
+    OVERRIDES
+    ---------
+    init_feedback_ui()
+    update_feedback_ui()
+    option_to_string(option: Any) -> str
+
+    API
+    ---
+    get_selected_option() -> list
+    add_feedback_ui_field(name: str, value: str, inline=True: boolean)
+    set_feedback_ui_field_at(index: int, name: str, value: str, default: str, inline=True: boolean)
+    """
     def __init__(self, ctx, title, options=None, pages=None, max_lines_per_page=5, option_padding=2, timeout=60.0):
+        """
+        PARAMS
+        ------
+        ctx                   - message ctx
+        title                 - title of embed
+        options=None          - list of options, broken up automatically, takes precedence over:
+        pages=None            - list of lists of options, each index will be a page
+        max_lines_per_page=5  - maximum number of options per page
+        option_padding=2      - number of \u2000 between option emoji and option string
+        timeout=60.0          - menu timeout in seconds
+        """
         super().__init__(ctx, title, pages, timeout)
 
         self._padding = option_padding
@@ -126,23 +166,31 @@ class MenuWithOptions(_MenuBase):
 
     # Overrides
     def init_feedback_ui(self):
+        """Initialise fields in the menu embed that represent the feedback ui."""
         pass
 
     def update_feedback_ui(self):
+        """Repaint feedback ui on option select."""
         pass
 
     def option_to_string(self, option):
+        """Must return a string representation of an option (returns 'option' by default)."""
         return option
 
     # API
     def get_selected_options(self):
+        """Returns a list of currently selected options."""
         return self._selected_options
 
     def add_feedback_ui_field(self, name, value, inline=True):
+        """Adds a field to the menu embed."""
         self._menu_embed.add_field(name=name, value=value, inline=inline)
         self._feedback_ui_field_indicies.append(len(self._menu_embed.fields) - 1)
 
     def set_feedback_ui_field_at(self, index, name, value, default, inline=True):
+        """
+        Sets the field at index in the menu embed (must be a field created with add_feedback_ui_field). If value is empty, value = default.
+        """
         if index not in self._feedback_ui_field_indicies:
             logger.error('index not in _feedback_ui_field_indicies')
         else:
