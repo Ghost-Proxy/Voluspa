@@ -270,7 +270,19 @@ class MenuWithOptions(_MenuBase):
         return pages
 
 class MenuWithCustomOptions(MenuWithOptions):
+    """Create a menu with custom options from a list of options or pages."""
     def __init__(self, ctx, title, options=None, pages=None, max_lines_per_page=5, option_padding=2, timeout=60.0):
+        """
+        PARAMS
+        ------
+        ctx                   - message ctx
+        title                 - title of embed
+        options=None          - dict of options, broken up automatically, takes precedence over:
+        pages=None            - list of dicts of options, each index will be a page
+        max_lines_per_page=5  - maximum number of options per page
+        option_padding=2      - number of \u2000 between option emoji and option string
+        timeout=60.0          - menu timeout in seconds
+        """
         super().__init__(ctx, title, options, pages, max_lines_per_page, option_padding, timeout)
 
         for i in range(len(self._pages)):
