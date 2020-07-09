@@ -138,6 +138,7 @@ class MenuWithOptions(_MenuBase):
 
     API
     ---
+    get_ctx() -> discord.ext.commands.Context
     get_selected_option() -> list
     add_feedback_ui_field(name: str, value: str, inline=True: boolean)
     set_feedback_ui_field_at(index: int, name: str, value: str, default: str, inline=True: boolean)
@@ -178,6 +179,10 @@ class MenuWithOptions(_MenuBase):
         return option
 
     # API
+    def get_ctx(self):
+        """Returns menu instance's context"""
+        return self._ctx
+
     def get_selected_options(self):
         """Returns a list of currently selected options."""
         return self._selected_options
