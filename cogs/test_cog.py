@@ -15,7 +15,7 @@ class TestMenu(MenuWithCustomOptions):
         self.set_feedback_ui_field_at(0, name='You Selected', value=field, default='None')
 
     def option_to_string(self, option):
-        return option['string']
+        return str(option['string'])
 
 class TestCog(commands.Cog):
     @commands.command()

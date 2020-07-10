@@ -193,9 +193,6 @@ class MenuWithOptions(_MenuBase):
             self._menu_embed.set_field_at(index, name=name, value=(value if len(value) > 0 else default), inline=inline)
 
     # Implementation
-    def _option_to_string(self, option):
-        return str(self.option_to_string(option))
-
     def _init_menu_embed(self):
         self.init_feedback_ui()
         super()._init_menu_embed()
@@ -215,7 +212,7 @@ class MenuWithOptions(_MenuBase):
             await self._menu_msg.add_reaction(ri_at_index(i))
 
     def _get_menu_field(self):
-        option_strings = [self._option_to_string(o) for o in self._pages[self._current_page_index]]
+        option_strings = [self.option_to_string(o) for o in self._pages[self._current_page_index]]
         padding = self._padding * '\u2000'
 
         for i in range(len(option_strings)):
@@ -310,7 +307,7 @@ class MenuWithCustomOptions(MenuWithOptions):
         padding = self._padding * '\u2000'
 
         for k, v in self._pages[self._current_page_index].items():
-            option_strings.append(f'{k}{padding}{self._option_to_string(v)}')
+            option_strings.append(f'{k}{padding}{self.option_to_string(v)}')
 
         return '\n'.join(option_strings)
 
