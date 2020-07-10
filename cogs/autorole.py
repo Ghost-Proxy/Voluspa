@@ -534,8 +534,7 @@ class Autorole(commands.Cog):
         Can only be used by Vanguard (atm).
         """
 
-        welcome_message = """_ _
-Hello Guardian and welcome to Ghost Proxy! <:ghost_proxy_2:455130686290919427>
+        welcome_message = """and welcome to Ghost Proxy! <:ghost_proxy_2:455130686290919427>
 
 If you haven't yet, please read through our #rules-conduct and #server-info and then feel free to explore the server! A good place to start is #voluspa, our very own home-grown Warmind where you can set game roles for yourself in addition to a bunch of other helpful commands.
 
@@ -553,7 +552,9 @@ _ _
 
         async def send_welcome_direct_message(user_rec):
             new_member = self.bot.get_user(user_rec['id'])
-            await new_member.send(welcome_message)
+            welcome_prefix = f"_ _" \
+                             f"Hello {user_rec['name']} "
+            await new_member.send(f"{welcome_prefix}{welcome_message}")
 
         async def send_welcome_guild_message(user_rec):
             new_member = self.bot.get_user(user_rec['id'])
