@@ -1,7 +1,7 @@
 # import re
 import asyncio
 import logging
-from typing import Any, List, Dict, Tuple, Sequence, Iterable
+from typing import Any, List, Dict, Tuple, Sequence, Iterable, Collection
 from collections import OrderedDict
 
 import discord
@@ -129,7 +129,7 @@ class Autorole(commands.Cog):
                                    ctx,
                                    role_class: str,
                                    roles: Sequence[str],
-                                   users: Tuple[str],
+                                   users: Collection[str],
                                    # role_limit: str = None,
                                    role_limits: Sequence[str] = None,
                                    action: str = 'add'):
