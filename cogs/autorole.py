@@ -12,6 +12,8 @@ from modules.styles import STYLES
 from cogs.config.roles import ROLES
 from modules.misc import chunk_list
 
+from voluspa import CONFIG
+
 from titlecase import titlecase
 
 logger = logging.getLogger('voluspa.cog.autorole')
@@ -132,7 +134,8 @@ class Autorole(commands.Cog):
                                    users: Collection[str],
                                    # role_limit: str = None,
                                    role_limits: Sequence[str] = None,
-                                   action: str = 'add'):
+                                   action: str = 'add',
+                                   success_callbacks: Sequence[Any] = None):
         # Args are multiple user names (potentially _n_)
         # Search member list for each user name provided
         #  - if more then one user name matches, return a list of matches and ask for a retry
@@ -278,6 +281,12 @@ class Autorole(commands.Cog):
                     # Send message after doing the above
                     # TODO: Ensure guarantee of removal before sending below...?
                     await ctx.send(f'{ctx.message.author.mention}', embed=role_embed)
+
+                    for cb in success_callbacks:
+                        try:
+                            await cb(user_matches[0])
+                        except Exception as e:
+                            logger.info(f'Success Callback Exception: {e}')
             else:
                 error_embed = default_embed(
                     title='No Matching User',
@@ -511,6 +520,64 @@ class Autorole(commands.Cog):
             await ctx.send(f'{ctx.message.author.mention} - DJ role is already set :+1:')
         else:
             await self.update_roles(ctx, 'rythm_dj', ['dj'])
+
+    @commands.command(name='onboard')
+    @commands.has_role('ghost-proxy-vanguard')
+    @commands.guild_only()
+    async def onboard_member(self, ctx, *users: str):
+        """Onboards User(s) to Members(s)
+
+        Currently implies _not_ a ghost-proxy-envoy (WIP)
+
+        Performs an ARM, then sends a DM to the user, and sends a Welcome to Private.
+
+        Can only be used by Vanguard (atm).
+        """
+
+        welcome_message = """_ _
+Hello Guardian and welcome to Ghost Proxy! <:ghost_proxy_2:455130686290919427>
+
+If you haven't yet, please read through our #rules-conduct and #server-info and then feel free to explore the server! A good place to start is #voluspa, our very own home-grown Warmind where you can set game roles for yourself in addition to a bunch of other helpful commands.
+
+If you have any questions about anything, feel free to ask in general chat, use the $feedback Voluspa feature (in an DM even), or use the `@ghost-proxy-vanguard` ping to ask for help from the Ghost Proxy admin team.
+
+Couple steps to do now that you are a member:
+
+1. Head to the #charlemagne channel and type `!register` you will receive a DM, please follow the instructions.
+
+2. Join our Steam Group <https://steamcommunity.com/groups/ghostproxy>
+
+Thanks and eyes up, Guardian! <:cayde_thumbs_up:451649810894946314>
+_ _
+        """
+
+        async def send_welcome_direct_message(user_rec):
+            new_member = self.bot.get_user(user_rec['id'])
+            await new_member.send(welcome_message)
+
+        async def send_welcome_guild_message(user_rec):
+            new_member = self.bot.get_user(user_rec['id'])
+            guild_welcome = f"_Greetings to our new member, {new_member.mention}! :tada: Welcome to Ghost Proxy!_ <:ghost_proxy_2:455130686290919427>"
+            guild_channel = ctx.bot.get_channel(CONFIG.Voluspa.private_guild_channel_id)
+            await guild_channel.send(guild_welcome)
+
+        await self.assign_roles_to_user(
+            ctx,
+            'ghost_proxy_roles',
+            [
+                'ghost-proxy-member'
+            ],
+            users,
+            role_limits=[
+                'ghost-proxy-friend',
+                'ghost-proxy-legacy',
+                'ghost-proxy-envoy',
+            ],
+            success_callbacks=[
+                send_welcome_direct_message,
+                send_welcome_guild_message
+            ]
+        )
 
     @commands.command(name='set-member', aliases=['p2m', 'arm'])
     @commands.has_role('ghost-proxy-vanguard')
