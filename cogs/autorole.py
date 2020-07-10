@@ -536,9 +536,9 @@ class Autorole(commands.Cog):
 
         welcome_message = """and welcome to Ghost Proxy! <:ghost_proxy_2:455130686290919427>
 
-If you haven't yet, please read through our #rules-conduct and #server-info and then feel free to explore the server! A good place to start is #voluspa, our very own home-grown Warmind where you can set game roles for yourself in addition to a bunch of other helpful commands.
+If you haven't yet, please read through our `#rules-conduct` and `#server-info` and then feel free to explore the server! A good place to start is `#voluspa`, our very own home-grown Warmind where you can set game roles for yourself in addition to a bunch of other helpful commands.
 
-If you have any questions about anything, feel free to ask in general chat, use the $feedback Voluspa feature (in an DM even), or use the `@ghost-proxy-vanguard` ping to ask for help from the Ghost Proxy admin team.
+If you have any questions about anything, feel free to ask in general chat, use the `$feedback Voluspa feature (in an DM even), or use the `@ghost-proxy-vanguard` ping to ask for help from the Ghost Proxy admin team.
 
 Couple steps to do now that you are a member:
 
