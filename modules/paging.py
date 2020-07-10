@@ -9,6 +9,7 @@ from emoji import emojize
 
 logger = logging.getLogger('voluspa.module.paging')
 
+
 class _MenuBase:
     LEFT_ARROW = '\u2b05'
     CHECK_MARK = '\u2705'
@@ -39,9 +40,6 @@ class _MenuBase:
         self._menu_embed.add_field(name=f'Page {self._current_page_index + 1}/{len(self._pages)}', value=menu_field, inline=False)
         self._menu_field_index = len(self._menu_embed.fields) - 1
 
-    async def _init_reactions(self):
-        logger.error('_init_reactions was not overriden.')
-
     async def _control_loop(self):
         try:
             def check_in_ctx(reaction, user):
@@ -64,9 +62,6 @@ class _MenuBase:
             await self._ctx.message.delete()
             await self._menu_msg.delete()
 
-    def _get_menu_field(self):
-        logger.error('_get_menu_field was not overriden.')
-
     async def _set_page(self, page_index):
         page_index %= len(self._pages)
         self._current_page_index = page_index
@@ -77,11 +72,6 @@ class _MenuBase:
         await self._menu_msg.edit(embed=self._menu_embed)
         await self._set_reactions()
 
-    async def _reaction_handler(self, reaction):
-        pass
-
-    async def _set_reactions(self):
-        pass
 
 class Menu(_MenuBase):
     """Create a menu from a raw string, a list of lines or a list of pages."""
@@ -125,6 +115,7 @@ class Menu(_MenuBase):
             pages.append("\n".join(lines[i:]))
 
         return pages
+
 
 class MenuWithOptions(_MenuBase):
     """
@@ -202,6 +193,9 @@ class MenuWithOptions(_MenuBase):
             self._menu_embed.set_field_at(index, name=name, value=(value if len(value) > 0 else default), inline=inline)
 
     # Implementation
+    def _option_to_string(self, option):
+        return str(self.option_to_string(option))
+
     def _init_menu_embed(self):
         self.init_feedback_ui()
         super()._init_menu_embed()
@@ -221,7 +215,7 @@ class MenuWithOptions(_MenuBase):
             await self._menu_msg.add_reaction(ri_at_index(i))
 
     def _get_menu_field(self):
-        option_strings = [self.option_to_string(o) for o in self._pages[self._current_page_index]]
+        option_strings = [self._option_to_string(o) for o in self._pages[self._current_page_index]]
         padding = self._padding * '\u2000'
 
         for i in range(len(option_strings)):
@@ -274,6 +268,7 @@ class MenuWithOptions(_MenuBase):
 
         return pages
 
+
 class MenuWithCustomOptions(MenuWithOptions):
     """Create a menu with custom options from a list of options or pages."""
     def __init__(self, ctx, title, options=None, pages=None, max_lines_per_page=5, option_padding=2, timeout=60.0):
@@ -315,7 +310,7 @@ class MenuWithCustomOptions(MenuWithOptions):
         padding = self._padding * '\u2000'
 
         for k, v in self._pages[self._current_page_index].items():
-            option_strings.append(f'{k}{padding}{self.option_to_string(v)}')
+            option_strings.append(f'{k}{padding}{self._option_to_string(v)}')
 
         return '\n'.join(option_strings)
 
