@@ -535,17 +535,23 @@ class Autorole(commands.Cog):
         Can only be used by Vanguard (atm).
         """
 
-        welcome_message = """and welcome to Ghost Proxy! <:ghost_proxy_2:455130686290919427>
+        welcome_message = """Welcome to Ghost Proxy! <:ghost_proxy_2:455130686290919427>
 
-If you haven't yet, please read through our `#rules-conduct` and `#server-info` and then feel free to explore the server! A good place to start is `#voluspa`, our very own home-grown Warmind where you can set game roles for yourself in addition to a bunch of other helpful commands.
+If you haven't yet, please read through our `#rules-conduct` and `#server-info` and then feel free to explore the server! A good place to start is `#voluspa`, our very own Warmind where you can set game roles, check who's online, and use a number of other helpful commands (type `$help`).
 
-If you have any questions about anything, feel free to ask in general chat, use the `$feedback Voluspa feature (in an DM even), or use the `@ghost-proxy-vanguard` ping to ask for help from the Ghost Proxy admin team.
+If you have any questions about anything, feel free to ask in general chat, use the `$feedback` Voluspa feature (here in a DM even), or use the `@ghost-proxy-vanguard` ping to ask for help from the Ghost Proxy admin team.
 
-Couple steps to do now that you are a member:
+\\*\\*\\*
 
-1. Head to the #charlemagne channel and type `!register` you will receive a DM, please follow the instructions.
+And finally, a couple of steps to do now that you are a member:
 
-2. Join our Steam Group <https://steamcommunity.com/groups/ghostproxy>
+1. Head to the `#charlemagne` channel and type `!register` -- you will receive a DM from Char, please follow the instructions :+1:
+
+2. Join our Steam Group <https://steamcommunity.com/groups/ghostproxy> 
+
+3. Head to the `#voluspa` channel and type `$help lfg-add` and then add your Game Mode roles
+
+4. Join our Social Tower voice channel and start forming fireteams and have fun!
 
 Thanks and eyes up, Guardian! <:cayde_thumbs_up:451649810894946314>
 _ _
@@ -553,8 +559,8 @@ _ _
 
         async def send_welcome_direct_message(user_rec):
             new_member = self.bot.get_user(user_rec['id'])
-            welcome_prefix = f"_ _" \
-                             f"Hello {user_rec['name']} "
+            welcome_prefix = f"_ _\n" \
+                             f"Hello, {user_rec['name']}! :wave: "
             await new_member.send(f"{welcome_prefix}{welcome_message}")
 
         async def send_welcome_guild_message(user_rec):
