@@ -9,6 +9,7 @@ from emoji import emojize
 
 logger = logging.getLogger('voluspa.module.paging')
 
+
 class _MenuBase:
     LEFT_ARROW = '\u2b05'
     CHECK_MARK = '\u2705'
@@ -39,9 +40,6 @@ class _MenuBase:
         self._menu_embed.add_field(name=f'Page {self._current_page_index + 1}/{len(self._pages)}', value=menu_field, inline=False)
         self._menu_field_index = len(self._menu_embed.fields) - 1
 
-    async def _init_reactions(self):
-        logger.error('_init_reactions was not overriden.')
-
     async def _control_loop(self):
         try:
             def check_in_ctx(reaction, user):
@@ -64,9 +62,6 @@ class _MenuBase:
             await self._ctx.message.delete()
             await self._menu_msg.delete()
 
-    def _get_menu_field(self):
-        logger.error('_get_menu_field was not overriden.')
-
     async def _set_page(self, page_index):
         page_index %= len(self._pages)
         self._current_page_index = page_index
@@ -77,11 +72,6 @@ class _MenuBase:
         await self._menu_msg.edit(embed=self._menu_embed)
         await self._set_reactions()
 
-    async def _reaction_handler(self, reaction):
-        pass
-
-    async def _set_reactions(self):
-        pass
 
 class Menu(_MenuBase):
     """Create a menu from a raw string, a list of lines or a list of pages."""
@@ -125,6 +115,7 @@ class Menu(_MenuBase):
             pages.append("\n".join(lines[i:]))
 
         return pages
+
 
 class MenuWithOptions(_MenuBase):
     """
@@ -273,6 +264,7 @@ class MenuWithOptions(_MenuBase):
             pages.append(current_page)
 
         return pages
+
 
 class MenuWithCustomOptions(MenuWithOptions):
     """Create a menu with custom options from a list of options or pages."""
