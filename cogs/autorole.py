@@ -282,11 +282,12 @@ class Autorole(commands.Cog):
                     # TODO: Ensure guarantee of removal before sending below...?
                     await ctx.send(f'{ctx.message.author.mention}', embed=role_embed)
 
-                    for cb in success_callbacks:
-                        try:
-                            await cb(user_matches[0])
-                        except Exception as e:
-                            logger.info(f'Success Callback Exception: {e}')
+                    if success_callbacks:
+                        for cb in success_callbacks:
+                            try:
+                                await cb(user_matches[0])
+                            except Exception as e:
+                                logger.info(f'Success Callback Exception: {e}')
             else:
                 error_embed = default_embed(
                     title='No Matching User',
