@@ -53,7 +53,7 @@ def read_config():
     print('Setting Voluspa boot settings...')
     voluspa_info = {
         'Voluspa': {
-            'version': 'v0.0.11',
+            'version': 'v0.0.12',
             'sha': os.getenv('SOURCE_VERSION')[:10] if os.getenv('SOURCE_VERSION') else 'Unknown (local?)',
             'app_cwd': os.path.abspath(os.getcwd()),
             'boot_time': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -90,7 +90,7 @@ def read_config():
     # Pick up Voluspa named Env Vars
     if 'Voluspa' not in secrets:
         secrets['Voluspa'] = {}
-    voluspa_config = ['VOLUSPA_PREFIX', 'VOLUSPA_FEEDBACK_CHANNEL_ID']
+    voluspa_config = ['VOLUSPA_PREFIX', 'VOLUSPA_FEEDBACK_CHANNEL_ID', 'VOLUSPA_PRIVATE_GUILD_CHANNEL_ID']
     for ve in voluspa_config:
         if os.getenv(ve):
             secrets['Voluspa'][ve.split('_', maxsplit=1)[1].lower()] = getenv_cast(ve)
