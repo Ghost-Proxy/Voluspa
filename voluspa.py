@@ -59,7 +59,6 @@ cog_extensions = [
     'jishaku',
     #'cogs.console', # https://github.com/Gorialis/jishaku/issues/55
     'cogs.gaminator',
-    'cogs.test_cog',
 ]
 
 
