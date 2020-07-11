@@ -559,7 +559,7 @@ _ _
 
         async def send_welcome_direct_message(user_rec):
             new_member = self.bot.get_user(user_rec['id'])
-            welcome_prefix = f"_ _\n" \
+            welcome_prefix = f"_ _\n_ _\n" \
                              f"Hello, {new_member.mention}! :wave: "
             await new_member.send(f"{welcome_prefix}{welcome_message}")
 
