@@ -53,7 +53,7 @@ def read_config():
     print('Setting Voluspa boot settings...')
     voluspa_info = {
         'Voluspa': {
-            'version': 'v0.0.11',
+            'version': 'v0.0.12',
             'sha': os.getenv('SOURCE_VERSION')[:10] if os.getenv('SOURCE_VERSION') else 'Unknown (local?)',
             'app_cwd': os.path.abspath(os.getcwd()),
             'boot_time': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
