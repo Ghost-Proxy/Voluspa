@@ -551,7 +551,11 @@ class Autorole(commands.Cog):
                 'ghost-proxy-friend'
             ],
             users,
-            role_limits=['ghost-proxy-member']
+            role_limits=[
+                'ghost-proxy-member',
+                'ghost-proxy-legacy',
+                'ghost-proxy-envoy'
+            ]
         )
 
     @commands.command(name='set-envoy', aliases=['p2e', 'are'])

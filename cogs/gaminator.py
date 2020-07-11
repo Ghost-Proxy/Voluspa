@@ -122,7 +122,7 @@ class Gaminator(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name='other-games')
+    @commands.command(name='other-games', aliases=['og'])
     @commands.cooldown(1, 1800, commands.BucketType.user)
     async def other_games(self, ctx):
         logger.info(f'{ctx.message.author} called other_games')

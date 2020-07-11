@@ -7,8 +7,8 @@ ROLES = {
             },
             'other_games': {  # Based on User Input
                 'og-ac': ['animal crossing', 'ac', 'animal crossing new horizons'],
-                # 'og-ant': ['anthem', 'ant'],
-                # 'og-apex': ['apex legends', 'apex', 'apex: legends'],
+                'og-ant': ['anthem', 'ant'],
+                'og-apex': ['apex legends', 'apex', 'apex: legends'],
                 'og-bl': ['borderlands', 'bl', 'borderlands 2', 'borderlands 3'],
                 'og-cod': ['call of duty', 'cod', 'mw', 'modern warfare'],
                 'og-div2': ['division 2', 'div2', 'td2', 'division', 'the division 2'],
@@ -30,6 +30,7 @@ ROLES = {
                 # 'og-rage': ['rage 2', 'rage'],
                 'og-r6s': ['rainbow six siege', 'r6s', 'rss', 'rainbow', 'siege', 'rainbow six', 'rainbow six: siege'],
                 'og-rdo': ['red dead online', 'rdo', 'red dead redemption 2', 'red dead'],
+                'og-rem': ['remnant', 'rem'],
                 'og-smash': ['super smash bros', 'smash', 'ssb', 'ssbu'],
                 'og-steep': ['steep'],
                 'og-sts': ['slay the spire', 'sts'],
