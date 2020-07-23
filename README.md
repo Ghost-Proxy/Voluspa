@@ -7,9 +7,9 @@
 ---
 
 ### Setup
-- Uses Python 3.8.1
+- Uses Python 3.8.5
 
-1. Install Python 3.8.1
+1. Install Python 3.8.5
 2. Grab [virtualenv](https://virtualenv.pypa.io/en/latest/installation/): `pip install --user virtualenv`
 3. Clone _Voluspa_ source `git clone https://github.com/Ghost-Proxy/Voluspa.git`
 4. Create a virtualenv: `virtualenv venv`
