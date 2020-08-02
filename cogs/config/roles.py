@@ -1,9 +1,9 @@
 ROLES = {
             'game_modes': {  # Based on User Input
-                'crucible': ['c', 'crucible'],
-                'gambit': ['g', 'gambit'],
-                'raid': ['r', 'raid'],
-                'strike-nf-pve': ['s', 'nf', 'pve', 'strike', 'nightfall', 'strike-nf-pve']
+                'crucible': ['crucible', 'c'],
+                'gambit': ['gambit', 'g'],
+                'raid': ['raid', 'r'],
+                'strike-nf-pve': ['strike-nf-pve', 's', 'nf', 'pve', 'strike', 'nightfall']
             },
             'other_games': {  # Based on User Input
                 'og-ac': ['animal crossing', 'ac', 'animal crossing new horizons'],
