@@ -10,6 +10,23 @@ logger = logging.getLogger('voluspa.cog.gaminator')
 TAB_LENGTH = 10
 MAX_LINES_PER_PAGE = 7
 
+
+def get_longest_role_name(role_dict):
+    longest_role = 0
+    for role, role_options in role_dict.items():
+        for role_option in role_options:
+            if len(role_option) > longest_role:
+                longest_role = len(role_option)
+    return longest_role
+
+
+def get_tab_length(default, longest_item, buffer=4):
+    return default if default > longest_item else longest_item + buffer
+
+
+DESTINY_ROLE_TAB_LENGTH = get_tab_length(TAB_LENGTH, get_longest_role_name(ROLES['game_modes']))
+
+
 class OtherGamesMenu(MenuWithOptions):
     # Override
     def update_feedback_ui(self):
@@ -32,6 +49,32 @@ class OtherGamesMenu(MenuWithOptions):
         qualified_name = option[1][0].title()
 
         return f'`@{role_name}`{padding}{qualified_name}'
+
+
+# Hmm... (figure out a means to DRY)
+class DestinyRoleMenu(MenuWithOptions):
+    # Override
+    def update_feedback_ui(self):
+        ctx = self.get_ctx()
+        adding = []
+        removing = []
+        for option in self.get_selected_options():
+            if option[0] not in [role.name for role in ctx.message.author.roles]:
+                adding.append(f'`@{option[0]}`')
+            else:
+                removing.append(f'`@{option[0]}`')
+
+        self.set_feedback_ui_field_at(0, 'Adding', '\n'.join(adding), 'None')
+        self.set_feedback_ui_field_at(1, 'Removing', '\n'.join(removing), 'None')
+
+    # Override
+    def option_to_string(self, option):
+        role_name = option[0]
+        padding = (DESTINY_ROLE_TAB_LENGTH - len(role_name)) * '\u2000'
+        qualified_name = option[1][0].title()
+
+        return f'`@{role_name}`{padding}{qualified_name}'
+
 
 class Gaminator(commands.Cog):
     def __init__(self, bot):
@@ -72,7 +115,7 @@ class Gaminator(commands.Cog):
         logger.info(f'{ctx.message.author} called game_roles')
 
         options = ROLES['game_modes'].items()
-        menu = OtherGamesMenu(ctx, 'Destiny Game Roles', options=options, max_lines_per_page=MAX_LINES_PER_PAGE)
+        menu = DestinyRoleMenu(ctx, 'Destiny Game Roles', options=options, max_lines_per_page=MAX_LINES_PER_PAGE)
         menu.add_feedback_ui_field('Adding', 'None')
         menu.add_feedback_ui_field('Removing', 'None')
 
