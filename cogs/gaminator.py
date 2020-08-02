@@ -66,5 +66,35 @@ class Gaminator(commands.Cog):
         finally:
             self.bot.get_command('other-games').reset_cooldown(ctx)
 
+    @commands.command(name='game-roles', aliases=['gr'])
+    @commands.cooldown(1, 1800, commands.BucketType.user)
+    async def game_roles(self, ctx):
+        logger.info(f'{ctx.message.author} called game_roles')
+
+        options = ROLES['game_modes'].items()
+        menu = OtherGamesMenu(ctx, 'Destiny Game Roles', options=options, max_lines_per_page=MAX_LINES_PER_PAGE)
+        menu.add_feedback_ui_field('Adding', 'None')
+        menu.add_feedback_ui_field('Removing', 'None')
+
+        try:
+            await menu.run()
+            if len(menu.get_selected_options()) > 0:
+                autorole = self.bot.get_cog('Autorole')
+                adding = []
+                removing = []
+                for option in menu.get_selected_options():
+                    if option[0] not in [role.name for role in ctx.message.author.roles]:
+                        adding.append(option)
+                    else:
+                        removing.append(option)
+
+                if len(adding) > 0:
+                    await autorole.lfg_add(ctx, *[option[1][0] for option in adding])
+                if len(removing) > 0:
+                    await autorole.lfg_remove(ctx, *[option[1][0] for option in removing])
+        finally:
+            self.bot.get_command('game-roles').reset_cooldown(ctx)
+
+
 def setup(bot):
     bot.add_cog(Gaminator(bot))
