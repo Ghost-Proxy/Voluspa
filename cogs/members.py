@@ -142,8 +142,10 @@ async def async_get_bungie_clan_members():
     logger.info('BUNGIE MEMBER LIST:\n{}'.format(bungie_results))
     member_results = bungie_results['results']
     num_members = bungie_results['totalResults']
-    member_list = [member['destinyUserInfo']['displayName'] for member in member_results]
-    return num_members, member_list, member_results
+    member_dict = {
+        member['destinyUserInfo']['membershipId']: get_destiny_member_info(member) for member in member_results
+    }
+    return num_members, member_dict, member_results
 
 
 async def async_get_bungie_member_list():
@@ -157,7 +159,7 @@ async def async_get_bungie_member_list():
     return num_members, member_list, member_results
 
 
-async def async_get_bungie_member_type_dict():
+async def async_get_bungie_member_type_dict():  # TODO
     target_endpoint = f'/GroupV2/{CONFIG.Bungie.clan_group_id}/Members/'
     raw_json = await async_bungie_request_handler(target_endpoint)
     bungie_results = raw_json['Response']
@@ -172,9 +174,9 @@ async def async_get_bungie_member_type_dict():
     # Member type 5 is founder
     for member in member_results:
         if member['memberType'] == 2:
-            member_dict['members'].append(member['destinyUserInfo']['displayName'])
+            member_dict['members'].append(member['destinyUserInfo']['membershipId'])
         elif member['memberType'] in {3, 5}:
-            member_dict['admins'].append(member['destinyUserInfo']['displayName'])
+            member_dict['admins'].append(member['destinyUserInfo']['membershipId'])
     return num_members, member_dict
 
 
@@ -242,10 +244,8 @@ class Members(commands.Cog):
             alpha_sorted_gp_members = sorted(gp_members, key=str.lower)
 
             # This will only ever return max of 100 records, thus safe to do ahead of time
-            bungie_num_members, bungie_member_list, bungie_members = await async_get_bungie_clan_members()
+            bungie_num_members, bungie_member_dict, bungie_members = await async_get_bungie_clan_members()
             _, bungie_member_types_dict = await async_get_bungie_member_type_dict()
-            bungie_member_list_alpha_sorted = sorted(bungie_member_list, key=str.lower)
-            # NOTE: bungie_member_list = [member['destinyUserInfo']['displayName'], ...]
 
             regex_pattern = re.compile(r'\W+')
 
@@ -256,25 +256,27 @@ class Members(commands.Cog):
             missing_discord_members = []
             missing_discord_admins = []
 
-            for bungie_member in bungie_member_list_alpha_sorted:
+            for bungie_member_id, bungie_member_info in bungie_member_dict.items():
                 member_missing = True
                 for discord_member in alpha_sorted_gp_members:
-                    if bungie_member.lower() in discord_member.lower() or discord_member.lower() in bungie_member.lower():
-                        member_missing = False
-                        break
+                    for name_key in ['displayName', 'LastSeenDisplayName', 'supplementalDisplayName', 'bungieNetDisplayName']:
+                        if bungie_member_info[name_key].lower() in discord_member.lower() or discord_member.lower() in bungie_member_info[name_key].lower():
+                            member_missing = False
+                            break
                 if member_missing:
-                    if bungie_member in bungie_member_types_dict['members']:
-                        missing_discord_members.append(bungie_member)
-                    elif bungie_member in bungie_member_types_dict['admins']:
-                        missing_discord_admins.append(bungie_member)
+                    if bungie_member_id in bungie_member_types_dict['members']:
+                        missing_discord_members.append(bungie_member_info['displayName'])
+                    elif bungie_member_id in bungie_member_types_dict['admins']:
+                        missing_discord_admins.append(bungie_member_info['displayName'])
 
             invalid_discord_members = []
-            member_found = False
             for discord_member in alpha_sorted_gp_members:
-                for bungie_member in bungie_member_list_alpha_sorted:
-                    if bungie_member.lower() in discord_member.lower():
-                        member_found = True
-                        break
+                member_found = False
+                for bungie_member_id, bungie_member_info in bungie_member_dict.items():
+                    for name_key in ['displayName', 'LastSeenDisplayName', 'supplementalDisplayName', 'bungieNetDisplayName']:
+                        if bungie_member_info[name_key].lower() in discord_member.lower():
+                            member_found = True
+                            break
                 if not member_found:
                     invalid_discord_members.append(discord_member)
 
