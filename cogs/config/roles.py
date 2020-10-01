@@ -9,6 +9,7 @@ ROLES = {
                 'og-ac': ['animal crossing', 'ac', 'animal crossing new horizons'],
                 'og-ant': ['anthem', 'ant'],
                 'og-apex': ['apex legends', 'apex', 'apex: legends'],
+                'og-au': ['among us', 'au'],
                 'og-bl': ['borderlands', 'bl', 'borderlands 2', 'borderlands 3'],
                 'og-cod': ['call of duty', 'cod', 'mw', 'modern warfare'],
                 'og-div2': ['division 2', 'div2', 'td2', 'division', 'the division 2'],
