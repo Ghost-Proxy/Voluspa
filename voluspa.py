@@ -36,6 +36,11 @@ else:
 from aiocache import caches
 caches.set_config(CONFIG.Voluspa.cache)
 
+# New as of discordpy 1.5.1
+intents = discord.Intents.default()
+intents.members = True
+intents.presences = True
+
 # Setup Initial Stuff
 client = discord.Client()
 
