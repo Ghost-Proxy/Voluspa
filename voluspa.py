@@ -42,7 +42,7 @@ intents.members = True
 intents.presences = True
 
 # Setup Initial Stuff
-client = discord.Client()
+client = discord.Client(intents=intents)
 
 # These should perhaps be cogs..?
 quotes = Quotes()
