@@ -12,6 +12,7 @@ ROLES = {
                 'og-au': ['among us', 'au'],
                 'og-bl': ['borderlands', 'bl', 'borderlands 2', 'borderlands 3'],
                 'og-cod': ['call of duty', 'cod', 'mw', 'modern warfare'],
+                'og-cp': ['cyberpunk 2077', 'cp', 'cyberpunk'],
                 'og-div2': ['division 2', 'div2', 'td2', 'division', 'the division 2'],
                 'og-dl': ['dying light', 'dl'],
                 'og-dota': ['dota 2', 'dota', 'defense of the ancients 2'],
