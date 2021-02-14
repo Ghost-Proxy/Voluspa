@@ -38,7 +38,7 @@ ROLES = {
                 'og-smash': ['super smash bros', 'smash', 'ssb', 'ssbu'],
                 'og-sd': ['stardew valley', 'sd', 'stardew'],
                 'og-steep': ['steep'],
-                'og-stel': ['stellaris'],
+                'og-stel': ['stellaris', 'stel'],
                 'og-sts': ['slay the spire', 'sts'],
                 'og-switch': ['nintendo switch', 'switch'],
                 'og-va': ['valorant', 'va'],
