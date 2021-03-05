@@ -486,6 +486,27 @@ class Autorole(commands.Cog):
                     'action': 'remove',
                 })
 
+    @commands.command(name='stonks', aliases=['stocks'])
+    @commands.has_any_role('ghost-proxy-member', 'ghost-proxy-friend')
+    @commands.guild_only()
+    async def stonks_toggle(self, ctx):
+        """Toggles the stonks role
+
+        Can only be used by Ghost Proxy Members or Friends.
+        """
+        stonks_role = discord.utils.get(ctx.message.guild.roles, name='stonks')
+        if stonks_role not in ctx.message.author.roles:
+            await self.update_roles(ctx, 'topics', ['stonks'])
+        else:
+            await self.update_roles(
+                ctx,
+                'topics',
+                ['stonks'],
+                options={
+                    'update_message': 'removed',
+                    'action': 'remove',
+                })
+
     @commands.command(name='sherpa', aliases=['s'])
     @commands.has_role('ghost-proxy-member')
     @commands.guild_only()
