@@ -1,5 +1,5 @@
 # MISC
-PyYAML==5.3
+PyYAML==5.4
 
 # ASYNC
 uvloop==0.14.0
