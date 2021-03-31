@@ -12,11 +12,14 @@ ROLES = {
                 'og-au': ['among us', 'au'],
                 'og-bl': ['borderlands', 'bl', 'borderlands 2', 'borderlands 3'],
                 'og-cod': ['call of duty', 'cod', 'mw', 'modern warfare'],
+                'og-c77': ['cyberpunk 2077', 'c77', 'cp77', 'cyberpunk'],
+                'og-drg': ['deep rock galactic', 'drg', 'deep rock'],
                 'og-div2': ['division 2', 'div2', 'td2', 'division', 'the division 2'],
                 'og-dl': ['dying light', 'dl'],
                 'og-dota': ['dota 2', 'dota', 'defense of the ancients 2'],
                 'og-eft': ['escape from tarkov', 'eft', 'tarkov'],
                 'og-f76': ['fallout 76', 'f76', 'fallout', 'fallout online'],
+                'og-ffxiv': ['final fantasy xiv', 'ffxiv'],
                 'og-gr': ['ghost recon', 'gr', 'grw', 'grb', 'ghost recon wildlands', 'ghost recon breakpoint'],
                 'og-gtao': ['grand theft auto online', 'gtao', 'gtav', 'gta'],
                 'og-gtfo': ['gtfo'],
@@ -32,11 +35,15 @@ ROLES = {
                 'og-r6s': ['rainbow six siege', 'r6s', 'rss', 'rainbow', 'siege', 'rainbow six', 'rainbow six: siege'],
                 'og-rdo': ['red dead online', 'rdo', 'red dead redemption 2', 'red dead'],
                 'og-rem': ['remnant', 'rem'],
+                'og-ror2': ['risk of rain', 'ror', 'ror2', 'risk of rain 2'],
                 'og-smash': ['super smash bros', 'smash', 'ssb', 'ssbu'],
+                'og-sd': ['stardew valley', 'sd', 'stardew'],
                 'og-steep': ['steep'],
+                'og-stel': ['stellaris', 'stel'],
                 'og-sts': ['slay the spire', 'sts'],
                 'og-switch': ['nintendo switch', 'switch'],
                 'og-va': ['valorant', 'va'],
+                'og-val': ['valheim', 'val'],
                 'og-warf': ['warframe', 'wf', 'warf'],
                 'og-wow': ['world of warcraft', 'wow', 'warcraft'],
             },
@@ -50,7 +57,8 @@ ROLES = {
                 'nsfw': ['nsfw']
             },
             'topics': {
-                'current-events': ['current events', 'ce', 'current-events', 'politics', 'news']
+                'current-events': ['current events', 'ce', 'current-events', 'politics', 'news'],
+                'stonks': ['stonks', 'stocks', 'finances', 'financial']
             },
             'ghost_proxy_roles': {  # Based on Function String
                 'ghost-proxy-friend': ['gpf', 'gp-friend', 'ghost-proxy-friend'],

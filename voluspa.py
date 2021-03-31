@@ -36,8 +36,13 @@ else:
 from aiocache import caches
 caches.set_config(CONFIG.Voluspa.cache)
 
+# New as of discordpy 1.5.1
+intents = discord.Intents.default()
+intents.members = True
+intents.presences = True
+
 # Setup Initial Stuff
-client = discord.Client()
+client = discord.Client(intents=intents)
 
 # These should perhaps be cogs..?
 quotes = Quotes()
@@ -66,7 +71,8 @@ cog_extensions = [
 bot = commands.Bot(
     command_prefix=get_prefix,
     description='Völuspá the Ghost Proxy Proto-Warmind AI',
-    case_insensitive=True
+    case_insensitive=True,
+    intents=intents
 )
 
 
