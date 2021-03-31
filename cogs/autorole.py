@@ -52,6 +52,20 @@ class Autorole(commands.Cog):
         self.bot = bot
         self.roles_dicts = ROLES
 
+    async def toggle_role(self, ctx, role_name, role_category):
+        role = discord.utils.get(ctx.message.guild.roles, name=role_name)
+        if role not in ctx.message.author.roles:
+            await self.update_roles(ctx, role_category, [role_name])
+        else:
+            await self.update_roles(
+                ctx,
+                role_category,
+                [role_name],
+                options={
+                    'update_message': 'removed',
+                    'action': 'remove',
+                })
+
     async def update_roles(self,
                            ctx,
                            role_class: str,
@@ -452,18 +466,7 @@ class Autorole(commands.Cog):
 
         Can only be used by Ghost Proxy Members or Friends.
         """
-        sherpa_role = discord.utils.get(ctx.message.guild.roles, name='nsfw')
-        if sherpa_role not in ctx.message.author.roles:
-            await self.update_roles(ctx, 'nsfw', ['nsfw'])
-        else:
-            await self.update_roles(
-                ctx,
-                'nsfw',
-                ['nsfw'],
-                options={
-                    'update_message': 'removed',
-                    'action': 'remove',
-                })
+        await self.toggle_role(ctx, 'nsfw', 'nsfw')
 
     @commands.command(name='current-events', aliases=['ce'])
     @commands.has_any_role('ghost-proxy-member', 'ghost-proxy-friend')
@@ -473,18 +476,7 @@ class Autorole(commands.Cog):
 
         Can only be used by Ghost Proxy Members or Friends.
         """
-        ce_role = discord.utils.get(ctx.message.guild.roles, name='current-events')
-        if ce_role not in ctx.message.author.roles:
-            await self.update_roles(ctx, 'topics', ['current-events'])
-        else:
-            await self.update_roles(
-                ctx,
-                'topics',
-                ['current-events'],
-                options={
-                    'update_message': 'removed',
-                    'action': 'remove',
-                })
+        await self.toggle_role(ctx, 'current-events', 'topics')
 
     @commands.command(name='stonks', aliases=['stocks'])
     @commands.has_any_role('ghost-proxy-member', 'ghost-proxy-friend')
@@ -494,18 +486,7 @@ class Autorole(commands.Cog):
 
         Can only be used by Ghost Proxy Members or Friends.
         """
-        stonks_role = discord.utils.get(ctx.message.guild.roles, name='stonks')
-        if stonks_role not in ctx.message.author.roles:
-            await self.update_roles(ctx, 'topics', ['stonks'])
-        else:
-            await self.update_roles(
-                ctx,
-                'topics',
-                ['stonks'],
-                options={
-                    'update_message': 'removed',
-                    'action': 'remove',
-                })
+        await self.toggle_role(ctx, 'stonks', 'topics')
 
     @commands.command(name='sherpa', aliases=['s'])
     @commands.has_role('ghost-proxy-member')
@@ -515,18 +496,7 @@ class Autorole(commands.Cog):
 
         Can only be used by Ghost Proxy Members.
         """
-        sherpa_role = discord.utils.get(ctx.message.guild.roles, name='sherpa')
-        if sherpa_role not in ctx.message.author.roles:
-            await self.update_roles(ctx, 'raid_leads', ['sherpa'])
-        else:
-            await self.update_roles(
-                ctx,
-                'raid_leads',
-                ['sherpa'],
-                options={
-                    'update_message': 'removed',
-                    'action': 'remove',
-                })
+        await self.toggle_role(ctx, 'sherpa', 'raid_leads')
 
     @commands.command(name='dj')
     @commands.has_any_role('ghost-proxy-member', 'ghost-proxy-envoy')
@@ -568,7 +538,7 @@ And finally, a couple of steps to do now that you are a member:
 
 1. Head to the `#charlemagne` channel and type `!register` -- you will receive a DM from Char, please follow the instructions :+1:
 
-2. Join our Steam Group <https://steamcommunity.com/groups/ghostproxy> 
+2. Join our Steam Group <https://steamcommunity.com/groups/ghostproxy>
 
 3. Head to the `#voluspa` channel and type `$game-roles` and then add your Game Mode roles
   (Type `$help game-roles` for more info, and also check out `$other-games` also)
