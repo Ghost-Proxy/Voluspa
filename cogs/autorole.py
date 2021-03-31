@@ -501,17 +501,13 @@ class Autorole(commands.Cog):
     @commands.command(name='dj')
     @commands.has_any_role('ghost-proxy-member', 'ghost-proxy-envoy')
     @commands.guild_only()
-    async def set_dj(self, ctx):
+    async def toggle_dj(self, ctx):
         """Adds DJ role for Rythm
 
         Can only be used by Members.
         """
-        # TODO: Improve this, possibly toggle?
-
-        if 'DJ' in [role.name for role in ctx.message.author.roles]:
-            await ctx.send(f'{ctx.message.author.mention} - DJ role is already set :+1:')
-        else:
-            await self.update_roles(ctx, 'rythm_dj', ['dj'])
+        # Must be capitalized else will not unset. Presumably exact matching done somewhere up the stack
+        await self.toggle_role(ctx, 'DJ', 'rythm_dj')
 
     @commands.command(name='onboard')
     @commands.has_role('ghost-proxy-vanguard')
