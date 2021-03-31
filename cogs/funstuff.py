@@ -1,7 +1,10 @@
 import asyncio
 import logging
+import re
+from random import randint
 
 from modules.fun import Quotes, RandomQuotes, get_xkcd_comic
+from modules.custom_embed import default_embed
 
 import discord
 from discord.ext import commands
@@ -11,10 +14,27 @@ random_quotes = RandomQuotes()
 
 logger = logging.getLogger('voluspa.cog.funstuff')
 
+REAL_DICE = ['d4', 'd6', 'd8', 'd10', 'd12', 'd20']
+REGEX_NUMERICAL = '[0-9]+'
 
 class FunStuff(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+
+    @commands.command(aliases=REAL_DICE)
+    async def roll(self, ctx, *dice):
+        """Random number utilities"""
+        d = 20
+        if ctx.invoked_with in REAL_DICE:
+            d = int(ctx.invoked_with[1:])
+        elif dice:
+            d_str = re.findall(REGEX_NUMERICAL, ' '.join(dice))
+            if d_str:
+                d = int(d_str[0])
+            else:
+                raise commands.UserInputError
+        msg = f'You rolled a d{d}, It landed on {randint(1, d)}!'
+        await ctx.send(msg)
 
     @commands.command()
     async def hello(self, ctx):

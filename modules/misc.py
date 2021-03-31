@@ -1,5 +1,5 @@
 import collections.abc
-from unittest import TestCase
+from typing import Any, List
 
 new_line = "\n"
 voluspa_raw_txt_logo = '--\\\\\\\\´//--'
@@ -17,6 +17,28 @@ def memoize(func):
         return result
 
     return memoized_func
+
+
+def chunk_list(chonk_list: List[Any], chunk_size: int = 1024):
+    """Casts elements to str"""
+    chunks = {}
+    current_chunk = 0
+    for item in chonk_list:
+        item = str(item)
+        if len(item) > chunk_size:
+            # need to chunk item itself, naive
+            new_chunks = [item[i:i + chunk_size] for i in range(0, len(item), chunk_size)]
+            for nc in new_chunks:
+                current_chunk += 1
+                chunks[current_chunk] = [nc]
+        elif len(str(item)) + len(''.join(chunks.get(current_chunk, ''))) > chunk_size:
+            # need to make a new chunk
+            current_chunk += 1
+            chunks[current_chunk] = [item]
+        else:
+            # add to current chunk
+            chunks.setdefault(current_chunk, []).append(item)
+    return [v for k, v in chunks.items()]
 
 
 # https://stackoverflow.com/questions/38034377/object-like-attribute-access-for-nested-dictionary
@@ -95,156 +117,3 @@ def merge_dicts(dct, merge_dct, add_keys=True, skip_none=False):
 
     return dct
 
-
-class DictMergeTestCase(TestCase):
-    def test_merges_dicts(self):
-        a = {
-            'a': 1,
-            'b': {
-                'b1': 2,
-                'b2': 3,
-            },
-        }
-        b = {
-            'a': 1,
-            'b': {
-                'b1': 4,
-            },
-        }
-
-        assert merge_dicts(a, b)['a'] == 1
-        assert merge_dicts(a, b)['b']['b2'] == 3
-        assert merge_dicts(a, b)['b']['b1'] == 4
-
-    def test_inserts_new_keys(self):
-        """Will it insert new keys by default?"""
-        a = {
-            'a': 1,
-            'b': {
-                'b1': 2,
-                'b2': 3,
-            },
-        }
-        b = {
-            'a': 1,
-            'b': {
-                'b1': 4,
-                'b3': 5
-            },
-            'c': 6,
-        }
-
-        assert merge_dicts(a, b)['a'] == 1
-        assert merge_dicts(a, b)['b']['b2'] == 3
-        assert merge_dicts(a, b)['b']['b1'] == 4
-        assert merge_dicts(a, b)['b']['b3'] == 5
-        assert merge_dicts(a, b)['c'] == 6
-
-    def test_does_not_insert_None_when_skip_none(self):
-        """Will skip keys merging keys that have none values"""
-        a = {
-            'a': 1,
-            'b': {
-                'b1': 2,
-                'b2': 3,
-            },
-            'c': 4
-        }
-        b = {
-            'a': 1,
-            'b': {
-                'b1': 4,
-                'b2': None,
-            },
-            'c': None,
-            'd': None,
-            'e': {
-                'e1': None
-            }
-
-        }
-
-        print(merge_dicts(a, b, skip_none=True))
-
-        assert merge_dicts(a, b, skip_none=True)['a'] == 1
-        assert merge_dicts(a, b, skip_none=True)['b']['b1'] == 4
-        assert merge_dicts(a, b, skip_none=True)['b']['b2'] == 3
-        assert merge_dicts(a, b, skip_none=True)['c'] == 4
-        try:
-            assert merge_dicts(a, b, skip_none=True)['d'] is None
-        except KeyError:
-            pass
-        else:
-            raise Exception('None value was added when it should not have been')
-
-    def test_does_not_insert_new_keys(self):
-        """Will it avoid inserting new keys when required?"""
-        a = {
-            'a': 1,
-            'b': {
-                'b1': 2,
-                'b2': 3,
-            },
-        }
-        b = {
-            'a': 1,
-            'b': {
-                'b1': 4,
-                'b3': 5,
-            },
-            'c': 6,
-        }
-
-        assert merge_dicts(a, b, add_keys=False)['a'] == 1
-        assert merge_dicts(a, b, add_keys=False)['b']['b2'] == 3
-        assert merge_dicts(a, b, add_keys=False)['b']['b1'] == 4
-        try:
-            assert merge_dicts(a, b, add_keys=False)['b']['b3'] == 5
-        except KeyError:
-            pass
-        else:
-            raise Exception('New keys added when they should not be')
-
-    def test_does_not_insert_None_when_skip_none_or_add_new_keys(self):
-        """Will skip keys merging keys that have none values"""
-        a = {
-            'a': 1,
-            'b': {
-                'b1': 2,
-                'b2': 3,
-            },
-            'c': 4
-        }
-        b = {
-            'a': 1,
-            'b': {
-                'b1': 4,
-                'b2': None,
-                'b3': 5,
-            },
-            'c': None,
-            'd': None,
-            'e': {
-                'e1': None
-            }
-
-        }
-
-        print(merge_dicts(a, b, add_keys=False, skip_none=True))
-
-        assert merge_dicts(a, b, add_keys=False, skip_none=True)['a'] == 1
-        assert merge_dicts(a, b, add_keys=False, skip_none=True)['b']['b1'] == 4
-        assert merge_dicts(a, b, add_keys=False, skip_none=True)['b']['b2'] == 3
-        assert merge_dicts(a, b, add_keys=False, skip_none=True)['c'] == 4
-        try:
-            assert merge_dicts(a, b, add_keys=False, skip_none=True)['d'] is None
-        except KeyError:
-            pass
-        else:
-            raise Exception('None value was added when it should not have been')
-        try:
-            assert merge_dicts(a, b, add_keys=False, skip_none=True)['b']['b3'] == 5
-        except KeyError:
-            pass
-        else:
-            raise Exception('New keys added when they should not be')

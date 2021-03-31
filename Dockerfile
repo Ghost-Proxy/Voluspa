@@ -54,14 +54,14 @@ RUN pip3 install -r requirements.txt
 
 # Dockerfile Build
 
-    # docker build . -t voluspa:local
+    # docker build . -t voluspa
 
 # Running the container
 
     # Mac/Nix
-    # docker run -it -v $(pwd):/app/voluspa:ro voluspa python3 ./voluspa.py
+    # docker run -it voluspa:latest python3 ./voluspa.py
 
     # Powershell (mounting won't work without share settings beforehand...)
-    # docker run -it -v ${$pwd.Path}:/app/voluspa:ro voluspa:local python3 ./voluspa.py
+    # docker run -it voluspa:latest python3 ./voluspa.py
 
-    # docker run -p 5337:5337 -it voluspa python3 ./voluspa.py
+    # docker run -p 5337:5337 -it voluspa:latest python3 ./voluspa.py

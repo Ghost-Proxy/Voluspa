@@ -1,7 +1,7 @@
 # import re
 import asyncio
 import logging
-from typing import Any, List, Dict, Tuple, Sequence, Iterable
+from typing import Any, List, Dict, Tuple, Sequence, Iterable, Collection
 from collections import OrderedDict
 
 import discord
@@ -9,6 +9,12 @@ from discord.ext import commands
 
 from modules.custom_embed import default_embed, format_list
 from modules.styles import STYLES
+from cogs.config.roles import ROLES
+from modules.misc import chunk_list
+
+from voluspa import CONFIG
+
+from titlecase import titlecase
 
 logger = logging.getLogger('voluspa.cog.autorole')
 
@@ -44,66 +50,21 @@ class Autorole(commands.Cog):
     # TODO: Break it down into a simple set of funcs/rules
     def __init__(self, bot):
         self.bot = bot
-        self.roles_dicts = {
-            'game_modes': {
-                'crucible': ['c', 'crucible'],
-                'gambit': ['g', 'gambit'],
-                'raid': ['r', 'raid'],
-                'strike-nf-pve': ['s', 'nf', 'pve', 'strike', 'nightfall', 'strike-nf-pve']
-            },
-            'other_games': {
-                # 'og-ant': ['anthem', 'ant'],
-                # 'og-apex': ['apex legends', 'apex', 'apex: legends'],
-                'og-bl': ['borderlands', 'bl', 'borderlands 2', 'borderlands 3'],
-                'og-div2': ['division 2', 'div2', 'td2', 'division', 'the division 2'],
-                'og-dota': ['dota 2', 'dota', 'defense of the ancients 2'],
-                'og-gr': ['ghost recon', 'gr', 'grw', 'grb', 'ghost recon wildlands', 'ghost recon breakpoint'],
-                'og-lol': ['league of legends', 'lol', 'league'],
-                'og-mc': ['minecraft', 'mc'],
-                'og-mhw': ['monster hunter world', 'mh', 'mhw', 'monster', 'monster hunter'],
-                'og-osu': ['osu'],
-                'og-ow': ['overwatch', 'ow'],
-                # 'og-rage': ['rage 2', 'rage'],
-                'og-r6s': ['rainbow six siege', 'r6s', 'rss', 'rainbow', 'siege', 'rainbow six', 'rainbow six: siege'],
-                'og-steep': ['steep'],
-                'og-warf': ['warframe', 'wf', 'warf']
-                # 'og-wow': ['world of warcraft', 'wow', 'warcraft'],
-            },
-            'raid_leads': {
-                'sherpa-active': ['on', 'active', 'true', 'enable', 'yes', '1'],
-                'sherpa-inactive': ['off', 'inactive', 'false', 'disable', 'no', '0']
-            },
-            'rythm_dj': {
-                'DJ': ['dj', 'rythm', 'rhythm']
-            },
-            'ghost_proxy_roles': {
-                'ghost-proxy-friend': ['gpf', 'gp-friend', 'ghost-proxy-friend'],
-                'ghost-proxy-member': ['gpm', 'gp-member', 'ghost-proxy-member'],
-                'ghost-proxy-legacy': ['gpl', 'gp-legacy', 'ghost-proxy-legacy'],
-                'ghost-proxy-envoy': ['gpe', 'gp-envoy', 'ghost-proxy-envoy'],
-                'ghost-proxy-veteran': ['gpv', 'gp-veteran', 'ghost-proxy-veteran'],
-                'ghost-proxy-archivist': ['gpa', 'gp-archivist', 'ghost-proxy-archivist'],
-                # Include lead roles for reset
-                'raid-lead': ['raid-lead'],
-                'gambit-lead': ['gambit-lead'],
-                'crucible-lead': ['crucible-lead'],
-                'strike-nf-pve-lead': ['strike-nf-pve-lead'],
-                # And Div2 admins
-                'div2-admin': ['div2-admin'],
-                # Same with sherpa
-                'sherpa-active': ['sherpa-active'],
-                'sherpa-inactive': ['sherpa-inactive'],
-            },  # TODO: Figure out what the plan was with the below...
-            'ghost_proxy_elevated_roles': {
-                'ghost-proxy-vanguard': ['vanguard', 'gp-vanguard', 'ghost-proxy-vanguard'],
-                'ghost-proxy-veteran': ['gpv', 'gp-veteran', 'ghost-proxy-veteran'],
-                'ghost-proxy-archivist': ['gpa', 'gp-archivist', 'ghost-proxy-archivist']
-            },
-            'ghost_proxy_protected_roles': {
-                'founder': ['founder', 'gp-founder', 'ghost-proxy-founder'],  # 'ghost-proxy-founder'
-                'ghost-proxy-gatekeeper': ['gatekeeper', 'gp-gatekeeper', 'ghost-proxy-gatekeeper']
-            }
-        }
+        self.roles_dicts = ROLES
+
+    async def toggle_role(self, ctx, role_name, role_category):
+        role = discord.utils.get(ctx.message.guild.roles, name=role_name)
+        if role not in ctx.message.author.roles:
+            await self.update_roles(ctx, role_category, [role_name])
+        else:
+            await self.update_roles(
+                ctx,
+                role_category,
+                [role_name],
+                options={
+                    'update_message': 'removed',
+                    'action': 'remove',
+                })
 
     async def update_roles(self,
                            ctx,
@@ -111,7 +72,8 @@ class Autorole(commands.Cog):
                            roles: Sequence[str],
                            user_id: int = None,
                            options: Dict = None,
-                           allow_all=False):
+                           allow_all=False,
+                           use_role_label=False):
         # TODO: Make it so that if the roles list is not supplied, the entire roles_dict is used?
         async with ctx.typing():
             # Set options and values
@@ -148,6 +110,10 @@ class Autorole(commands.Cog):
             # elif:  # if 'DJ' in [role.name for role in ctx.message.author.roles]:
             # pass
 
+            role_results = roles_to_update
+            if use_role_label:
+                role_results = [f'{role:<12} {titlecase(role_dict[role][0])}' for role in roles_to_update]
+
             # TODO: Add check if roles are already applied and avoid doing it again?
 
             print(f'"Updating Roles (action: {action}): {updated_roles}')
@@ -167,7 +133,7 @@ class Autorole(commands.Cog):
             if confirm:
                 confirm_embed = default_embed(
                     title='Role Update',
-                    description=f'\n{update_message.capitalize()} role(s):{format_list(roles_to_update)}',
+                    description=f'\n{update_message.capitalize()} role(s):{format_list(role_results)}',
                     color=STYLES.colors.success
                 )
                 await ctx.send(f'{ctx.message.author.mention}', embed=confirm_embed)
@@ -179,10 +145,11 @@ class Autorole(commands.Cog):
                                    ctx,
                                    role_class: str,
                                    roles: Sequence[str],
-                                   users: Tuple[str],
+                                   users: Collection[str],
                                    # role_limit: str = None,
                                    role_limits: Sequence[str] = None,
-                                   action: str = 'add'):
+                                   action: str = 'add',
+                                   success_callbacks: Sequence[Any] = None):
         # Args are multiple user names (potentially _n_)
         # Search member list for each user name provided
         #  - if more then one user name matches, return a list of matches and ask for a retry
@@ -328,6 +295,13 @@ class Autorole(commands.Cog):
                     # Send message after doing the above
                     # TODO: Ensure guarantee of removal before sending below...?
                     await ctx.send(f'{ctx.message.author.mention}', embed=role_embed)
+
+                    if success_callbacks:
+                        for cb in success_callbacks:
+                            try:
+                                await cb(user_matches[0])
+                            except Exception as e:
+                                logger.info(f'Success Callback Exception: {e}')
             else:
                 error_embed = default_embed(
                     title='No Matching User',
@@ -452,7 +426,8 @@ class Autorole(commands.Cog):
             'other_games',
             games,
             options={'update_message': 'added Other Game(s)'},
-            allow_all=True
+            allow_all=True,
+            use_role_label=True
         )
 
     @commands.command(name='og-remove', aliases=['other-game-remove'])
@@ -479,62 +454,126 @@ class Autorole(commands.Cog):
                 'update_message': 'removed Other Game(s)',
                 'action': 'remove'
             },
-            allow_all=True
+            allow_all=True,
+            use_role_label=True
         )
 
-    @commands.command(name='sherpa-on')
-    @commands.has_role('raid-lead')
+    @commands.command(name='nsfw')
+    @commands.has_any_role('ghost-proxy-member', 'ghost-proxy-friend')
     @commands.guild_only()
-    async def sherpa_on(self, ctx):
-        """Sets Sherpa status to Active
+    async def nsfw_toggle(self, ctx):
+        """Toggles the NSFW role
 
-        Can only be used by Raid Leads.
+        Can only be used by Ghost Proxy Members or Friends.
         """
-        await self.update_roles(ctx, 'raid_leads', ['active'])
-        await self.update_roles(
-            ctx,
-            'raid_leads',
-            ['inactive'],
-            options={
-                'update_message': 'removed',
-                'action': 'remove',
-                'confirm': False
-            })
+        await self.toggle_role(ctx, 'nsfw', 'nsfw')
 
-    @commands.command(name='sherpa-off')
-    @commands.has_role('raid-lead')
+    @commands.command(name='current-events', aliases=['ce'])
+    @commands.has_any_role('ghost-proxy-member', 'ghost-proxy-friend')
     @commands.guild_only()
-    async def sherpa_off(self, ctx):
-        """Sets Sherpa status to Inactive
+    async def current_events_toggle(self, ctx):
+        """Toggles the current-events role
 
-        Can only be used by Raid Leads.
+        Can only be used by Ghost Proxy Members or Friends.
         """
-        await self.update_roles(ctx, 'raid_leads', ['inactive'])
-        await self.update_roles(
-            ctx,
-            'raid_leads',
-            ['active'],
-            options={
-                'update_message': 'removed',
-                'action': 'remove',
-                'confirm': False
-            }
-        )
+        await self.toggle_role(ctx, 'current-events', 'topics')
+
+    @commands.command(name='stonks', aliases=['stocks'])
+    @commands.has_any_role('ghost-proxy-member', 'ghost-proxy-friend')
+    @commands.guild_only()
+    async def stonks_toggle(self, ctx):
+        """Toggles the stonks role
+
+        Can only be used by Ghost Proxy Members or Friends.
+        """
+        await self.toggle_role(ctx, 'stonks', 'topics')
+
+    @commands.command(name='sherpa', aliases=['s'])
+    @commands.has_role('ghost-proxy-member')
+    @commands.guild_only()
+    async def sherpa_toggle(self, ctx):
+        """Toggles the Sherpa role
+
+        Can only be used by Ghost Proxy Members.
+        """
+        await self.toggle_role(ctx, 'sherpa', 'raid_leads')
 
     @commands.command(name='dj')
     @commands.has_any_role('ghost-proxy-member', 'ghost-proxy-envoy')
     @commands.guild_only()
-    async def set_dj(self, ctx):
+    async def toggle_dj(self, ctx):
         """Adds DJ role for Rythm
 
         Can only be used by Members.
         """
-        # TODO: Improve this, possibly toggle?
+        # Must be capitalized else will not unset. Presumably exact matching done somewhere up the stack
+        await self.toggle_role(ctx, 'DJ', 'rythm_dj')
 
-        if 'DJ' in [role.name for role in ctx.message.author.roles]:
-            await ctx.send(f'{ctx.message.author.mention} - DJ role is already set :+1:')
-        else:
-            await self.update_roles(ctx, 'rythm_dj', ['dj'])
+    @commands.command(name='onboard')
+    @commands.has_role('ghost-proxy-vanguard')
+    @commands.guild_only()
+    async def onboard_member(self, ctx, *users: str):
+        """Onboards User(s) to Members(s)
+
+        Currently implies _not_ a ghost-proxy-envoy (WIP)
+
+        Performs an ARM, then sends a DM to the user, and sends a Welcome to Private.
+
+        Can only be used by Vanguard (atm).
+        """
+
+        welcome_message = """Welcome to Ghost Proxy! <:ghost_proxy_2:455130686290919427>
+
+If you haven't yet, please read through our `#rules-conduct` and `#server-info` and then feel free to explore the server! A good place to start is `#voluspa`, our very own Warmind where you can set game roles, check who's online, and use a number of other helpful commands (type `$help`).
+
+If you have any questions about anything, feel free to ask in general chat, use the `$feedback` Voluspa feature (here in a DM even), or use the `@ghost-proxy-vanguard` ping to ask for help from the Ghost Proxy admin team.
+
+\\*\\*\\*
+
+And finally, a couple of steps to do now that you are a member:
+
+1. Head to the `#charlemagne` channel and type `!register` -- you will receive a DM from Char, please follow the instructions :+1:
+
+2. Join our Steam Group <https://steamcommunity.com/groups/ghostproxy>
+
+3. Head to the `#voluspa` channel and type `$game-roles` and then add your Game Mode roles
+  (Type `$help game-roles` for more info, and also check out `$other-games` also)
+
+4. Join our Social Tower voice channel and start forming fireteams and have fun!
+
+Thanks and eyes up, Guardian! <:cayde_thumbs_up:451649810894946314>
+_ _
+        """
+
+        async def send_welcome_direct_message(user_rec):
+            new_member = self.bot.get_user(user_rec['id'])
+            welcome_prefix = f"_ _\n_ _\n" \
+                             f"Hello, {new_member.mention}! :wave: "
+            await new_member.send(f"{welcome_prefix}{welcome_message}")
+
+        async def send_welcome_guild_message(user_rec):
+            new_member = self.bot.get_user(user_rec['id'])
+            guild_welcome = f"_Greetings to our new member, {new_member.mention}! :tada: Welcome to Ghost Proxy!_ <:ghost_proxy_2:455130686290919427>"
+            guild_channel = ctx.bot.get_channel(CONFIG.Voluspa.private_guild_channel_id)
+            await guild_channel.send(guild_welcome)
+
+        await self.assign_roles_to_user(
+            ctx,
+            'ghost_proxy_roles',
+            [
+                'ghost-proxy-member'
+            ],
+            users,
+            role_limits=[
+                'ghost-proxy-friend',
+                'ghost-proxy-legacy',
+                'ghost-proxy-envoy',
+            ],
+            success_callbacks=[
+                send_welcome_direct_message,
+                send_welcome_guild_message
+            ]
+        )
 
     @commands.command(name='set-member', aliases=['p2m', 'arm'])
     @commands.has_role('ghost-proxy-vanguard')
@@ -575,7 +614,11 @@ class Autorole(commands.Cog):
                 'ghost-proxy-friend'
             ],
             users,
-            role_limits=['ghost-proxy-member']
+            role_limits=[
+                'ghost-proxy-member',
+                'ghost-proxy-legacy',
+                'ghost-proxy-envoy'
+            ]
         )
 
     @commands.command(name='set-envoy', aliases=['p2e', 'are'])
@@ -769,22 +812,26 @@ class Autorole(commands.Cog):
                 role_stats[role.name] = len(role.members)
             formatted_role_stats = [f'{r_mems:<8}{r_name}' for r_name, r_mems in reversed(role_stats.items())]
 
-            embed = default_embed(
-                title='Role Stats',
-                description='List of Roles and number of associated Users'
-            )
-            embed.add_field(
-                name='Number of Roles',
-                value=num_roles,
-                inline=False
-            )
-            embed.add_field(
-                name='Roles and number of Users',
-                value=f'{format_list(formatted_role_stats)}',
-                inline=False
-            )
-
-        await ctx.send(embed=embed)
+            split_formatted_stats = format_list(formatted_role_stats, surround='').split('\n')
+            pages = chunk_list(split_formatted_stats, 1024 - (len(split_formatted_stats) * 2) - 100)
+            for page_num, page in enumerate(pages, start=1):
+                page = "\n".join(page)
+                embed = default_embed(
+                    title='Role Stats',
+                    description='List of Roles and number of associated Users',
+                    footer_notes=f'Page {page_num} of {len(pages)}'
+                )
+                embed.add_field(
+                    name='Number of Roles',
+                    value=num_roles,
+                    inline=False
+                )
+                embed.add_field(
+                    name='Roles and number of Users',
+                    value=f'```{page}```',
+                    inline=False
+                )
+                await ctx.send(embed=embed)
 
     # async def get_members_by_roles(self, roles: List[str], include_bots=False):
     #     # TODO: WIP

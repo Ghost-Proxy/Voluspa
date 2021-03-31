@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 
-"""Voluspa Ghost Proxy Discord Bot"""
-VOLUSPA_VERSION = 'v0.0.10e'
-# Bot Example: https://gist.github.com/EvieePy/d78c061a4798ae81be9825468fe146be
+"""Völuspá Ghost Proxy Discord Bot"""
 
 import datetime
 import math
 import sys
 import traceback
+import asyncio
 
 # Custom Imports
 from modules.config import CONFIG
@@ -17,7 +16,7 @@ archivist = Archivist()
 logger = archivist.get_logger()
 
 from modules.fun import Quotes
-from modules.database import Database
+#from modules.database import Database
 from modules.discord_utils import get_prefix, update_status_task
 from modules.exceptions import VoluspaError, BungieAPIError, BungieAPIOffline
 
@@ -25,17 +24,29 @@ from modules.exceptions import VoluspaError, BungieAPIError, BungieAPIOffline
 import discord
 from discord.ext import commands
 
+# UVloop
+try:
+    import uvloop
+except ImportError:
+    pass
+else:
+    asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
+
 # Caches
 from aiocache import caches
 caches.set_config(CONFIG.Voluspa.cache)
 
+# New as of discordpy 1.5.1
+intents = discord.Intents.default()
+intents.members = True
+intents.presences = True
+
 # Setup Initial Stuff
-VOLUSPA_SHA = CONFIG.Voluspa.sha[:10]
-client = discord.Client()
+client = discord.Client(intents=intents)
 
 # These should perhaps be cogs..?
 quotes = Quotes()
-db = Database()
+#db = Database()
 
 cog_extensions = [
     'cogs.autorole',
@@ -45,6 +56,14 @@ cog_extensions = [
     'cogs.destinyart',
     'cogs.utilities',
     'cogs.cache',
+    'cogs.polls',
+    'cogs.feedback',
+    'cogs.kudos',
+    'cogs.cog_control',
+    #'cogs.roster',
+    'jishaku',
+    #'cogs.console', # https://github.com/Gorialis/jishaku/issues/55
+    'cogs.gaminator',
 ]
 
 
@@ -52,7 +71,8 @@ cog_extensions = [
 bot = commands.Bot(
     command_prefix=get_prefix,
     description='Völuspá the Ghost Proxy Proto-Warmind AI',
-    case_insensitive=True
+    case_insensitive=True,
+    intents=intents
 )
 
 
