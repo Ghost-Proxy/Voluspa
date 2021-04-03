@@ -7,7 +7,7 @@
 ---
 
 ### Setup
-- Uses Python 3.9.x
+- Uses Python 3.9
 - Setup assumes Debian based package manager
 - Setup shows how to install Python using the [Deadsnakes PPA](https://launchpad.net/~deadsnakes/+archive/ubuntu/ppa)
 

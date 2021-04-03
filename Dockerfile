@@ -1,7 +1,7 @@
 FROM ubuntu:18.04
 LABEL maintainer="Mirage"
-ENV PY_VER "3.7.4"
-ENV PY_VER_MAJOR "3.7"
+ENV PY_VER "3.9.3"
+ENV PY_VER_MAJOR "3.9"
 ENV DEBIAN_FRONTEND noninteractive
 
 RUN apt-get update && \
