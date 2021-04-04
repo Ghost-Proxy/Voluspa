@@ -61,7 +61,5 @@ RUN pip3 install -r requirements.txt
     # Mac/Nix
     # docker run -it voluspa:latest python3 ./voluspa.py
 
-    # Powershell (mounting won't work without share settings beforehand...)
-    # docker run -it voluspa:latest python3 ./voluspa.py
-
-    # docker run -p 5337:5337 -it voluspa:latest python3 ./voluspa.py
+    # Powershell (at this stage, mounting works in rw mode with WSL2+ backend)
+    # docker run -it -v ${pwd}:/app/voluspa voluspa:latest python3 ./voluspa.py
