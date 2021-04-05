@@ -1,4 +1,5 @@
 FROM ubuntu:20.04
+
 ENV DEBIAN_FRONTEND noninteractive
 ENV RELEASE_NAME 'focal'
 ENV PY_VER_MAJOR '3.9'
@@ -18,8 +19,9 @@ ENV LC_ALL en_US.UTF-8
 RUN sed -i "s=http://archive.ubuntu.com/ubuntu/=$(wget -qO- mirrors.ubuntu.com/mirrors.txt | head -n 1)=" /etc/apt/sources.list && \
     echo "deb http://ppa.launchpad.net/deadsnakes/ppa/ubuntu ${RELEASE_NAME} main" >> /etc/apt/sources.list && \
     apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv F23C5A6CF475977595C89F51BA6932366A755776 && \
-    apt-get clean && \
-    apt-get update && \
+    apt-get clean
+
+RUN apt-get update && \
     apt-get install -qq --no-install-recommends \
         python${PY_VER_MAJOR} \
         python${PY_VER_MAJOR}-dev \
