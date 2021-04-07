@@ -72,5 +72,5 @@ docker build . -t voluspa
 
 #### Running the container
 ```
-docker run -it voluspa:latest python3.9 ./voluspa.py
+docker run -it voluspa:latest python ./voluspa.py
 ```
