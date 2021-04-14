@@ -1,7 +1,6 @@
 FROM heroku/heroku:20
 LABEL maintainer="Ghost Proxy"
 ENV PY_VER_MAJOR "3.8"
-ENV UBUNTU_RELEASE_NAME focal
 ENV DEBIAN_FRONTEND noninteractive
 
 RUN sed -i "s=http://archive.ubuntu.com/ubuntu/=$(wget -qO- http://mirrors.ubuntu.com/mirrors.txt | head -n 1)=" /etc/apt/sources.list
