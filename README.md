@@ -7,9 +7,10 @@
 ---
 
 ### Setup
-- Uses Python 3.9
+- Uses Python 3.8
 - Setup assumes Debian based package manager
 - Setup shows how to install Python using the [Deadsnakes PPA](https://launchpad.net/~deadsnakes/+archive/ubuntu/ppa)
+- If using Ubuntu 20.04 "Focal Fossa", you won't need to add the Deadsnakes PPA, as Python 3.8 is bundled with the OS
 
 1. Install the bare essentials
 
@@ -21,7 +22,7 @@
 
 3. Install Python and related packages
 
-`apt install python3.9 python3.9-dev python3.9-venv python3-pip`
+`apt install python3.8 python3.8-dev python3.8-venv python3-pip`
 
 4. Clone the Voluspa repository
 
@@ -33,15 +34,15 @@
 
 6. Create and enter a virtual environment
 
-`python3.9 -m venv ./venv && source venv/bin/activate`
+`python3.8 -m venv ./venv && source venv/bin/activate`
 
 7. Upgrade pip
 
-`python3.9 -m pip install -U pip`
+`python3.8 -m pip install -U pip`
 
 8. If building dependencies from source, you will need wheel
 
-`python3.9 -m pip install wheel`
+`python3.8 -m pip install wheel`
 
 9. Install dependencies
 
@@ -55,7 +56,7 @@
 
 11. Start Voluspa
 
-`python3.9 voluspa.py`
+`python3.8 voluspa.py`
 
 12. Happy coding and have fun!
 
@@ -72,5 +73,5 @@ docker build . -t voluspa
 
 #### Running the container
 ```
-docker run -it voluspa:latest python3.9 ./voluspa.py
+docker run -it voluspa:latest python3.8 ./voluspa.py
 ```
