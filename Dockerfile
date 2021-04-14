@@ -3,6 +3,12 @@ LABEL maintainer="Ghost Proxy"
 ENV PY_VER_MAJOR "3.8"
 ENV DEBIAN_FRONTEND noninteractive
 
+RUN locale-gen en_US.UTF-8
+
+ENV LANG en_US.UTF-8
+ENV LANGUAGE en_US:en
+ENV LC_ALL en_US.UTF-8
+
 RUN sed -i "s=http://archive.ubuntu.com/ubuntu/=$(wget -qO- http://mirrors.ubuntu.com/mirrors.txt | head -n 1)=" /etc/apt/sources.list
 
 RUN apt-get update && \
@@ -11,12 +17,6 @@ RUN apt-get update && \
         python3-pip && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
-
-RUN locale-gen en_US.UTF-8
-
-ENV LANG en_US.UTF-8
-ENV LANGUAGE en_US:en
-ENV LC_ALL en_US.UTF-8
 
 RUN python${PY_VER_MAJOR} -m pip install -U pip
 
