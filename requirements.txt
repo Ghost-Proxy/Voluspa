@@ -29,7 +29,7 @@ jishaku==1.17.1.181
 # tox==3.13.2
 
 # DATABASE
-asyncpg==0.20.1
+asyncpg==0.21.0
 # aiopg==1.0.0
 
 # CACHE
