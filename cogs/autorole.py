@@ -36,12 +36,9 @@ def process_role_inputs(role_inputs, role_dict, allow_all=False):
 
 
 def match_users(user_list, username):
-    print(f'USERNAME REC: {username}')
     matched_users = [user for user in user_list if username[0] in user['name'] or username[0] in user['nick']]
-    print(f'>>> Match results before salt: {matched_users}')
     if len(username) >= 2:
         matched_users = [user for user in matched_users if user['salt'] == username[1]]
-    print(f'>>> Match results AFTER salt: {matched_users}')
     return matched_users
 
 
@@ -100,9 +97,6 @@ class Autorole(commands.Cog):
             logger.info(f'update_roles - roles_input: {roles}')
             roles_to_update = process_role_inputs(roles, role_dict, allow_all=allow_all)
 
-            print(f'Roles to Update: {roles_to_update}')
-            print(f'Role Dict: {role_dict}')
-
             if not list(roles_to_update):
                 return
 
@@ -118,7 +112,6 @@ class Autorole(commands.Cog):
 
             # TODO: Add check if roles are already applied and avoid doing it again?
 
-            print(f'"Updating Roles (action: {action}): {updated_roles}')
             if user_id:
                 user = ctx.guild.get_member(user_id)
             else:
@@ -201,7 +194,6 @@ class Autorole(commands.Cog):
 
         multiple_users_found = False
         for user_rec in user_results:
-            print(f'USER REC: {user_rec} | type: {type(user_rec)}')
             req_user = list(user_rec.keys())[0]
             user_matches = user_rec[req_user]
             if len(user_matches) > 1:
@@ -340,7 +332,7 @@ class Autorole(commands.Cog):
             await ctx.send(f'Request timed out... :(')
             return False
         else:
-            print(f'reaction_emoji: {reaction} | {reaction.emoji}')
+            # print(f'reaction_emoji: {reaction} | {reaction.emoji}')
             # await ctx.send(f'Received reaction: {reaction.emoji} from user: {user}')
             if reaction.emoji == react_unicode['yes']:
                 return True
