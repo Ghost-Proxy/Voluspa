@@ -14,7 +14,7 @@ from modules.misc import chunk_list
 
 from voluspa import CONFIG
 
-from templates.autorole import offboard_message, onboard_message
+from templates.autorole import offboard_message, onboard_member_message, onboard_friend_message
 
 from titlecase import titlecase
 
@@ -528,7 +528,7 @@ class Autorole(commands.Cog):
             new_member = self.bot.get_user(user_rec['id'])
             welcome_prefix = f"_ _\n" \
                              f"Hello, {new_member.mention}! :wave: "
-            await new_member.send(f"{welcome_prefix}\n\n{onboard_message}")
+            await new_member.send(f"{welcome_prefix}\n\n{onboard_member_message}")
 
         async def send_welcome_guild_message(user_rec):
             new_member = self.bot.get_user(user_rec['id'])
@@ -595,6 +595,40 @@ class Autorole(commands.Cog):
             ],
             success_callbacks=[
                 send_offboard_direct_message
+            ]
+        )
+
+    @commands.command(name='friend', aliases=['gpfri'])
+    @commands.has_role('ghost-proxy-vanguard')
+    @commands.guild_only()
+    async def onboard_friend(self, ctx, *users: str):
+        """Onboards Non-Role(s) to Friend(s)
+
+        Currently implies _not_ a ghost-proxy-envoy (WIP)
+
+        Performs an ARL, then sends a DM to the user.
+
+        Can only be used by Vanguard (atm).
+        """
+
+        async def send_friend_direct_message(user_rec):
+            new_friend = self.bot.get_user(user_rec['id'])
+            msg_prefix = f"_ _\n" \
+                         f"Hello, {new_friend.mention}! :wave: "
+            await new_friend.send(f"{msg_prefix}\n\n{onboard_friend_message}")
+
+        # Check if has any role and bail
+        #                 'ghost-proxy-member', legacy, envoy
+
+        await self.assign_roles_to_user(
+            ctx,
+            'ghost_proxy_roles',
+            [
+                'ghost-proxy-friend',
+            ],
+            users,
+            success_callbacks=[
+                send_friend_direct_message
             ]
         )
 
