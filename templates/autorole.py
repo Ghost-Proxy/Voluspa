@@ -13,9 +13,9 @@ And finally, a couple of steps to do now that you are a member:
 2. Join our Steam Group <https://steamcommunity.com/groups/ghostproxy>
 
 3. Head to the `#voluspa` channel and type `$game-roles` and then add your Game Mode roles
-  (Type `$help game-roles` for more info, and also check out `$other-games` also)
+  (Type `$help game-roles` for more info, and also check out `$other-games`!)
 
-4. Join our Social Tower voice channel and start forming fireteams and have fun!
+4. Join our Social Tower voice channel, start forming fireteams, checkout out the `#lfg` channel, and most importantly, have fun!
 
 Thanks and eyes up, Guardian! <:cayde_thumbs_up:451649810894946314>
 _ _

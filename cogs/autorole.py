@@ -526,9 +526,9 @@ class Autorole(commands.Cog):
 
         async def send_welcome_direct_message(user_rec):
             new_member = self.bot.get_user(user_rec['id'])
-            welcome_prefix = f"_ _\n_ _\n" \
+            welcome_prefix = f"_ _\n" \
                              f"Hello, {new_member.mention}! :wave: "
-            await new_member.send(f"{welcome_prefix}{onboard_message}")
+            await new_member.send(f"{welcome_prefix}\n\n{onboard_message}")
 
         async def send_welcome_guild_message(user_rec):
             new_member = self.bot.get_user(user_rec['id'])
@@ -573,9 +573,9 @@ class Autorole(commands.Cog):
 
         async def send_offboard_direct_message(user_rec):
             legacy_member = self.bot.get_user(user_rec['id'])
-            msg_prefix = f"_ _\n_ _\n" \
+            msg_prefix = f"_ _\n" \
                          f"Hello, {legacy_member.mention}! :wave: "
-            await legacy_member.send(f"{msg_prefix}{offboard_message}")
+            await legacy_member.send(f"{msg_prefix}\n\n{offboard_message}")
 
         await self.assign_roles_to_user(
             ctx,
