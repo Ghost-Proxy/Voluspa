@@ -1,4 +1,5 @@
-onboard_member_message = """Welcome to Ghost Proxy! <:ghost_proxy_2:455130686290919427>
+onboard_member_message = """
+Welcome to Ghost Proxy! <:ghost_proxy_2:455130686290919427>
 
 If you haven't yet, please read through our `#rules-conduct` and `#server-info` and then feel free to explore the server! A good place to start is `#voluspa`, our very own Warmind where you can set game roles, check who's online, and use a number of other helpful commands (type `$help`).
 
@@ -21,7 +22,8 @@ Thanks and eyes up, Guardian! <:cayde_thumbs_up:451649810894946314>
 _ _
 """
 
-offboard_message = """Sadly due to the Destiny clan limit, and since you haven't been in-game for a while, we need to remove you for now to make room for new members. 
+offboard_message = """
+Sadly due to the Destiny clan limit, and since you haven't been in-game for a while, we need to remove you for now to make room for new members. 
 
 However, if you do get back into the game please let us know. More than happy to invite you back! :smiley: 
 
