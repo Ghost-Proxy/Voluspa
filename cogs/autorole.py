@@ -14,6 +14,8 @@ from modules.misc import chunk_list
 
 from voluspa import CONFIG
 
+from templates.autorole import offboard_message, onboard_message
+
 from titlecase import titlecase
 
 logger = logging.getLogger('voluspa.cog.autorole')
@@ -509,7 +511,7 @@ class Autorole(commands.Cog):
         # Must be capitalized else will not unset. Presumably exact matching done somewhere up the stack
         await self.toggle_role(ctx, 'DJ', 'rythm_dj')
 
-    @commands.command(name='onboard')
+    @commands.command(name='onboard', aliases=['gpon'])
     @commands.has_role('ghost-proxy-vanguard')
     @commands.guild_only()
     async def onboard_member(self, ctx, *users: str):
@@ -522,34 +524,11 @@ class Autorole(commands.Cog):
         Can only be used by Vanguard (atm).
         """
 
-        welcome_message = """Welcome to Ghost Proxy! <:ghost_proxy_2:455130686290919427>
-
-If you haven't yet, please read through our `#rules-conduct` and `#server-info` and then feel free to explore the server! A good place to start is `#voluspa`, our very own Warmind where you can set game roles, check who's online, and use a number of other helpful commands (type `$help`).
-
-If you have any questions about anything, feel free to ask in general chat, use the `$feedback` Voluspa feature (here in a DM even), or use the `@ghost-proxy-vanguard` ping to ask for help from the Ghost Proxy admin team.
-
-\\*\\*\\*
-
-And finally, a couple of steps to do now that you are a member:
-
-1. Head to the `#charlemagne` channel and type `!register` -- you will receive a DM from Char, please follow the instructions :+1:
-
-2. Join our Steam Group <https://steamcommunity.com/groups/ghostproxy>
-
-3. Head to the `#voluspa` channel and type `$game-roles` and then add your Game Mode roles
-  (Type `$help game-roles` for more info, and also check out `$other-games` also)
-
-4. Join our Social Tower voice channel and start forming fireteams and have fun!
-
-Thanks and eyes up, Guardian! <:cayde_thumbs_up:451649810894946314>
-_ _
-        """
-
         async def send_welcome_direct_message(user_rec):
             new_member = self.bot.get_user(user_rec['id'])
             welcome_prefix = f"_ _\n_ _\n" \
                              f"Hello, {new_member.mention}! :wave: "
-            await new_member.send(f"{welcome_prefix}{welcome_message}")
+            await new_member.send(f"{welcome_prefix}{onboard_message}")
 
         async def send_welcome_guild_message(user_rec):
             new_member = self.bot.get_user(user_rec['id'])
@@ -572,6 +551,50 @@ _ _
             success_callbacks=[
                 send_welcome_direct_message,
                 send_welcome_guild_message
+            ]
+        )
+
+    @commands.command(name='offboard', aliases=['gpoff'])
+    @commands.has_role('ghost-proxy-vanguard')
+    @commands.guild_only()
+    async def offboard_member(self, ctx, *users: str):
+        """Offboards Members(s) to Legacy(s)
+
+        Currently implies _not_ a ghost-proxy-envoy (WIP)
+
+        Performs an ARL, then sends a DM to the user.
+
+        Can only be used by Vanguard (atm).
+        """
+
+        # Hmm, noticing some duplication in terms of the wrapped calls
+        # e.g. onboard/offboard and the lower level role commands
+        # would be nice to reuse a bit more if possible
+
+        async def send_offboard_direct_message(user_rec):
+            legacy_member = self.bot.get_user(user_rec['id'])
+            msg_prefix = f"_ _\n_ _\n" \
+                         f"Hello, {legacy_member.mention}! :wave: "
+            await legacy_member.send(f"{msg_prefix}{offboard_message}")
+
+        await self.assign_roles_to_user(
+            ctx,
+            'ghost_proxy_roles',
+            [
+                'ghost-proxy-friend',
+                'ghost-proxy-legacy',
+            ],
+            users,
+            role_limits=[
+                'ghost-proxy-member',
+                'ghost-proxy-veteran',
+                'raid-lead',
+                'crucible-lead',
+                'gambit-lead',
+                'strike-nf-pve-lead'
+            ],
+            success_callbacks=[
+                send_offboard_direct_message
             ]
         )
 
