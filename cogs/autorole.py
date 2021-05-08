@@ -525,7 +525,7 @@ class Autorole(commands.Cog):
             new_member = self.bot.get_user(user_rec['id'])
             welcome_prefix = f"_ _\n" \
                              f"Hello, {new_member.mention}! :wave: "
-            await new_member.send(f"{welcome_prefix}\n\n{onboard_member_message}")
+            await new_member.send(f"{welcome_prefix}\n{onboard_member_message}")
 
         async def send_welcome_guild_message(user_rec):
             new_member = self.bot.get_user(user_rec['id'])
@@ -572,7 +572,7 @@ class Autorole(commands.Cog):
             legacy_member = self.bot.get_user(user_rec['id'])
             msg_prefix = f"_ _\n" \
                          f"Hello, {legacy_member.mention}! :wave: "
-            await legacy_member.send(f"{msg_prefix}\n\n{offboard_message}")
+            await legacy_member.send(f"{msg_prefix}\n{offboard_message}")
 
         await self.assign_roles_to_user(
             ctx,
@@ -612,7 +612,7 @@ class Autorole(commands.Cog):
             new_friend = self.bot.get_user(user_rec['id'])
             msg_prefix = f"_ _\n" \
                          f"Hello, {new_friend.mention}! :wave: "
-            await new_friend.send(f"{msg_prefix}\n\n{onboard_friend_message}")
+            await new_friend.send(f"{msg_prefix}\n{onboard_friend_message}")
 
         await self.assign_roles_to_user(
             ctx,
