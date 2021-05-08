@@ -144,7 +144,8 @@ class Autorole(commands.Cog):
                                    # role_limit: str = None,
                                    role_limits: Sequence[str] = None,
                                    action: str = 'add',
-                                   success_callbacks: Sequence[Any] = None):
+                                   success_callbacks: Sequence[Any] = None,
+                                   allow_conflict_resolution: bool = True):
         # Args are multiple user names (potentially _n_)
         # Search member list for each user name provided
         #  - if more then one user name matches, return a list of matches and ask for a retry
@@ -213,48 +214,52 @@ class Autorole(commands.Cog):
                 if role_limits:
                     conflicting_roles = [role for role in role_limits if role in user_matches[0]['roles']]
                     if conflicting_roles:
-                        conflict_roles_embed = default_embed(
-                            title='Role Update Error',
-                            description=f'\n:no_entry: Sorry, could not immediately change Roles for:\n\n'
-                            f'`{user_matches[0]["name"]}#{user_matches[0]["salt"]} ({user_matches[0]["nick"]})`'
-                            f'\n\nUser has the following conflicting Role(s):{format_list(conflicting_roles)}',
-                            color=STYLES.colors.danger
-                        )
-                        await ctx.send(f'{ctx.message.author.mention}', embed=conflict_roles_embed)
+                        if allow_conflict_resolution:
+                            conflict_roles_embed = default_embed(
+                                title='Role Update Error',
+                                description=f'\n:no_entry: Sorry, could not immediately change Roles for:\n\n'
+                                f'`{user_matches[0]["name"]}#{user_matches[0]["salt"]} ({user_matches[0]["nick"]})`'
+                                f'\n\nUser has the following conflicting Role(s):{format_list(conflicting_roles)}',
+                                color=STYLES.colors.danger
+                            )
+                            await ctx.send(f'{ctx.message.author.mention}', embed=conflict_roles_embed)
 
-                        conflict_embed = default_embed(
-                            title='Role Conflict',
-                            description='\nWould you like to remove the conflicting role(s)'
-                            ' and continue with role updates?\n\n'
-                            '  To remove the role and continue select :white_check_mark:\n'
-                            '  To cancel the role change command select :no_entry:',
-                            color=STYLES.colors.warning
-                        )
-                        role_conflict_msg = await ctx.send(embed=conflict_embed)
-                        # TODO: Ask for a reset of conflicting role here :check
-                        ok_to_update_roles = await self.handle_role_conflict(ctx, role_conflict_msg)
+                            conflict_embed = default_embed(
+                                title='Role Conflict',
+                                description='\nWould you like to remove the conflicting role(s)'
+                                ' and continue with role updates?\n\n'
+                                '  To remove the role and continue select :white_check_mark:\n'
+                                '  To cancel the role change command select :no_entry:',
+                                color=STYLES.colors.warning
+                            )
+                            role_conflict_msg = await ctx.send(embed=conflict_embed)
+                            # TODO: Ask for a reset of conflicting role here :check
+                            ok_to_update_roles = await self.handle_role_conflict(ctx, role_conflict_msg)
 
-                        if ok_to_update_roles:
-                            # Remove conflicting roles
-                            roles_removed = []
-                            for conf_role in conflicting_roles:
-                                rm_role = await self.update_roles(
-                                    ctx,
-                                    role_class,
-                                    [conf_role],  # Could technically pass in the list of roles...
-                                    user_id=user_matches[0]['id'],
-                                    options={
-                                        'confirm': False,
-                                        'action': 'remove'
-                                    }
-                                )
-                                if rm_role:
-                                    roles_removed.append(conf_role)
+                            if ok_to_update_roles:
+                                # Remove conflicting roles
+                                roles_removed = []
+                                for conf_role in conflicting_roles:
+                                    rm_role = await self.update_roles(
+                                        ctx,
+                                        role_class,
+                                        [conf_role],  # Could technically pass in the list of roles...
+                                        user_id=user_matches[0]['id'],
+                                        options={
+                                            'confirm': False,
+                                            'action': 'remove'
+                                        }
+                                    )
+                                    if rm_role:
+                                        roles_removed.append(conf_role)
 
-                            ok_to_update_roles = set(conflicting_roles) == set(roles_removed)
-                            if not ok_to_update_roles:
-                                logger.info('Error during conflict role updating!')
-                                await ctx.send(':no_entry: ERROR: Problem updating conflicting roles!')
+                                ok_to_update_roles = set(conflicting_roles) == set(roles_removed)
+                                if not ok_to_update_roles:
+                                    logger.info('Error during conflict role updating!')
+                                    await ctx.send(':no_entry: ERROR: Problem updating conflicting roles!')
+                        else:
+                            await ctx.send(':no_entry: Sorry, not allowed to resolve user role conflicts.')
+                            ok_to_update_roles = False
 
                 if ok_to_update_roles:
 
@@ -609,9 +614,6 @@ class Autorole(commands.Cog):
                          f"Hello, {new_friend.mention}! :wave: "
             await new_friend.send(f"{msg_prefix}\n\n{onboard_friend_message}")
 
-        # Check if has any role and bail
-        #                 'ghost-proxy-member', legacy, envoy
-
         await self.assign_roles_to_user(
             ctx,
             'ghost_proxy_roles',
@@ -619,9 +621,15 @@ class Autorole(commands.Cog):
                 'ghost-proxy-friend',
             ],
             users,
+            role_limits=[
+                'ghost-proxy-member',
+                'ghost-proxy-legacy',
+                'ghost-proxy-envoy',
+            ],
             success_callbacks=[
                 send_friend_direct_message
-            ]
+            ],
+            allow_conflict_resolution=False
         )
 
     @commands.command(name='set-member', aliases=['p2m', 'arm'])
