@@ -16,7 +16,7 @@ And finally, a couple of steps to do now that you are a member:
 3. Head to the `#voluspa` channel and type `$game-roles` and then add your Game Mode roles
   (Type `$help game-roles` for more info, and also check out `$other-games`!)
 
-4. Join our Social Tower voice channel, start forming fireteams, checkout out the `#lfg` channel, and most importantly, have fun!
+4. Join our Social Tower voice channel, start forming fireteams, browse the `#lfg` and game mode channels, and most importantly, have fun!
 
 Thanks and eyes up, Guardian! <:cayde_thumbs_up:451649810894946314>
 _ _
@@ -31,7 +31,7 @@ Also, you are totally welcome to stay in the GP Discord and chat/group for games
 
 Best wishes and hope to see you around! :heart:
 
-- The GP Mod Team
+- The GP Admin Team
 _ _
 """
 
@@ -51,7 +51,7 @@ And finally, a couple of steps to do now that you have arrived:
 2. Head to the `#voluspa` channel and type `$game-roles` and then add your Game Mode roles
   (Type `$help game-roles` for more info, and also check out `$other-games`!)
 
-3. Join our Social Tower voice channel, start forming fireteams, checkout out the `#lfg` channel, and most importantly, have fun!
+3. Join our Social Tower voice channel, start forming fireteams, browse the `#lfg` and game mode channels, and most importantly, have fun!
 
 Thanks and eyes up, Guardian! <:cayde_thumbs_up:451649810894946314>
 _ _
