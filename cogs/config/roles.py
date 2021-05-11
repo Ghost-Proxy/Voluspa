@@ -58,7 +58,8 @@ ROLES = {
             },
             'topics': {
                 'current-events': ['current events', 'ce', 'current-events', 'politics', 'news'],
-                'stonks': ['stonks', 'stocks', 'finances', 'financial']
+                'stonks': ['stonks', 'stocks', 'finances', 'financial'],
+                'vog': ['vog', 'vault', 'glass', 'vault of glass']
             },
             'ghost_proxy_roles': {  # Based on Function String
                 'ghost-proxy-friend': ['gpf', 'gp-friend', 'ghost-proxy-friend'],

@@ -487,6 +487,16 @@ class Autorole(commands.Cog):
         """
         await self.toggle_role(ctx, 'stonks', 'topics')
 
+    @commands.command(name='vog')
+    @commands.has_any_role('ghost-proxy-member', 'ghost-proxy-friend')
+    @commands.guild_only()
+    async def vog_toggle(self, ctx):
+        """Toggles the Vault of Glass spoiler role
+
+        Can only be used by Ghost Proxy Members or Friends.
+        """
+        await self.toggle_role(ctx, 'vog', 'topics')
+
     @commands.command(name='sherpa', aliases=['s'])
     @commands.has_role('ghost-proxy-member')
     @commands.guild_only()
