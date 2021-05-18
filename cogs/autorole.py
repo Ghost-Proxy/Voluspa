@@ -353,6 +353,13 @@ class Autorole(commands.Cog):
 
         Uses either short names like 'c' for crucible, or full names like 'gambit'.
 
+        ```
+        c crucible
+        g gambit
+        r raid
+        s strike-nf-pve
+        ```
+
         Multiple roles can be added at once, e.g. `$lfg-add c g` adds @crucible and @gambit.
         """
         # $lfg (no param) -- Lists current LFG roles set
@@ -371,6 +378,13 @@ class Autorole(commands.Cog):
         """Removes Game Mode roles for @ pings
 
         Uses either short names like 'c' for crucible, or full names like 'gambit'.
+
+        ```
+        c crucible
+        g gambit
+        r raid
+        s strike-nf-pve
+        ```
 
         Multiple roles can be removed at once, e.g. `$lfg-remove c g` removes @crucible and @gambit.
         """
