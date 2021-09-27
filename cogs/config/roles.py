@@ -32,6 +32,7 @@ ROLES = {
         'og-lol': ['league of legends', 'lol', 'league'],
         'og-mc': ['minecraft', 'mc'],
         'og-mhw': ['monster hunter world', 'mh', 'mhw', 'monster', 'monster hunter'],
+        'og-nw': ['new world', 'nw'],
         'og-osu': ['osu'],
         'og-ow': ['overwatch', 'ow'],
         'og-rage': ['rage 2', 'rage'],
