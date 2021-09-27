@@ -186,9 +186,9 @@ class Polls(commands.Cog):
     async def collate_poll(self, ctx, *poll_ids: str):
         """Summarises the given poll references
 
-        Use $cd for dark theme
+        Use $prd for dark theme
 
-        Use $c c<channel-id> <poll-args>... to specify a channel to pull from
+        Use $pr c<channel-id> <poll-args>... to specify a channel to pull from
         """
 
         logger.info(f'Collating {len(poll_ids)} polls')
