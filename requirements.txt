@@ -12,7 +12,7 @@ aiohttp>=3.7.4
 fuzzywuzzy[speedup]==0.17.0
 
 # API's
-discord.py[voice]==1.5.1
+discord.py[voice]==1.7.3
 
 # CHARTS
 matplotlib>=3.1.1
