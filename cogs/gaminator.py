@@ -86,8 +86,7 @@ class Gaminator(commands.Cog):
     async def other_games(self, ctx):
         """Wizard to enable channels of other games
 
-        Provides a role wizard that adds specific other game @ roles
-        and makes the related Other Game channel visible.
+        Provides a role wizard that adds specific other game @ roles and makes the related Other Game channel visible.
         """
         logger.info(f'{ctx.message.author} called other_games')
 
