@@ -30,6 +30,7 @@ ROLES = {
         'og-hunt': ['hunt showdown', 'hunt', 'the hunt'],
         'og-kart': ['mario kart 8', 'kart', 'mario kart'],
         'og-lol': ['league of legends', 'lol', 'league'],
+        'og-lost': ['lost ark', 'la', 'lost', 'ark'],
         'og-mc': ['minecraft', 'mc'],
         'og-mhw': ['monster hunter world', 'mh', 'mhw', 'monster', 'monster hunter'],
         'og-nw': ['new world', 'nw'],
