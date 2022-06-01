@@ -14,6 +14,8 @@ from modules.misc import chunk_list
 
 from voluspa import CONFIG
 
+from templates.autorole import offboard_message, onboard_member_message, onboard_friend_message
+
 from titlecase import titlecase
 
 logger = logging.getLogger('voluspa.cog.autorole')
@@ -34,12 +36,9 @@ def process_role_inputs(role_inputs, role_dict, allow_all=False):
 
 
 def match_users(user_list, username):
-    print(f'USERNAME REC: {username}')
     matched_users = [user for user in user_list if username[0] in user['name'] or username[0] in user['nick']]
-    print(f'>>> Match results before salt: {matched_users}')
     if len(username) >= 2:
         matched_users = [user for user in matched_users if user['salt'] == username[1]]
-    print(f'>>> Match results AFTER salt: {matched_users}')
     return matched_users
 
 
@@ -98,9 +97,6 @@ class Autorole(commands.Cog):
             logger.info(f'update_roles - roles_input: {roles}')
             roles_to_update = process_role_inputs(roles, role_dict, allow_all=allow_all)
 
-            print(f'Roles to Update: {roles_to_update}')
-            print(f'Role Dict: {role_dict}')
-
             if not list(roles_to_update):
                 return
 
@@ -116,7 +112,6 @@ class Autorole(commands.Cog):
 
             # TODO: Add check if roles are already applied and avoid doing it again?
 
-            print(f'"Updating Roles (action: {action}): {updated_roles}')
             if user_id:
                 user = ctx.guild.get_member(user_id)
             else:
@@ -149,7 +144,8 @@ class Autorole(commands.Cog):
                                    # role_limit: str = None,
                                    role_limits: Sequence[str] = None,
                                    action: str = 'add',
-                                   success_callbacks: Sequence[Any] = None):
+                                   success_callbacks: Sequence[Any] = None,
+                                   allow_conflict_resolution: bool = True):
         # Args are multiple user names (potentially _n_)
         # Search member list for each user name provided
         #  - if more then one user name matches, return a list of matches and ask for a retry
@@ -199,7 +195,6 @@ class Autorole(commands.Cog):
 
         multiple_users_found = False
         for user_rec in user_results:
-            print(f'USER REC: {user_rec} | type: {type(user_rec)}')
             req_user = list(user_rec.keys())[0]
             user_matches = user_rec[req_user]
             if len(user_matches) > 1:
@@ -219,48 +214,52 @@ class Autorole(commands.Cog):
                 if role_limits:
                     conflicting_roles = [role for role in role_limits if role in user_matches[0]['roles']]
                     if conflicting_roles:
-                        conflict_roles_embed = default_embed(
-                            title='Role Update Error',
-                            description=f'\n:no_entry: Sorry, could not immediately change Roles for:\n\n'
-                            f'`{user_matches[0]["name"]}#{user_matches[0]["salt"]} ({user_matches[0]["nick"]})`'
-                            f'\n\nUser has the following conflicting Role(s):{format_list(conflicting_roles)}',
-                            color=STYLES.colors.danger
-                        )
-                        await ctx.send(f'{ctx.message.author.mention}', embed=conflict_roles_embed)
+                        if allow_conflict_resolution:
+                            conflict_roles_embed = default_embed(
+                                title='Role Update Error',
+                                description=f'\n:no_entry: Sorry, could not immediately change Roles for:\n\n'
+                                f'`{user_matches[0]["name"]}#{user_matches[0]["salt"]} ({user_matches[0]["nick"]})`'
+                                f'\n\nUser has the following conflicting Role(s):{format_list(conflicting_roles)}',
+                                color=STYLES.colors.danger
+                            )
+                            await ctx.send(f'{ctx.message.author.mention}', embed=conflict_roles_embed)
 
-                        conflict_embed = default_embed(
-                            title='Role Conflict',
-                            description='\nWould you like to remove the conflicting role(s)'
-                            ' and continue with role updates?\n\n'
-                            '  To remove the role and continue select :white_check_mark:\n'
-                            '  To cancel the role change command select :no_entry:',
-                            color=STYLES.colors.warning
-                        )
-                        role_conflict_msg = await ctx.send(embed=conflict_embed)
-                        # TODO: Ask for a reset of conflicting role here :check
-                        ok_to_update_roles = await self.handle_role_conflict(ctx, role_conflict_msg)
+                            conflict_embed = default_embed(
+                                title='Role Conflict',
+                                description='\nWould you like to remove the conflicting role(s)'
+                                ' and continue with role updates?\n\n'
+                                '  To remove the role and continue select :white_check_mark:\n'
+                                '  To cancel the role change command select :no_entry:',
+                                color=STYLES.colors.warning
+                            )
+                            role_conflict_msg = await ctx.send(embed=conflict_embed)
+                            # TODO: Ask for a reset of conflicting role here :check
+                            ok_to_update_roles = await self.handle_role_conflict(ctx, role_conflict_msg)
 
-                        if ok_to_update_roles:
-                            # Remove conflicting roles
-                            roles_removed = []
-                            for conf_role in conflicting_roles:
-                                rm_role = await self.update_roles(
-                                    ctx,
-                                    role_class,
-                                    [conf_role],  # Could technically pass in the list of roles...
-                                    user_id=user_matches[0]['id'],
-                                    options={
-                                        'confirm': False,
-                                        'action': 'remove'
-                                    }
-                                )
-                                if rm_role:
-                                    roles_removed.append(conf_role)
+                            if ok_to_update_roles:
+                                # Remove conflicting roles
+                                roles_removed = []
+                                for conf_role in conflicting_roles:
+                                    rm_role = await self.update_roles(
+                                        ctx,
+                                        role_class,
+                                        [conf_role],  # Could technically pass in the list of roles...
+                                        user_id=user_matches[0]['id'],
+                                        options={
+                                            'confirm': False,
+                                            'action': 'remove'
+                                        }
+                                    )
+                                    if rm_role:
+                                        roles_removed.append(conf_role)
 
-                            ok_to_update_roles = set(conflicting_roles) == set(roles_removed)
-                            if not ok_to_update_roles:
-                                logger.info('Error during conflict role updating!')
-                                await ctx.send(':no_entry: ERROR: Problem updating conflicting roles!')
+                                ok_to_update_roles = set(conflicting_roles) == set(roles_removed)
+                                if not ok_to_update_roles:
+                                    logger.info('Error during conflict role updating!')
+                                    await ctx.send(':no_entry: ERROR: Problem updating conflicting roles!')
+                        else:
+                            await ctx.send(':no_entry: Sorry, not allowed to resolve user role conflicts.')
+                            ok_to_update_roles = False
 
                 if ok_to_update_roles:
 
@@ -338,7 +337,7 @@ class Autorole(commands.Cog):
             await ctx.send(f'Request timed out... :(')
             return False
         else:
-            print(f'reaction_emoji: {reaction} | {reaction.emoji}')
+            # print(f'reaction_emoji: {reaction} | {reaction.emoji}')
             # await ctx.send(f'Received reaction: {reaction.emoji} from user: {user}')
             if reaction.emoji == react_unicode['yes']:
                 return True
@@ -353,6 +352,13 @@ class Autorole(commands.Cog):
         """Adds Game Mode roles for @ pings
 
         Uses either short names like 'c' for crucible, or full names like 'gambit'.
+
+        ```
+        c crucible
+        g gambit
+        r raid
+        s strike-nf-pve
+        ```
 
         Multiple roles can be added at once, e.g. `$lfg-add c g` adds @crucible and @gambit.
         """
@@ -372,6 +378,13 @@ class Autorole(commands.Cog):
         """Removes Game Mode roles for @ pings
 
         Uses either short names like 'c' for crucible, or full names like 'gambit'.
+
+        ```
+        c crucible
+        g gambit
+        r raid
+        s strike-nf-pve
+        ```
 
         Multiple roles can be removed at once, e.g. `$lfg-remove c g` removes @crucible and @gambit.
         """
@@ -488,6 +501,16 @@ class Autorole(commands.Cog):
         """
         await self.toggle_role(ctx, 'stonks', 'topics')
 
+    @commands.command(name='vog')
+    @commands.has_any_role('ghost-proxy-member', 'ghost-proxy-friend')
+    @commands.guild_only()
+    async def vog_toggle(self, ctx):
+        """Toggles the Vault of Glass spoiler role
+
+        Can only be used by Ghost Proxy Members or Friends.
+        """
+        await self.toggle_role(ctx, 'vog', 'topics')
+
     @commands.command(name='sherpa', aliases=['s'])
     @commands.has_role('ghost-proxy-member')
     @commands.guild_only()
@@ -509,7 +532,7 @@ class Autorole(commands.Cog):
         # Must be capitalized else will not unset. Presumably exact matching done somewhere up the stack
         await self.toggle_role(ctx, 'DJ', 'rythm_dj')
 
-    @commands.command(name='onboard')
+    @commands.command(name='onboard', aliases=['gpon'])
     @commands.has_role('ghost-proxy-vanguard')
     @commands.guild_only()
     async def onboard_member(self, ctx, *users: str):
@@ -522,34 +545,11 @@ class Autorole(commands.Cog):
         Can only be used by Vanguard (atm).
         """
 
-        welcome_message = """Welcome to Ghost Proxy! <:ghost_proxy_2:455130686290919427>
-
-If you haven't yet, please read through our `#rules-conduct` and `#server-info` and then feel free to explore the server! A good place to start is `#voluspa`, our very own Warmind where you can set game roles, check who's online, and use a number of other helpful commands (type `$help`).
-
-If you have any questions about anything, feel free to ask in general chat, use the `$feedback` Voluspa feature (here in a DM even), or use the `@ghost-proxy-vanguard` ping to ask for help from the Ghost Proxy admin team.
-
-\\*\\*\\*
-
-And finally, a couple of steps to do now that you are a member:
-
-1. Head to the `#charlemagne` channel and type `!register` -- you will receive a DM from Char, please follow the instructions :+1:
-
-2. Join our Steam Group <https://steamcommunity.com/groups/ghostproxy>
-
-3. Head to the `#voluspa` channel and type `$game-roles` and then add your Game Mode roles
-  (Type `$help game-roles` for more info, and also check out `$other-games` also)
-
-4. Join our Social Tower voice channel and start forming fireteams and have fun!
-
-Thanks and eyes up, Guardian! <:cayde_thumbs_up:451649810894946314>
-_ _
-        """
-
         async def send_welcome_direct_message(user_rec):
             new_member = self.bot.get_user(user_rec['id'])
-            welcome_prefix = f"_ _\n_ _\n" \
+            welcome_prefix = f"_ _\n" \
                              f"Hello, {new_member.mention}! :wave: "
-            await new_member.send(f"{welcome_prefix}{welcome_message}")
+            await new_member.send(f"{welcome_prefix}\n{onboard_member_message}")
 
         async def send_welcome_guild_message(user_rec):
             new_member = self.bot.get_user(user_rec['id'])
@@ -573,6 +573,87 @@ _ _
                 send_welcome_direct_message,
                 send_welcome_guild_message
             ]
+        )
+
+    @commands.command(name='offboard', aliases=['gpoff'])
+    @commands.has_role('ghost-proxy-vanguard')
+    @commands.guild_only()
+    async def offboard_member(self, ctx, *users: str):
+        """Offboards Members(s) to Legacy(s)
+
+        Currently implies _not_ a ghost-proxy-envoy (WIP)
+
+        Performs an ARL, then sends a DM to the user.
+
+        Can only be used by Vanguard (atm).
+        """
+
+        # Hmm, noticing some duplication in terms of the wrapped calls
+        # e.g. onboard/offboard and the lower level role commands
+        # would be nice to reuse a bit more if possible
+
+        async def send_offboard_direct_message(user_rec):
+            legacy_member = self.bot.get_user(user_rec['id'])
+            msg_prefix = f"_ _\n" \
+                         f"Hello, {legacy_member.mention}! :wave: "
+            await legacy_member.send(f"{msg_prefix}\n{offboard_message}")
+
+        await self.assign_roles_to_user(
+            ctx,
+            'ghost_proxy_roles',
+            [
+                'ghost-proxy-friend',
+                'ghost-proxy-legacy',
+            ],
+            users,
+            role_limits=[
+                'ghost-proxy-member',
+                'ghost-proxy-veteran',
+                'raid-lead',
+                'crucible-lead',
+                'gambit-lead',
+                'strike-nf-pve-lead'
+            ],
+            success_callbacks=[
+                send_offboard_direct_message
+            ]
+        )
+
+    @commands.command(name='friend', aliases=['gpfri'])
+    @commands.has_role('ghost-proxy-vanguard')
+    @commands.guild_only()
+    async def onboard_friend(self, ctx, *users: str):
+        """Onboards Non-Role(s) to Friend(s)
+
+        Currently implies _not_ a ghost-proxy-envoy (WIP)
+
+        Performs an ARL, then sends a DM to the user.
+
+        Can only be used by Vanguard (atm).
+        """
+
+        async def send_friend_direct_message(user_rec):
+            new_friend = self.bot.get_user(user_rec['id'])
+            msg_prefix = f"_ _\n" \
+                         f"Hello, {new_friend.mention}! :wave: "
+            await new_friend.send(f"{msg_prefix}\n{onboard_friend_message}")
+
+        await self.assign_roles_to_user(
+            ctx,
+            'ghost_proxy_roles',
+            [
+                'ghost-proxy-friend',
+            ],
+            users,
+            role_limits=[
+                'ghost-proxy-member',
+                'ghost-proxy-legacy',
+                'ghost-proxy-envoy',
+            ],
+            success_callbacks=[
+                send_friend_direct_message
+            ],
+            allow_conflict_resolution=False
         )
 
     @commands.command(name='set-member', aliases=['p2m', 'arm'])
