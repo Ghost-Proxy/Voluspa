@@ -21,6 +21,7 @@ ROLES = {
         'og-dl': ['dying light', 'dl'],
         'og-dota': ['dota 2', 'dota', 'defense of the ancients 2'],
         'og-eft': ['escape from tarkov', 'eft', 'tarkov'],
+        'og-elden': ['elden ring', 'er', 'elden'],
         'og-f76': ['fallout 76', 'f76', 'fallout', 'fallout online'],
         'og-ffxiv': ['final fantasy xiv', 'ffxiv'],
         'og-gr': ['ghost recon', 'gr', 'grw', 'grb', 'ghost recon wildlands', 'ghost recon breakpoint'],
