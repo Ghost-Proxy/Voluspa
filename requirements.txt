@@ -34,7 +34,7 @@ asyncpg==0.21.0
 
 # CACHE
 # https://github.com/argaen/aiocache
-ujson==1.35
+ujson==5.2.0
 msgpack==0.6.2
 # aiocache[redis,memcached]==0.10.1
 aiocache[redis,memcached]==0.11.1
