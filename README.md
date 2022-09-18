@@ -22,7 +22,7 @@
 
 3. Install Python and related packages
 
-`apt install python3.8 python3.8-dev python3.8-venv python3-pip`
+`apt install python3.9 python3.9-dev python3.9-venv python3-pip`
 
 4. Clone the Voluspa repository
 
@@ -34,15 +34,15 @@
 
 6. Create and enter a virtual environment
 
-`python3.8 -m venv ./venv && source venv/bin/activate`
+`python3.9 -m venv ./venv && source venv/bin/activate`
 
 7. Upgrade pip
 
-`python3.8 -m pip install -U pip`
+`python3.9 -m pip install -U pip`
 
 8. If building dependencies from source, you will need wheel
 
-`python3.8 -m pip install wheel`
+`python3.9 -m pip install wheel`
 
 9. Install dependencies
 
@@ -56,7 +56,7 @@
 
 11. Start Voluspa
 
-`python3.8 voluspa.py`
+`python3.9 voluspa.py`
 
 12. Happy coding and have fun!
 
