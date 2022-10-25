@@ -35,5 +35,5 @@ class Feedback(commands.Cog):
         logger.info('Feedback has been sent.')
 
 
-def setup(bot):
-    bot.add_cog(Feedback(bot))
+async def setup(bot):
+    await bot.add_cog(Feedback(bot))

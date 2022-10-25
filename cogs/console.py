@@ -13,4 +13,4 @@ class Console(JishakuBase, metaclass=GroupCogMeta, command_parent=jk):
 
 
 def setup(bot: commands.Bot):
-    bot.add_cog(Console(bot))
+    await bot.add_cog(Console(bot))

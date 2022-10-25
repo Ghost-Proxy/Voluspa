@@ -50,5 +50,5 @@ class CogControl(commands.Cog):
             await ctx.send('**`SUCCESS`**')
 
 
-def setup(bot):
-    bot.add_cog(CogControl(bot))
+async def setup(bot):
+    await bot.add_cog(CogControl(bot))

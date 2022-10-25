@@ -130,5 +130,5 @@ class Utilities(commands.Cog):
         await ctx.send(embed=datetime_embed)
 
 
-def setup(bot):
-    bot.add_cog(Utilities(bot))
+async def setup(bot):
+    await bot.add_cog(Utilities(bot))

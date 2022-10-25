@@ -110,5 +110,5 @@ class Systems(commands.Cog):
         await ctx.send(embed=confirm_embed)
 
 
-def setup(bot):
-    bot.add_cog(Systems(bot))
+async def setup(bot):
+    await bot.add_cog(Systems(bot))

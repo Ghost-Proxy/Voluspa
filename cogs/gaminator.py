@@ -151,5 +151,5 @@ class Gaminator(commands.Cog):
             self.bot.get_command('game-roles').reset_cooldown(ctx)
 
 
-def setup(bot):
-    bot.add_cog(Gaminator(bot))
+async def setup(bot):
+    await bot.add_cog(Gaminator(bot))
