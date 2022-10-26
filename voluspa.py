@@ -22,6 +22,7 @@ from modules.exceptions import VoluspaError, BungieAPIError, BungieAPIOffline
 
 # Third-Party Imports
 import discord
+from discord import app_commands
 from discord.ext import commands
 
 # UVloop
@@ -199,6 +200,13 @@ async def on_command_error(ctx, error):
 
     traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
 
+# https://github.com/Rapptz/RoboDanny/blob/rewrite/cogs/stats.py
+async def on_app_command_error(interaction: discord.Interaction, error: discord.app_commands.AppCommandError) -> None:
+    if isinstance(error, app_commands.errors.CommandOnCooldown):
+        await interaction.response.send_message("This command is on cooldown, please retry in {}s.".format(math.ceil(error.retry_after)))
+        return
+
+bot.tree.on_error = on_app_command_error
 
 # TODO: Get Error Handling working...
 # @bot.event
