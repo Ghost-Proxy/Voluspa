@@ -92,6 +92,8 @@ async def on_ready():
 
     bot.loop.create_task(update_status_task(bot, quotes))
 
+    await bot.tree.sync()
+
     # ' bot.send_message('message.channel')
     # ' general_channel = discord.Object(id='channel_id_here')
     # ' await bot.send_message(message.channel, fmt.format(message))
