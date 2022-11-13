@@ -82,5 +82,5 @@ class FunStuff(commands.Cog):
     #     await ctx.send(req.text)
 
 
-def setup(bot):
-    bot.add_cog(FunStuff(bot))
+async def setup(bot):
+    await bot.add_cog(FunStuff(bot))

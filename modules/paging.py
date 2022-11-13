@@ -69,7 +69,7 @@ class _MenuBase:
         menu_field = self._get_menu_field()
         self._menu_embed.set_field_at(self._menu_field_index, name=f'Page {self._current_page_index + 1}/{len(self._pages)}', value=menu_field, inline=False)
 
-        await self._menu_msg.edit(embed=self._menu_embed)
+        self._menu_msg = await self._menu_msg.edit(embed=self._menu_embed)
         await self._set_reactions()
 
 
@@ -230,7 +230,7 @@ class MenuWithOptions(_MenuBase):
                 self._selected_options.remove(self._pages[self._current_page_index][index_of_ri(reaction.emoji)])
 
             self.update_feedback_ui()
-            await self._menu_msg.edit(embed=self._menu_embed)
+            self._menu_msg = await self._menu_msg.edit(embed=self._menu_embed)
 
             return False
 
@@ -321,7 +321,7 @@ class MenuWithCustomOptions(MenuWithOptions):
                 self._selected_options.remove(self._pages[self._current_page_index][reaction.emoji])
 
             self.update_feedback_ui()
-            await self._menu_msg.edit(embed=self._menu_embed)
+            self._menu_msg = await self._menu_msg.edit(embed=self._menu_embed)
 
             return False
 

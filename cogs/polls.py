@@ -135,7 +135,7 @@ class Polls(commands.Cog):
                 poll_embed=gen_poll_embed(poll_args)
                 result_msg = await ctx.send(embed=poll_embed)
                 poll_embed.add_field(name="Poll Reference", value=result_msg.id)
-                await result_msg.edit(embed=poll_embed)
+                result_msg = await result_msg.edit(embed=poll_embed)
 
             react_char = '\U0001f1e6'
             for arg_iter in range(1, len(poll_args)):
@@ -264,5 +264,5 @@ class Polls(commands.Cog):
                 png_wrapper.close()
                 plt.close()
 
-def setup(bot):
-    bot.add_cog(Polls(bot))
+async def setup(bot):
+    await bot.add_cog(Polls(bot))

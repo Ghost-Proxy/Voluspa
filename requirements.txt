@@ -2,7 +2,7 @@
 PyYAML==5.4
 
 # ASYNC
-uvloop==0.14.0
+uvloop==0.17.0
 
 # HTTP
 requests==2.22.0
@@ -12,7 +12,7 @@ aiohttp>=3.7.4
 fuzzywuzzy[speedup]==0.17.0
 
 # API's
-discord.py[voice]==1.7.3
+discord.py[voice]==2.0.1
 
 # CHARTS
 matplotlib>=3.1.1
@@ -23,7 +23,7 @@ emoji==0.5.4
 titlecase==0.12.0
 
 # Discord.py DEBUG
-jishaku==1.17.1.181
+jishaku==2.5.1
 
 # TESTING
 # tox==3.13.2

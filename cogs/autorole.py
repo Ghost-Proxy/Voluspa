@@ -930,5 +930,5 @@ class Autorole(commands.Cog):
     #     return member_list
 
 
-def setup(bot):
-    bot.add_cog(Autorole(bot))
+async def setup(bot):
+    await bot.add_cog(Autorole(bot))

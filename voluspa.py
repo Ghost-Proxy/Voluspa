@@ -40,6 +40,7 @@ caches.set_config(CONFIG.Voluspa.cache)
 intents = discord.Intents.default()
 intents.members = True
 intents.presences = True
+intents.message_content = True
 
 # Setup Initial Stuff
 client = discord.Client(intents=intents)
@@ -231,14 +232,15 @@ async def on_command_error(ctx, error):
 #     traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
 
 
-def main():
+async def main():
     logger.info('// Völuspá / Booting...')
 
     logger.info('Starting bot...')
-    for extension in cog_extensions:
-        bot.load_extension(extension)
-    bot.run(CONFIG.Discord.api_key)
+    async with bot:
+        for extension in cog_extensions:
+            await bot.load_extension(extension)
+        await bot.start(CONFIG.Discord.api_key)
 
 
 if __name__ == '__main__':
-    main()
+    asyncio.run(main())
