@@ -51,7 +51,7 @@ async def gen_polls_from_ids(ctx, poll_ids, id_fetch_point):
 
 def gen_poll_options(poll):
     for option in poll.embeds[0].description.split("\n"):
-        key = emoji.emojize(option[:option.find(' ')], use_aliases=True)
+        key = emoji.emojize(option[:option.find(' ')], language='alias')
         desc = option[option.find(' ') + 1:]
 
         # If polls options don't match reactions, list has been messed with
