@@ -201,10 +201,69 @@ async def on_command_error(ctx, error):
     traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
 
 # https://github.com/Rapptz/RoboDanny/blob/rewrite/cogs/stats.py
-async def on_app_command_error(interaction: discord.Interaction, error: discord.app_commands.AppCommandError) -> None:
-    if isinstance(error, app_commands.errors.CommandOnCooldown):
+async def on_app_command_error(interaction: discord.Interaction, error: app_commands.AppCommandError) -> None:
+    # Why is this necessary?
+    error = getattr(error, 'original', error)
+
+    if isinstance(error, app_commands.CommandNotFound):
+        return
+
+    if isinstance(error, app_commands.BotMissingPermissions):
+        missing = [perm.replace('_', ' ').replace('guild', 'server').title() for perm in error.missing_permissions]
+        if len(missing) > 2:
+            fmt = '{}, and {}'.format("**, **".join(missing[:-1]), missing[-1])
+        else:
+            fmt = ' and '.join(missing)
+        _message = 'I need the **{}** permission(s) to run this command.'.format(fmt)
+        await interaction.response.send_message(_message)
+        return
+
+    # if isinstance(error, commands.DisabledCommand):
+    #     await ctx.send('This command has been disabled.')
+    #     return
+    
+    if isinstance(error, app_commands.CommandOnCooldown):
         await interaction.response.send_message("This command is on cooldown, please retry in {}s.".format(math.ceil(error.retry_after)))
         return
+
+    if isinstance(error, app_commands.MissingPermissions):
+        missing = [perm.replace('_', ' ').replace('guild', 'server').title() for perm in error.missing_permissions]
+        if len(missing) > 2:
+            fmt = '{}, and {}'.format("**, **".join(missing[:-1]), missing[-1])
+        else:
+            fmt = ' and '.join(missing)
+        _message = 'You need the **{}** permission(s) to use this command.'.format(fmt)
+        await interaction.response.send_message(_message)
+        return
+
+    if isinstance(error, app_commands.UserInputError):
+        await interaction.response.send_message("Invalid input.")
+        # await ctx.send_help(ctx.command)
+        return
+
+    if isinstance(error, app_commands.NoPrivateMessage):
+        try:
+            await interaction.user.send('This command cannot be used in direct messages.')
+        except discord.Forbidden:
+            pass
+        return
+
+    if isinstance(error, app_commands.CheckFailure):
+        await interaction.response.send_message("You do not have permission to use this command.")
+        return
+
+    if isinstance(error, BungieAPIError):
+        await interaction.response.send_message("There was an error with the Bungie API.")
+        return
+
+    if isinstance(error, BungieAPIOffline):
+        await interaction.response.send_message("Bungie API appears to be currently offline. :(")
+        return
+
+    # ignore all other exception types, but print them to stderr
+    print('Ignoring exception in command {}:'.format(interaction.command), file=sys.stderr)
+
+    traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)    
 
 bot.tree.on_error = on_app_command_error
 
