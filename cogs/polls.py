@@ -245,7 +245,7 @@ class Polls(commands.Cog):
                 plt.ylim(bottom=0, top=top_ylim)
 
                 plt.yticks(gen_yticks(max(poll_results)))  # Appropriate tick spacing for number of respondents
-                plt.xticks(rotation=45)
+                plt.xticks(rotation=45, ha='right')
 
                 # Adds number of respondents at top of bars
                 for x, y in enumerate(poll_results):
