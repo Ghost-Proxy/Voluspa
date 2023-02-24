@@ -1,7 +1,6 @@
 import logging
-from github import Github
 
-from modules.ui_elements import FeedbackModal
+from modules.ui_elements import FeedbackModal, IssueModal
 from modules.config import CONFIG
 
 import discord
@@ -17,13 +16,10 @@ class Feedback(commands.Cog):
     @discord.app_commands.command()
     @discord.app_commands.checks.cooldown(1, 1800.0)
     @discord.app_commands.checks.has_role('ghost-proxy-vanguard')
-    async def issue(self, interaction: discord.Interaction, title: str, body: str) -> None:
+    async def issue(self, interaction: discord.Interaction) -> None:
         """Creates an issue in the Voluspa Github repository"""
-        g = Github(CONFIG.Github.token)
-        repo = g.get_repo(CONFIG.Github.repo_name)
-        issue = repo.create_issue(title=title, body=body)
 
-        await interaction.response.send_message(content=f'Your issue has been created _([#{issue.number}]({issue.html_url}))_', ephemeral=True)
+        await interaction.response.send_modal(IssueModal())
 
     @discord.app_commands.command()
     @discord.app_commands.checks.cooldown(2, 1800.0) # 2 uses permitted in case a mistake is made
