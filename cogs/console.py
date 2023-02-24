@@ -12,5 +12,5 @@ class Console(JishakuBase, metaclass=GroupCogMeta, command_parent=jk):
     pass
 
 
-def setup(bot: commands.Bot):
+async def setup(bot: commands.Bot):
     await bot.add_cog(Console(bot))
