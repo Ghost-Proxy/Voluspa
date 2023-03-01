@@ -114,5 +114,5 @@ class DestinyArt(commands.Cog):
         await ctx.send(embed=self.create_destiny_art_embed(*self.emotes_info))
 
 
-def setup(bot):
-    bot.add_cog(DestinyArt(bot))
+async def setup(bot):
+    await bot.add_cog(DestinyArt(bot))

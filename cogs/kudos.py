@@ -32,6 +32,6 @@ class Kudos(commands.Cog):
         await ctx.send('send_kudos')
 
 
-def setup(bot):
-    bot.add_cog(Kudos(bot))
+async def setup(bot):
+    await bot.add_cog(Kudos(bot))
 

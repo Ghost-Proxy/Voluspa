@@ -77,15 +77,23 @@ class DestinyRoleMenu(MenuWithOptions):
 
 
 class Gaminator(commands.Cog):
+    """Wizards for setting @ roles and more!"""
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name='other-games', aliases=['og'])
+    @commands.command(name='other-games', aliases=['og', 'games'])
     @commands.cooldown(1, 1800, commands.BucketType.user)
     async def other_games(self, ctx):
+        """Wizard to enable channels of other games
+
+        Provides a role wizard that adds specific other game @ roles and makes the related Other Game channel visible.
+        """
         logger.info(f'{ctx.message.author} called other_games')
 
         options = ROLES['other_games'].items()
+        # We could do this dynamically!
+        # Get a list of all server roles, filter for anything starting with `og-`
+        # fetch/build list everyday at midnight UTC and during reboot/spawn, then cache
         menu = OtherGamesMenu(ctx, 'Other Games', options=options, max_lines_per_page=MAX_LINES_PER_PAGE)
         menu.add_feedback_ui_field('Adding', 'None')
         menu.add_feedback_ui_field('Removing', 'None')
@@ -109,9 +117,13 @@ class Gaminator(commands.Cog):
         finally:
             self.bot.get_command('other-games').reset_cooldown(ctx)
 
-    @commands.command(name='game-roles', aliases=['gr'])
+    @commands.command(name='game-roles', aliases=['gr', 'game-modes', 'gm'])
     @commands.cooldown(1, 1800, commands.BucketType.user)
     async def game_roles(self, ctx):
+        """Wizard to enable Destiny 2 game mode roles
+
+        Provides a role wizard that adds the Destiny 2 @ game mode roles.
+        """
         logger.info(f'{ctx.message.author} called game_roles')
 
         options = ROLES['game_modes'].items()
@@ -139,5 +151,5 @@ class Gaminator(commands.Cog):
             self.bot.get_command('game-roles').reset_cooldown(ctx)
 
 
-def setup(bot):
-    bot.add_cog(Gaminator(bot))
+async def setup(bot):
+    await bot.add_cog(Gaminator(bot))

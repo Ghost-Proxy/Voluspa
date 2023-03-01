@@ -53,7 +53,7 @@ def read_config():
     print('Setting Voluspa boot settings...')
     voluspa_info = {
         'Voluspa': {
-            'version': 'v0.0.12',
+            'version': 'v0.0.13',
             'sha': os.getenv('SOURCE_VERSION')[:10] if os.getenv('SOURCE_VERSION') else 'Unknown (local?)',
             'app_cwd': os.path.abspath(os.getcwd()),
             'boot_time': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -61,7 +61,7 @@ def read_config():
     }
 
     merged_config_1 = merge_dicts(file_config, voluspa_info)
-    print(f'Merged Config:\n{merged_config_1}')
+    # print(f'Merged Config:\n{merged_config_1}')
 
     secrets_path = os.path.join(os.getcwd(), './config/secrets.yaml')
     secrets_file = None
@@ -108,8 +108,8 @@ def read_config():
     if not nested_config.Resources.image_bucket_root_url:
         nested_config.Resources.image_bucket_root_url = os.getenv('IMAGE_BUCKET_ROOT_URL', '')
 
-    print(f'Voluspa merged config -- Resources:\n{nested_config.Resources}')
-    print(f'Voluspa merged config -- Voluspa:\n{nested_config.Voluspa}')
+    #print(f'Voluspa merged config -- Resources:\n{nested_config.Resources}')
+    #print(f'Voluspa merged config -- Voluspa:\n{nested_config.Voluspa}')
 
     return nested_config
 

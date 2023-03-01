@@ -1,55 +1,29 @@
-FROM ubuntu:18.04
-LABEL maintainer="Mirage"
-ENV PY_VER "3.7.4"
-ENV PY_VER_MAJOR "3.7"
+FROM heroku/heroku:20
+LABEL maintainer="Ghost Proxy"
+ENV PY_VER_MAJOR "3.8"
 ENV DEBIAN_FRONTEND noninteractive
 
-RUN apt-get update && \
-    apt-get install -qq \
-        locales && \
-    sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
-    locale-gen
+RUN locale-gen en_US.UTF-8
+
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
 
-RUN apt-get update && \
-    apt-get install -qq \
-        apt-utils \
-        build-essential \
-        curl \
-        libbz2-dev \
-        libffi-dev \
-        libgdbm-dev \
-        liblzma-dev \
-        libncurses5-dev \
-        libnss3-dev \
-        libreadline-dev \
-        libssl-dev \
-        libsqlite3-dev \
-        software-properties-common \
-        wget \
-        zlib1g-dev
-
-RUN cd /opt && \
-    curl https://www.python.org/ftp/python/${PY_VER}/Python-${PY_VER}.tar.xz -o Python-${PY_VER}.tar.xz && \
-    tar -xf Python-${PY_VER}.tar.xz && \
-    cd Python-${PY_VER} && \
-    ./configure --enable-optimizations && \
-    make -j $(getconf _NPROCESSORS_ONLN) install
-
-RUN python${PY_VER_MAJOR} --version && \
-    python${PY_VER_MAJOR} -m pip install -U pip
+RUN sed -i "s=http://archive.ubuntu.com/ubuntu/=$(wget -qO- http://mirrors.ubuntu.com/mirrors.txt | head -n 1)=" /etc/apt/sources.list
 
 RUN apt-get update && \
-    apt-get install -qq \
-        vim
+    apt-get install -qq --no-install-recommends \
+        python${PY_VER_MAJOR}-dev \
+        python3-pip && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
-EXPOSE 5337
+RUN python${PY_VER_MAJOR} -m pip install -U pip
 
 RUN mkdir -p /app/voluspa
 COPY . /app/voluspa/
 WORKDIR /app/voluspa
+
 RUN pip3 install -r requirements.txt
 
 # Dockerfile Build
@@ -59,9 +33,7 @@ RUN pip3 install -r requirements.txt
 # Running the container
 
     # Mac/Nix
-    # docker run -it voluspa:latest python3 ./voluspa.py
+    # docker run -it voluspa:latest python3.8 ./voluspa.py
 
-    # Powershell (mounting won't work without share settings beforehand...)
-    # docker run -it voluspa:latest python3 ./voluspa.py
-
-    # docker run -p 5337:5337 -it voluspa:latest python3 ./voluspa.py
+    # Powershell (at this stage, mounting works in rw mode with WSL2+ backend)
+    # docker run -it -v ${pwd}:/app/voluspa voluspa:latest python3.8 ./voluspa.py

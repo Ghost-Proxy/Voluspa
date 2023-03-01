@@ -51,7 +51,7 @@ async def gen_polls_from_ids(ctx, poll_ids, id_fetch_point):
 
 def gen_poll_options(poll):
     for option in poll.embeds[0].description.split("\n"):
-        key = emoji.emojize(option[:option.find(' ')], use_aliases=True)
+        key = emoji.emojize(option[:option.find(' ')], language='alias')
         desc = option[option.find(' ') + 1:]
 
         # If polls options don't match reactions, list has been messed with
@@ -135,7 +135,7 @@ class Polls(commands.Cog):
                 poll_embed=gen_poll_embed(poll_args)
                 result_msg = await ctx.send(embed=poll_embed)
                 poll_embed.add_field(name="Poll Reference", value=result_msg.id)
-                await result_msg.edit(embed=poll_embed)
+                result_msg = await result_msg.edit(embed=poll_embed)
 
             react_char = '\U0001f1e6'
             for arg_iter in range(1, len(poll_args)):
@@ -186,9 +186,9 @@ class Polls(commands.Cog):
     async def collate_poll(self, ctx, *poll_ids: str):
         """Summarises the given poll references
 
-        Use $cd for dark theme
+        Use $prd for dark theme
 
-        Use $c c<channel-id> <poll-args>... to specify a channel to pull from
+        Use $pr c<channel-id> <poll-args>... to specify a channel to pull from
         """
 
         logger.info(f'Collating {len(poll_ids)} polls')
@@ -264,5 +264,5 @@ class Polls(commands.Cog):
                 png_wrapper.close()
                 plt.close()
 
-def setup(bot):
-    bot.add_cog(Polls(bot))
+async def setup(bot):
+    await bot.add_cog(Polls(bot))
