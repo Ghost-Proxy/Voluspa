@@ -17,10 +17,16 @@ A **Dockerfile** is provided that will also automagically setup a bot environmen
 docker build . -t voluspa
 ```
 
-#### Running the container
+#### Running the container (Mac/Nix)
 
 ```
 docker run -it voluspa:latest python3.11 ./voluspa.py
+```
+
+#### Running the container (Powershell)
+
+```
+docker run -it -v ${pwd}:/app/voluspa voluspa:latest python3.8 ./voluspa.py
 ```
 
 ---
