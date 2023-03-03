@@ -1,6 +1,6 @@
 FROM heroku/heroku:20
 LABEL maintainer="Ghost Proxy"
-ENV PY_VER_MAJOR "3.8"
+ENV PY_VER_MAJOR "3.11"
 ENV DEBIAN_FRONTEND noninteractive
 
 RUN locale-gen en_US.UTF-8
