@@ -31,7 +31,7 @@ So you like doing things the hard way, that's totally cool also! Here are some i
 
 #### Requirements
 
--   Uses Python 3.8
+-   Uses Python 3.11.2
 -   Setup assumes Debian based package manager
 -   Setup shows how to install Python using the [Deadsnakes PPA](https://launchpad.net/~deadsnakes/+archive/ubuntu/ppa)
 -   If using Ubuntu 20.04 "Focal Fossa", you won't need to add the Deadsnakes PPA, as Python 3.8 is bundled with the OS
