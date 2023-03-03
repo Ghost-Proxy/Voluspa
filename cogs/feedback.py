@@ -1,7 +1,6 @@
 import logging
 
 from modules.ui_elements import FeedbackModal, IssueModal
-from modules.config import CONFIG
 
 import discord
 from discord.ext import commands
