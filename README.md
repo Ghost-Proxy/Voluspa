@@ -2,6 +2,8 @@
 > **// Ghost Proxy** / Proto-Warmind AI  
 > _Destiny 2 Discord Bot_
 
+[![Docker Image CI](https://github.com/Ghost-Proxy/Voluspa/actions/workflows/docker-image.yml/badge.svg?branch=develop)](https://github.com/Ghost-Proxy/Voluspa/actions/workflows/docker-image.yml)
+
 ![Voluspa Logo](images/voluspa/Voluspa_icon_100x133_black.png)
 
 ---
