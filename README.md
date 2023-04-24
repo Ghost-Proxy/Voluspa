@@ -3,8 +3,13 @@
 > **// Ghost Proxy** / Proto-Warmind AI
 > _Destiny 2 Discord Bot_
 
-![Voluspa Logo](images/voluspa/Voluspa_icon_100x133_black.png)
+[![Docker Image CI](https://github.com/Ghost-Proxy/Voluspa/actions/workflows/docker-image.yml/badge.svg?branch=develop)](https://github.com/Ghost-Proxy/Voluspa/actions/workflows/docker-image.yml)  
+[![Pylint](https://github.com/Ghost-Proxy/Voluspa/actions/workflows/pylint.yml/badge.svg)](https://github.com/Ghost-Proxy/Voluspa/actions/workflows/pylint.yml)  
+[![Dependency Review](https://github.com/Ghost-Proxy/Voluspa/actions/workflows/dependency-review.yml/badge.svg)](https://github.com/Ghost-Proxy/Voluspa/actions/workflows/dependency-review.yml)  
+[![Python application](https://github.com/Ghost-Proxy/Voluspa/actions/workflows/python-app.yml/badge.svg)](https://github.com/Ghost-Proxy/Voluspa/actions/workflows/python-app.yml)  
 
+![Voluspa Logo](images/voluspa/Voluspa_icon_100x133_black.png)   
+    
 ---
 
 ### Local Docker for development
