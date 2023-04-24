@@ -12,8 +12,12 @@ ENV LC_ALL en_US.UTF-8
 RUN sed -i "s=http://archive.ubuntu.com/ubuntu/=$(wget -qO- http://mirrors.ubuntu.com/mirrors.txt | head -n 1)=" /etc/apt/sources.list
 
 RUN apt-get update && \
-    apt-get install -qq --no-install-recommends \
-        python${PY_VER_MAJOR}-dev \
+    apt-get install -qq \
+        build-essential \
+        libssl-dev \
+        libffi-dev \
+        python${PY_VER_MAJOR} \
+        python3-dev \
         python3-pip && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
