@@ -65,7 +65,7 @@ def read_config():
 
     secrets_path = os.path.join(os.getcwd(), './config/secrets.yaml')
     secrets_file = None
-    print(f'Attempting to load secrets from: {secrets_path}')
+    print(f'Attempting to load secrets from file...')
     if os.path.isfile(secrets_path):
         print('Found secrets.yml loading...')
         secrets_file = read_yaml('./config/secrets.yaml')
