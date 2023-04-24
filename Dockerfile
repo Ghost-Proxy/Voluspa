@@ -1,4 +1,4 @@
-FROM heroku/heroku:20
+FROM heroku/heroku:22
 LABEL maintainer="Ghost Proxy"
 ENV PY_VER_MAJOR "3.11"
 ENV DEBIAN_FRONTEND noninteractive
@@ -33,7 +33,7 @@ RUN pip3 install -r requirements.txt
 # Running the container
 
     # Mac/Nix
-    # docker run -it voluspa:latest python3.8 ./voluspa.py
+    # docker run -it voluspa:latest python3.11 ./voluspa.py
 
     # Powershell (at this stage, mounting works in rw mode with WSL2+ backend)
-    # docker run -it -v ${pwd}:/app/voluspa voluspa:latest python3.8 ./voluspa.py
+    # docker run -it -v ${pwd}:/app/voluspa voluspa:latest python3.11 ./voluspa.py
