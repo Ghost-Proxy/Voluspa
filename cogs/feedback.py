@@ -1,39 +1,33 @@
 import logging
 
+from modules.ui_elements import FeedbackModal, IssueModal
+
 import discord
 from discord.ext import commands
 
-from voluspa import CONFIG
-
 logger = logging.getLogger('voluspa.cog.feedback')
-
 
 class Feedback(commands.Cog):
     """Feedback System"""
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
 
-    @commands.command(aliases=['f'])
-    @commands.cooldown(2, 1800, type=commands.cooldowns.BucketType.user)  # 2 uses permitted in case a mistake is made
-    async def feedback(self, ctx, *, message):
-        """Sends an anonymous feedback message
+    @discord.app_commands.command()
+    @discord.app_commands.checks.cooldown(1, 1800.0)
+    @discord.app_commands.checks.has_role('ghost-proxy-vanguard')
+    async def issue(self, interaction: discord.Interaction) -> None:
+        """Creates an issue in the Voluspa Github repository"""
 
-        You can write your message across multiple lines
-        Sign your message if you would like to be contacted for follow-up"""
-        feedback_channel = ctx.bot.get_channel(CONFIG.Voluspa.feedback_channel_id)
-        await feedback_channel.send("Incoming message for the Vanguard:\n>>> " + message)
+        await interaction.response.send_modal(IssueModal())
 
-        if isinstance(ctx.message.channel, discord.abc.GuildChannel):
-            await ctx.send(
-                "Your feedback has been sent. These messages will self-destruct in one minute.",
-                delete_after=60
-            )
-            await ctx.message.delete(delay=60)
-        else:
-            await ctx.send("Your feedback has been sent.")
+    @discord.app_commands.command()
+    @discord.app_commands.checks.cooldown(2, 1800.0) # 2 uses permitted in case a mistake is made
+    async def feedback(self, interaction: discord.Interaction) -> None:
+        """Sends anonymous feedback to @ghost-proxy-vanguard."""
+
+        await interaction.response.send_modal(FeedbackModal())
 
         logger.info('Feedback has been sent.')
-
 
 async def setup(bot):
     await bot.add_cog(Feedback(bot))

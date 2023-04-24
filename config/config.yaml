@@ -13,3 +13,7 @@ Voluspa:
   prefix: '$'
   cache: {}
   feedback_channel_id: 0
+
+Github:
+    token: ''
+    repo_name: ''
