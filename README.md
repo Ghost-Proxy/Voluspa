@@ -8,7 +8,14 @@
 [![Codecov](https://github.com/Ghost-Proxy/Voluspa/actions/workflows/codecov.yml/badge.svg)](https://github.com/Ghost-Proxy/Voluspa/actions/workflows/codecov.yml)  
 [![Dependency Review](https://github.com/Ghost-Proxy/Voluspa/actions/workflows/dependency-review.yml/badge.svg)](https://github.com/Ghost-Proxy/Voluspa/actions/workflows/dependency-review.yml)  
 [![Python application](https://github.com/Ghost-Proxy/Voluspa/actions/workflows/python-app.yml/badge.svg)](https://github.com/Ghost-Proxy/Voluspa/actions/workflows/python-app.yml)  
-    
+
+---
+
+### Current Code Coverage
+
+https://app.codecov.io/gh/Ghost-Proxy/Voluspa  
+<img src='https://codecov.io/gh/Ghost-Proxy/Voluspa/branch/develop/graphs/icicle.svg?token=8ZKTJIKKNB' />
+
 ---
 
 ### Local Docker for development
