@@ -1,8 +1,10 @@
+"""Cache Module"""
+
 import logging
 
-from voluspa import CONFIG
-
 from aiocache import caches
+
+from voluspa import CONFIG
 
 logger = logging.getLogger('voluspa.cache')
 
@@ -11,10 +13,11 @@ if CONFIG.Voluspa.cache.get('redis', None):
 else:
     CACHE_NAME = 'default'
 CACHE_TYPE = CONFIG.Voluspa.cache[CACHE_NAME].cache
-logger.info(f'Using "{CACHE_NAME}" cache ({CACHE_TYPE})')
+logger.info('Using "%s" cache (%s)', CACHE_NAME, CACHE_TYPE)
 
 
 async def add(key, value, cache_name=CACHE_NAME):
+    """Add a key and value to the cache"""
     # This will fail if the key already exists
     cache = caches.get(cache_name)
     await cache.add(key, value)
@@ -28,6 +31,7 @@ async def add(key, value, cache_name=CACHE_NAME):
 
 
 async def write(key, value, cache_name=CACHE_NAME):
+    """Write the value to a key, whether it exists or not"""
     # This also implies add -- AND is a forced overwrite
     cache = caches.get(cache_name)
     await cache.set(key, value)
@@ -42,6 +46,7 @@ async def write(key, value, cache_name=CACHE_NAME):
 
 
 async def read(key, cache_name=CACHE_NAME):
+    """Read the value from the requested key"""
     cache = caches.get(cache_name)
     value = await cache.get(key)
     if value:
@@ -53,6 +58,7 @@ async def read(key, cache_name=CACHE_NAME):
 
 
 async def delete(key, cache_name=CACHE_NAME):
+    """Delete the key (and value) requested"""
     cache = caches.get(cache_name)
     result = await cache.delete(key)
     if result:

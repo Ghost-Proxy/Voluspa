@@ -1,11 +1,14 @@
+"""Logging Module"""
+
 import logging
 import asyncio
 from textwrap import wrap
 
+from emoji import emojize
+
 from modules.custom_embed import default_embed
 from modules.emoji_utils import ri_at_index, ri_alphabet, index_of_ri, normalize
 
-from emoji import emojize
 
 logger = logging.getLogger('voluspa.module.paging')
 
@@ -16,7 +19,7 @@ class _MenuBase:
     RIGHT_ARROW = '\u27a1'
 
     def __init__(self, ctx, title, pages, timeout):
-        logger.info(f'{ctx.message.author} created a menu.')
+        logger.info('%s created a menu.', ctx.message.author)
 
         # Paramaters
         self._ctx = ctx
@@ -30,6 +33,7 @@ class _MenuBase:
         self._current_page_index = 0
 
     async def run(self):
+        """Run the page"""
         self._init_menu_embed()
         self._menu_msg = await self._ctx.send(embed=self._menu_embed)
         await self._init_reactions()
@@ -37,7 +41,11 @@ class _MenuBase:
 
     def _init_menu_embed(self):
         menu_field = self._get_menu_field()
-        self._menu_embed.add_field(name=f'Page {self._current_page_index + 1}/{len(self._pages)}', value=menu_field, inline=False)
+        self._menu_embed.add_field(
+            name=f'Page {self._current_page_index + 1}/{len(self._pages)}',
+            value=menu_field,
+            inline=False
+            )
         self._menu_field_index = len(self._menu_embed.fields) - 1
 
     async def _control_loop(self):
@@ -57,7 +65,7 @@ class _MenuBase:
                 if not user.bot:
                     await reaction.remove(user)
         except asyncio.TimeoutError:
-            logger.info(f'{self._ctx.message.author} timed out.')
+            logger.info('%s timed out.', self._ctx.message.author)
         finally:
             await self._ctx.message.delete()
             await self._menu_msg.delete()
@@ -67,7 +75,12 @@ class _MenuBase:
         self._current_page_index = page_index
 
         menu_field = self._get_menu_field()
-        self._menu_embed.set_field_at(self._menu_field_index, name=f'Page {self._current_page_index + 1}/{len(self._pages)}', value=menu_field, inline=False)
+        self._menu_embed.set_field_at(
+            self._menu_field_index,
+            name=f'Page {self._current_page_index + 1}/{len(self._pages)}',
+            value=menu_field,
+            inline=False
+            )
 
         self._menu_msg = await self._menu_msg.edit(embed=self._menu_embed)
         await self._set_reactions()
@@ -75,7 +88,15 @@ class _MenuBase:
 
 class Menu(_MenuBase):
     """Create a menu from a raw string, a list of lines or a list of pages."""
-    def __init__(self, ctx, title, raw=None, lines=None, pages=None, max_chars_per_line=64, max_lines_per_page=16, timeout=60.0):
+    def __init__(self,
+                 ctx,
+                 title,
+                 raw=None,
+                 lines=None,
+                 pages=None,
+                 max_chars_per_line=64,
+                 max_lines_per_page=16,
+                 timeout=60.0):
         """
         PARAMS
         ------
@@ -159,11 +180,9 @@ class MenuWithOptions(_MenuBase):
     # Overrides
     def init_feedback_ui(self):
         """Initialise fields in the menu embed that represent the feedback ui."""
-        pass
 
     def update_feedback_ui(self):
         """Repaint feedback ui on option select."""
-        pass
 
     def option_to_string(self, option):
         """Must return a string representation of an option (returns 'option' by default)."""
@@ -185,7 +204,8 @@ class MenuWithOptions(_MenuBase):
 
     def set_feedback_ui_field_at(self, index, name, value, default, inline=True):
         """
-        Sets the field at index in the menu embed (must be a field created with add_feedback_ui_field). If value is empty, value = default.
+        Sets the field at index in the menu embed (must be a field created with add_feedback_ui_field).
+        If value is empty, value = default.
         """
         if index not in self._feedback_ui_field_indicies:
             logger.error('index not in _feedback_ui_field_indicies')
@@ -285,7 +305,7 @@ class MenuWithCustomOptions(MenuWithOptions):
         for i in range(len(self._pages)):
             temp = {}
             for k, v in self._pages[i].items():
-                temp[emojize(normalize(k), use_aliases=True)] = v
+                temp[emojize(normalize(k), language='alias')] = v
             self._pages[i] = temp
 
     async def _init_reactions(self):

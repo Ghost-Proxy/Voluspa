@@ -1,9 +1,12 @@
+"""Gaminator Cog"""
+
 import logging
+
+from discord.ext import commands
 
 from cogs.config.roles import ROLES
 from modules.paging import MenuWithOptions
 
-from discord.ext import commands
 
 logger = logging.getLogger('voluspa.cog.gaminator')
 
@@ -12,8 +15,9 @@ MAX_LINES_PER_PAGE = 7
 
 
 def get_longest_role_name(role_dict):
+    """Find and return the longest role name"""
     longest_role = 0
-    for role, role_options in role_dict.items():
+    for _role, role_options in role_dict.items():
         for role_option in role_options:
             if len(role_option) > longest_role:
                 longest_role = len(role_option)
@@ -21,6 +25,7 @@ def get_longest_role_name(role_dict):
 
 
 def get_tab_length(default, longest_item, buffer=4):
+    """Get the calculated tab length"""
     return default if default > longest_item else longest_item + buffer
 
 
@@ -28,6 +33,7 @@ DESTINY_ROLE_TAB_LENGTH = get_tab_length(TAB_LENGTH, get_longest_role_name(ROLES
 
 
 class OtherGamesMenu(MenuWithOptions):
+    """Other Games Menu class"""
     # Override
     def update_feedback_ui(self):
         ctx = self.get_ctx()
@@ -53,6 +59,7 @@ class OtherGamesMenu(MenuWithOptions):
 
 # Hmm... (figure out a means to DRY)
 class DestinyRoleMenu(MenuWithOptions):
+    """Destiny Role menu class"""
     # Override
     def update_feedback_ui(self):
         ctx = self.get_ctx()
@@ -88,7 +95,7 @@ class Gaminator(commands.Cog):
 
         Provides a role wizard that adds specific other game @ roles and makes the related Other Game channel visible.
         """
-        logger.info(f'{ctx.message.author} called other_games')
+        logger.info('%s called other_games', ctx.message.author)
 
         options = ROLES['other_games'].items()
         # We could do this dynamically!
@@ -124,7 +131,7 @@ class Gaminator(commands.Cog):
 
         Provides a role wizard that adds the Destiny 2 @ game mode roles.
         """
-        logger.info(f'{ctx.message.author} called game_roles')
+        logger.info('%s called game_roles', ctx.message.author)
 
         options = ROLES['game_modes'].items()
         menu = DestinyRoleMenu(ctx, 'Destiny Game Roles', options=options, max_lines_per_page=MAX_LINES_PER_PAGE)
@@ -152,4 +159,5 @@ class Gaminator(commands.Cog):
 
 
 async def setup(bot):
+    """Cog Setup"""
     await bot.add_cog(Gaminator(bot))

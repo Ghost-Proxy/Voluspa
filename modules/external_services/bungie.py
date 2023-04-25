@@ -1,5 +1,6 @@
+"""External Services Module"""
+
 import logging
-from typing import Any, List, Dict, Tuple, Sequence, Iterable
 
 from modules.config import CONFIG
 from modules.async_request import async_request_handler
@@ -9,6 +10,7 @@ logger = logging.getLogger('voluspa.bungie_requests')
 
 
 async def async_bungie_request_handler(target_endpoint, request_url=None, params=None, response_handler=None):
+    """Unified Bungie request handler"""
     bungie_platform_url = 'https://www.bungie.net/Platform'
     _request_url = request_url if request_url else bungie_platform_url
     resp = await async_request_handler(_request_url,
@@ -19,7 +21,7 @@ async def async_bungie_request_handler(target_endpoint, request_url=None, params
                                        )
     if resp['status'] == 200:
         logger.info('Bungie request was successful!')
-        logger.info(f'Bungie response: {resp["content"]}')  # TODO: Remove
+        logger.info('Bungie response: %s', resp["content"])
         return resp['content']
     elif resp['status'] == 504:
         logger.info('Bungie API appears to be offline!')

@@ -1,6 +1,9 @@
+"""Polls Cog"""
+
 import io
 import datetime
 import logging
+from textwrap import wrap
 
 import discord
 from discord.ext import commands
@@ -9,13 +12,13 @@ from discord.utils import escape_markdown
 import pandas as pd
 import matplotlib.pyplot as plt
 import emoji
-from textwrap import wrap
 
 from modules.custom_embed import default_embed
 
 logger = logging.getLogger('voluspa.cog.polls')
 
 async def get_poll_context_channel(ctx, poll_ids):
+    """Get the Poll channel context for the requested poll_id"""
     if len(poll_ids) > 0 and poll_ids[0][0] == 'c':
         id_fetch_point = ctx.bot.get_channel(int(poll_ids[0][1:]))
         if id_fetch_point is None:
@@ -33,6 +36,7 @@ async def get_poll_context_channel(ctx, poll_ids):
     return id_fetch_point, poll_ids
 
 async def gen_polls_from_ids(ctx, poll_ids, id_fetch_point):
+    """Generate a Poll from the requested poll_id"""
     for pid in poll_ids:
         try:
             poll = await id_fetch_point.fetch_message(pid)
@@ -50,6 +54,7 @@ async def gen_polls_from_ids(ctx, poll_ids, id_fetch_point):
         yield poll, pid
 
 def gen_poll_options(poll):
+    """Generate Poll options"""
     for option in poll.embeds[0].description.split("\n"):
         key = emoji.emojize(option[:option.find(' ')], language='alias')
         desc = option[option.find(' ') + 1:]
@@ -62,6 +67,7 @@ def gen_poll_options(poll):
         yield key, desc, reaction
 
 def gen_poll_embed(poll_args):
+    """Generate the Poll embed"""
     desc_str = ""
     react_char = '\U0001f1e6'
     for arg_iter in range(1, len(poll_args)):
@@ -126,7 +132,7 @@ class Polls(commands.Cog):
 
         Note that line breaks will be replaced with spaces
         """
-        logger.info(f'New poll requested by {ctx.message.author.name}')
+        logger.info('New poll requested by %s', ctx.message.author.name)
 
         if len(poll_args) < 2:
             await ctx.send('Sorry, your poll needs at least 1 option!')
@@ -148,7 +154,7 @@ class Polls(commands.Cog):
     async def poll_list_respondents_by_option(self, ctx, *poll_ids: str):
         """Lists a poll's respondents by the options they chose"""
 
-        logger.info(f'Tabulating {len(poll_ids)} polls')
+        logger.info('Tabulating %s polls', len(poll_ids))
 
         id_fetch_point, poll_ids = await get_poll_context_channel(ctx, poll_ids)
         if id_fetch_point is None:
@@ -193,7 +199,7 @@ class Polls(commands.Cog):
         Use $pr c<channel-id> <poll-args>... to specify a channel to pull from
         """
 
-        logger.info(f'Collating {len(poll_ids)} polls')
+        logger.info('Collating %s polls', len(poll_ids))
 
         id_fetch_point, poll_ids = await get_poll_context_channel(ctx, poll_ids)
         if id_fetch_point is None:
@@ -267,4 +273,5 @@ class Polls(commands.Cog):
                 plt.close()
 
 async def setup(bot):
+    """Cog Setup"""
     await bot.add_cog(Polls(bot))

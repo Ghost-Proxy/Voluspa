@@ -1,19 +1,21 @@
+"""Misc Module"""
+
 import collections.abc
 from typing import Any, List
 
-new_line = "\n"
-voluspa_raw_txt_logo = '--\\\\\\\\´//--'
+NEW_LINE = "\n"
+VOLUSPA_RAW_TXT_LOGO = '--\\\\\\\\´//--'
+CACHE = {}
 
 
 def memoize(func):
+    """Memoize any function"""
     # Guarantees that the initial call to config is the same config over the lifetime of the app, in theory
-    cache = dict()
-
     def memoized_func(*args):
-        if args in cache:
-            return cache[args]
+        if args in CACHE:
+            return CACHE[args]
         result = func(*args)
-        cache[args] = result
+        CACHE[args] = result
         return result
 
     return memoized_func
@@ -28,9 +30,9 @@ def chunk_list(chonk_list: List[Any], chunk_size: int = 1024):
         if len(item) > chunk_size:
             # need to chunk item itself, naive
             new_chunks = [item[i:i + chunk_size] for i in range(0, len(item), chunk_size)]
-            for nc in new_chunks:
+            for chunk in new_chunks:
                 current_chunk += 1
-                chunks[current_chunk] = [nc]
+                chunks[current_chunk] = [chunk]
         elif len(str(item)) + len(''.join(chunks.get(current_chunk, ''))) > chunk_size:
             # need to make a new chunk
             current_chunk += 1
@@ -61,6 +63,7 @@ class AttrDict(dict):
 
 # https://stackoverflow.com/questions/25833613/python-safe-method-to-get-value-of-nested-dictionary
 class Hasher(dict):
+    """Dictionary Hasher"""
     # https://stackoverflow.com/a/3405143/190597
     def __missing__(self, key):
         value = self[key] = type(self)()
@@ -116,4 +119,3 @@ def merge_dicts(dct, merge_dct, add_keys=True, skip_none=False):
             dct[k] = v
 
     return dct
-

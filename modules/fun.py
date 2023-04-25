@@ -1,33 +1,38 @@
+"""Fun Module"""
+
 import logging
-import re
-import asyncio
-import requests
 import random
+import re
+
+import requests
 import aiohttp
 
 logger = logging.getLogger('voluspa.modules.fun')
 
 
 async def get_latest_xkcd_comic():
+    """Get and display the latest xkcd comic"""
     xkcd_index_url = 'https://xkcd.com/info.0.json'
     async with aiohttp.ClientSession() as session:
-        async with session.get(xkcd_index_url) as r:
-            if r.status == 200:
-                latest_xkcd_comic = await r.json()
+        async with session.get(xkcd_index_url) as resp:
+            if resp.status == 200:
+                latest_xkcd_comic = await resp.json()
                 latest_xkcd_num = latest_xkcd_comic['num']
                 return latest_xkcd_num, latest_xkcd_comic
 
 
 async def get_xkcd_comic_num(num: int = 1):
+    """Get the specific xkcd comic via request number"""
     xkcd_url = f'https://xkcd.com/{num}/info.0.json'
     async with aiohttp.ClientSession() as session:
-        async with session.get(xkcd_url) as r:
-            if r.status == 200:
-                xkcd_comic = await r.json()
+        async with session.get(xkcd_url) as resp:
+            if resp.status == 200:
+                xkcd_comic = await resp.json()
                 return xkcd_comic
 
 
 async def get_xkcd_comic(latest=False):
+    """Get an xkcd comic"""
     latest_xkcd_num, latest_xkcd_comic = await get_latest_xkcd_comic()
 
     # {
@@ -60,8 +65,9 @@ async def get_xkcd_comic(latest=False):
 
 # TODO: Break this out into a better means of handling... could just be functional...
 class Quotes(object):
+    """Quotes class"""
     def __init__(self):
-        self.Voluspa_quotes = {
+        self.voluspa_quotes = {
             'greetings': [
                 '<:awesome_smiley:455152593052762140> :wave: Hello there, %%USER%%!',
                 '<:awesome_smiley:455152593052762140> :wave: Aloha %%USER%%!',
@@ -136,32 +142,22 @@ class Quotes(object):
         }
 
     async def pick_quote(self, quote_type, user_mention=None):
-        quotes = self.Voluspa_quotes[quote_type]
+        """Pick a random quote to use"""
+        quotes = self.voluspa_quotes[quote_type]
         rand_idx = random.randint(0, len(quotes) - 1)
-        logger.info('PICK QUOTE -- random quote: {}'.format(rand_idx))
+        logger.info('PICK QUOTE -- random quote: %s', rand_idx)
         quote = quotes[rand_idx]
         if user_mention:
             quote = re.sub(r'%%USER%%',
                            user_mention,
                            quote)
-        logger.info('PICK QUOTE -- using quote: {}'.format(quote))
-        return quote #return self._pick_quote(quote_type, user_mention
-
-    def _pick_quote(self, quote_type, user_mention=None):
-        quotes = self.Voluspa_quotes[quote_type]
-        rand_idx = random.randint(0, len(quotes) - 1)
-        logger.info('PICK QUOTE -- random quote: {}'.format(rand_idx))
-        quote = quotes[rand_idx]
-        if user_mention:
-            quote = re.sub(r'%%USER%%',
-                           user_mention,
-                           quote)
-        logger.info('PICK QUOTE -- using quote: {}'.format(quote))
+        logger.info('PICK QUOTE -- using quote: %s', quote)
         return quote
 
 
 # TODO: Replace with async http....
 class RandomQuotes(object):
+    """Random Quotes class"""
     def __init__(self):
         self.quote_funcs = [
             # self.get_ron_swanson_quote,
@@ -171,25 +167,30 @@ class RandomQuotes(object):
         ]
 
     async def get_dad_joke(self):
+        """Get a Dad joke"""
         # GET https://icanhazdadjoke.com/
         # GET https://icanhazdadjoke.com/j/<joke_id>.png
-        req = requests.get('https://icanhazdadjoke.com/', headers={'Accept': 'application/json'})
+        req = requests.get('https://icanhazdadjoke.com/', headers={'Accept': 'application/json'}, timeout=20)
         dad_joke = req.json()['joke']
         return dad_joke
 
     async def get_ron_swanson_quote(self):
-        req = requests.get('https://ron-swanson-quotes.herokuapp.com/v2/quotes')
+        """Get a Ron Swanson quote"""
+        req = requests.get('https://ron-swanson-quotes.herokuapp.com/v2/quotes', timeout=20)
         ron_quote = '"{}" -Ron Swanson'.format(req.json()[0])
         return ron_quote
 
     async def get_inspirobot_quote(self):
-        req = requests.get('http://inspirobot.me/api?generate=true')
+        """Get an inspirobot quote"""
+        req = requests.get('http://inspirobot.me/api?generate=true', timeout=20)
         return req.text
 
     async def get_chuck_norris_quote(self):
-        req = requests.get('http://api.icndb.com/jokes/random?limitTo=[nerdy]')
+        """Get a Chuck Norris quote"""
+        req = requests.get('http://api.icndb.com/jokes/random?limitTo=[nerdy]', timeout=20)
         return req.json()['value']['joke']
 
     async def get_random_quote(self):
+        """Get a RANDOM quote"""
         rand_int = random.randint(0, len(self.quote_funcs) - 1)
         return await self.quote_funcs[rand_int]()

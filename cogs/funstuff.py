@@ -1,13 +1,14 @@
-import asyncio
+"""Fun Stuff Cog"""
+
 import logging
 import re
 from random import randint
 
-from modules.fun import Quotes, RandomQuotes, get_xkcd_comic
-from modules.custom_embed import default_embed
-
 import discord
 from discord.ext import commands
+
+from modules.fun import Quotes, RandomQuotes, get_xkcd_comic
+
 
 quotes = Quotes()
 random_quotes = RandomQuotes()
@@ -18,34 +19,35 @@ REAL_DICE = ['d4', 'd6', 'd8', 'd10', 'd12', 'd20']
 REGEX_NUMERICAL = '[0-9]+'
 
 class FunStuff(commands.Cog):
+    """Fun Stuff Class Cog"""
     def __init__(self, bot):
         self.bot = bot
 
     @commands.command(aliases=REAL_DICE)
     async def roll(self, ctx, *dice):
         """Random number utilities"""
-        d = 20
+        die_type = 20
         if ctx.invoked_with in REAL_DICE:
-            d = int(ctx.invoked_with[1:])
+            die_type = int(ctx.invoked_with[1:])
         elif dice:
             d_str = re.findall(REGEX_NUMERICAL, ' '.join(dice))
             if d_str:
-                d = int(d_str[0])
+                die_type = int(d_str[0])
             else:
                 raise commands.UserInputError
-        msg = f'You rolled a d{d}, It landed on {randint(1, d)}!'
+        msg = f'You rolled a d{die_type}, It landed on {randint(1, die_type)}!'
         await ctx.send(msg)
 
     @commands.command()
     async def hello(self, ctx):
         """Say hello to Voluspa"""
-        logger.info('CTX INFO: {}'.format(ctx))
+        logger.info('CTX INFO: %s', ctx)
         await ctx.send(await quotes.pick_quote('greetings', ctx.message.author.mention))
 
     @commands.command()
     async def goodbye(self, ctx):
         """Say goodbye to Voluspa"""
-        logger.info('CTX INFO: {}'.format(ctx))
+        logger.info('CTX INFO: %s', ctx)
         await ctx.send(await quotes.pick_quote('goodbyes', ctx.message.author.mention))
 
     @commands.command()
@@ -83,4 +85,5 @@ class FunStuff(commands.Cog):
 
 
 async def setup(bot):
+    """Cog Setup"""
     await bot.add_cog(FunStuff(bot))

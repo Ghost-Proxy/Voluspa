@@ -322,8 +322,8 @@ class Autorole(commands.Cog):
             multiple_users_embed = default_embed(
                 title='Multiple Users Found',
                 description='\n**NOTE:** _Multiple User results were found for 1 or more requested Users._\n\n'
-                f'Please review the results above and then try again with a full Username.\n\n'
-                f'_Example:_  `<user>#<id>`  ->  `$p2f guardian#1234`',
+                    'Please review the results above and then try again with a full Username.\n\n'
+                    '_Example:_  `<user>#<id>`  ->  `$p2f guardian#1234`',
                 color=styles.colors('info')
             )
             await ctx.send(embed=multiple_users_embed)
@@ -440,7 +440,7 @@ class Autorole(commands.Cog):
         All other games can be added by using `$og-add all`.
         """
         # $lfg (no param) -- Lists current LFG roles set
-        logger.info(f'game input: {games}')
+        logger.info('game input: %s', games)
         await self.update_roles(
             ctx,
             'other_games',
@@ -465,7 +465,7 @@ class Autorole(commands.Cog):
 
         All other-games can be remove by using `$og-add all`.
         """
-        logger.info(f'game input: {games}')
+        logger.info('game input: %s', games)
         await self.update_roles(
             ctx,
             'other_games',
@@ -939,5 +939,5 @@ class Autorole(commands.Cog):
 
 
 async def setup(bot):
-    """Cog setup"""
+    """Cog Setup"""
     await bot.add_cog(Autorole(bot))

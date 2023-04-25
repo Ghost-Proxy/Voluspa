@@ -1,3 +1,5 @@
+"""Logger Module"""
+
 import os
 import logging
 from logging.handlers import RotatingFileHandler
@@ -5,9 +7,8 @@ from logging.handlers import RotatingFileHandler
 from modules.config import CONFIG
 
 
-def log_to_channel(log_channel, log_msg):
-    """For logging messages to a Discord channel also... WIP"""
-    pass
+# def log_to_channel(log_channel, log_msg):
+#     """For logging messages to a Discord channel also... WIP"""
 
 
 def _setup_logging(log_level=logging.INFO):
@@ -59,6 +60,8 @@ def _setup_logging(log_level=logging.INFO):
     voluspa_file_handler.setFormatter(log_formatter)
 
     voluspa_logger.info('Logging online!')
+
+    # TODO WTF...???!?! WHAT IS THIS?!?! rewrite this crap... come on
     voluspa_logger.info(f'Log file [{"exists" if os.path.isfile(log_file_path) else "does NOT exist"}] at: [{log_file_path}]')
     voluspa_logger.info(f'Log file [{"exists" if os.path.isfile(discord_log_file_path) else "does NOT exist"}] at: [{discord_log_file_path}]')
     voluspa_logger.info(f'Log file [{"exists" if os.path.isfile(voluspa_log_file_path) else "does NOT exist"}] at: [{voluspa_log_file_path}]')
@@ -66,10 +69,12 @@ def _setup_logging(log_level=logging.INFO):
 
 
 class Archivist(object):
+    """Archivist logging class"""
     logger = _setup_logging()
 
     def __init__(self):
         self.logger = Archivist.logger
 
     def get_logger(self):
+        """Return the configured logger"""
         return self.logger

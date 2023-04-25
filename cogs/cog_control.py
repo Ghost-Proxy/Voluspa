@@ -54,5 +54,5 @@ class CogControl(commands.Cog):
 
 
 async def setup(bot):
-    """Cog setup"""
+    """Cog Setup"""
     await bot.add_cog(CogControl(bot))
