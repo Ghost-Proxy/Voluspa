@@ -52,7 +52,7 @@ class Systems(commands.Cog):
         # embed.add_field(name='SHA', value=CONFIG.Voluspa.sha, inline=False)
         embed.add_field(name='Boot Time', value=CONFIG.Voluspa.boot_time, inline=False)
         embed.add_field(name='Uptime', value=f'{get_bot_uptime(self.bot)}', inline=False)
-        embed.add_field(name='Developers', value=f'Mirage\nOxy\nStevenNic', inline=False)
+        embed.add_field(name='Developers', value=f'Mirage\nOxy\nStevenNic\nWindows98', inline=False)
 
         # give info about you here
         # embed.add_field(name='_ _', value="_Discovered by Mirage ,'}_")
