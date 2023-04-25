@@ -1,6 +1,6 @@
-# voluspa
+# Völuspá
 
-> **// Ghost Proxy** / Proto-Warmind AI
+> **// Ghost Proxy** / Proto-Warmind AI  
 > _Destiny 2 Discord Bot_
 
 [![Docker Image CI](https://github.com/Ghost-Proxy/Voluspa/actions/workflows/docker-image.yml/badge.svg?branch=develop)](https://github.com/Ghost-Proxy/Voluspa/actions/workflows/docker-image.yml)  
@@ -87,7 +87,7 @@ So you like doing things the hard way, that's totally cool also! Here are some i
 
 10. Create (and populate) a secrets file, or set secrets in your environment
 
-**WARNING:** **DO NOT** share or commit your secrets. Accidental commits should be prevented by the .gitignore
+    **WARNING:** **DO NOT** share or commit your secrets. Accidental commits should be prevented by the .gitignore
 
     `cp config/config.yaml config/secrets.yaml`
 
