@@ -299,10 +299,12 @@ bot.tree.on_error = on_app_command_error
 async def main():
     logger.info('// Völuspá / Booting...')
 
-    logger.info('Starting bot...')
     async with bot:
+        logger.info('Initializing bot...')
         for extension in cog_extensions:
+            logger.info(f'Loading extension [{extension}]...')
             await bot.load_extension(extension)
+        logger.info('Starting bot...')
         await bot.start(CONFIG.Discord.api_key)
 
 
