@@ -31,7 +31,7 @@ def parse_datetime(dt_str):
 
 def display_datetime(datetime_str, time_zone=None, verbose=True):
     """Returns a formatted datetime with TZ (if provided) or 'Error (Missing)"""
-    """      
+    """
     >>> print(datetime.datetime.utcnow().strftime("%Y/%m/%d %a %I:%M %p"))
     2019/05/19 Sun 01:10 AM
     """
@@ -90,7 +90,7 @@ class Utilities(commands.Cog):
 
             datetime_embed = default_embed(
                 title=":globe_with_meridians: World Clocks :clock1:",
-                description=f'Provided by Völuspá Timekeeping {self.bot.get_emoji(562955074708439040)}',
+                description=f'Provided by Völuspá Timekeeping',
                 color=0x4286f4
             )
             # datetime_embed.set_author(name="Völuspá Timekeeping")
