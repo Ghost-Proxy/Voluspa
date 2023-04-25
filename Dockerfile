@@ -9,7 +9,8 @@ ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
 
-RUN sed -i "s=http://archive.ubuntu.com/ubuntu/=$(wget -qO- http://mirrors.ubuntu.com/mirrors.txt | head -n 1)=" /etc/apt/sources.list
+RUN export mirror_url=$(wget -qO- http://mirrors.ubuntu.com/mirrors.txt | grep -v "^#" | head -n 1) && \
+    sed -i "s|http://archive.ubuntu.com/ubuntu/|${mirror_url}|" /etc/apt/sources.list
 
 RUN apt-get update && \
     apt-get install -qq \
