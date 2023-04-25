@@ -80,6 +80,10 @@ def read_config():
         'Discord': {
             'api_key': getenv_cast('DISCORD_API_KEY')
         },
+        'GitHub': {
+            'token': getenv_cast('GITHUB_TOKEN'),
+            'repo_name': getenv_cast('GITHUB_REPO_NAME')
+        }
     }
 
     if secrets_file:
