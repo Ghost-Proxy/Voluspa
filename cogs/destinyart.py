@@ -1,3 +1,5 @@
+"""Destiny Art Cog"""
+
 import logging
 import random
 

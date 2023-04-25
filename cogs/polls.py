@@ -92,8 +92,10 @@ def gen_yticks(max_pt):
 
 
 def trunc_label(label, num_opts=None, max_lines=None, max_length=25):
-    """Breaks the label up into 25 character max lines."""
-    """If the label space is too small, only some lines will be append and the rest will be represented with ..."""
+    """
+    Breaks the label up into 25 character max lines.
+    If the label space is too small, only some lines will be append and the rest will be represented with ...
+    """
     if max_lines is None:
         if num_opts <= 4:
             max_lines = 4

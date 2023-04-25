@@ -80,7 +80,7 @@ async def async_get_destiny_profile_characters(destiny_membership_id, membership
     target_endpoint = f'/Destiny2/{membership_type}/Profile/{destiny_membership_id}/'
     profile_params = {'components': 'Profiles,Characters'}  # ?components=Profiles,Characters
     raw_json = await async_bungie_request_handler(target_endpoint, params=profile_params)
-    logger.info(f'Successfully retrieved characters for {target_endpoint}')
+    logger.info('Successfully retrieved characters for %s', target_endpoint)
     bungie_response = raw_json['Response']
     characters_data = bungie_response['characters']['data']
     characters = []
@@ -89,9 +89,11 @@ async def async_get_destiny_profile_characters(destiny_membership_id, membership
     return characters
 
 
-async def async_get_member_data_by_id(membership_id, membership_type, platform_type=3):  # platform_type 4 is PC
+async def async_get_member_data_by_id(membership_id, membership_type, platform_type=4):  # platform_type 4 is PC
+    # https://bungie-net.github.io/multi/operation_get_User-GetMembershipDataById.html#operation_get_User-GetMembershipDataById
     target_endpoint = f'/User/GetMembershipsById/{membership_id}/{membership_type}/'
     raw_json = await async_bungie_request_handler(target_endpoint)
+    # logger.info('MEMBER DATA INFO:\n{}'.format(raw_json))
     bungie_response = raw_json['Response']
     destiny_memberships = bungie_response['destinyMemberships']
     destiny_membership_info = [dm for dm in destiny_memberships if dm['membershipType'] == platform_type][0]
@@ -107,18 +109,6 @@ async def async_get_clan_members():
     num_members = bungie_results['totalResults']
     logger.info('BUNGIE MEMBER LIST:\n{}'.format(len(member_list)))
     return num_members, member_list
-
-
-async def async_get_member_data_by_id(membership_id, membership_type, platform_type=4):  # platform_type 4 is PC
-    # https://bungie-net.github.io/multi/operation_get_User-GetMembershipDataById.html#operation_get_User-GetMembershipDataById
-    target_endpoint = f'/User/GetMembershipsById/{membership_id}/{membership_type}/'
-    raw_json = await async_bungie_request_handler(target_endpoint)
-    # logger.info('MEMBER DATA INFO:\n{}'.format(raw_json))
-    bungie_response = raw_json['Response']
-    destiny_memberships = bungie_response['destinyMemberships']
-    destiny_membership_info = [dm for dm in destiny_memberships if dm['membershipType'] == platform_type][0]
-    # logger.info('> Returning: {}'.format(destiny_membership_info['membershipId']))
-    return destiny_membership_info['membershipId']
 
 
 def get_destiny_member_info(member):
@@ -187,7 +177,7 @@ def filter_members_by_field(member_dict, field_name):
 
 def get_members_attr_list_by_role(member_dict, role_name, attr):
     filtered_members = []
-    for member_id, member_info in member_dict.items():
+    for _member_id, member_info in member_dict.items():
         exclusion_list = ['@everyone']
         roles = [role.name for role in member_info['roles'] if role.name not in exclusion_list]
         if role_name in roles:

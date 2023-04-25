@@ -1,4 +1,4 @@
-from modules.misc import AttrDict
+"""Provides a unified message style and theme color palette"""
 
 STYLES = {
     'colors': {
@@ -13,4 +13,11 @@ STYLES = {
     }
 }
 
-STYLES = AttrDict.from_nested_dict(STYLES)
+class Styles():
+    """Styles Object"""
+    def __init__(self):
+        self.styles = STYLES
+
+    def colors(self, color_name):
+        """Return the relevant color code"""
+        return self.styles.get(color_name, None)

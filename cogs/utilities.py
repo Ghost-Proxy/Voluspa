@@ -1,7 +1,10 @@
-import aiohttp
+"""Utilities Cog"""
+
 import logging
 # from typing import Any, List, Dict, Tuple, Sequence
 import datetime
+
+import aiohttp
 
 from discord.ext import commands
 
@@ -11,30 +14,29 @@ logger = logging.getLogger('voluspa.cog.utilities')
 
 
 async def get_online_datetime(location):
-    # Uses https://worldtimeapi.org/
+    """Gets online datetime from https://worldtimeapi.org/"""
     worldtimeapi_url = f'https://www.worldtimeapi.org/api/timezone/{location}'
     async with aiohttp.ClientSession() as session:
-        async with session.get(worldtimeapi_url) as r:
-            if r.status == 200:
-                json_resp = await r.json()
+        async with session.get(worldtimeapi_url) as resp:
+            if resp.status == 200:
+                json_resp = await resp.json()
                 #datetime_str = json_resp['datetime']
                 #return json_resp  #, datetime_str
                 return parse_datetime(json_resp['datetime']), json_resp['abbreviation']
             else:
-                logger.info(f'Error: Unable to retrieve time for: {location} | Resp: {r}')
+                logger.info('Error: Unable to retrieve time for: %s | Resp: %s', location, resp)
                 return None, None
 
 
 def parse_datetime(dt_str):
+    """Parses and returns a datetime"""
     return datetime.datetime.strptime(dt_str, '%Y-%m-%dT%H:%M:%S.%f%z')
 
 
 def display_datetime(datetime_str, time_zone=None, verbose=True):
     """Returns a formatted datetime with TZ (if provided) or 'Error (Missing)"""
-    """
-    >>> print(datetime.datetime.utcnow().strftime("%Y/%m/%d %a %I:%M %p"))
-    2019/05/19 Sun 01:10 AM
-    """
+    # >>> print(datetime.datetime.utcnow().strftime("%Y/%m/%d %a %I:%M %p"))
+    # 2019/05/19 Sun 01:10 AM
     if datetime_str:  # and type(datetime_str) == datetime.datetime.now():
         if verbose:
             return f'{datetime_str.strftime("%Y/%m/%d %a %I:%M %p")}{f" ({time_zone})" if time_zone else ""}'
@@ -52,13 +54,13 @@ class Utilities(commands.Cog):
     @commands.command(name='emotes-list', aliases=['el'])
     @commands.is_owner()
     async def custom_emotes_list(self, ctx):
+        """Displays a list of all custom emojis"""
         bot_emojis = self.bot.emojis
         guild_emojis = ctx.guild.emojis
-        nl = '\n'
         # logger.info(f'Bot Emojis: {nl.join(bot_emojis)}\n')
         # logger.info(f'Guild Emojis: {nl.join(guild_emojis)}\n')
-        logger.info(f'bot emojis: {bot_emojis}')
-        logger.info(f'guild emojis: {guild_emojis}')
+        logger.info('bot emojis: %s', bot_emojis)
+        logger.info('guild emojis: %s', guild_emojis)
 
     @commands.command(name='time', aliases=['clock', 't'])
     @commands.guild_only()
@@ -90,7 +92,7 @@ class Utilities(commands.Cog):
 
             datetime_embed = default_embed(
                 title=":globe_with_meridians: World Clocks :clock1:",
-                description=f'Provided by Völuspá Timekeeping',
+                description='Provided by Völuspá Timekeeping',
                 color=0x4286f4
             )
             # datetime_embed.set_author(name="Völuspá Timekeeping")
@@ -114,7 +116,7 @@ class Utilities(commands.Cog):
                 datetime_embed.add_field(name='Dubai', value=display_datetime(dubai_time[0], 'GST'), inline=False)
                 datetime_embed.add_field(name='Shanghai', value=display_datetime(*shanghai_time), inline=False)
                 datetime_embed.add_field(name='Tokyo', value=display_datetime(*tokyo_time), inline=False)
-                datetime_embed.add_field(name='Australia East', value=display_datetime(*australia_east_time), inline=False)
+                datetime_embed.add_field(name='Aussie East', value=display_datetime(*australia_east_time), inline=False)
                 datetime_embed.add_field(name='Auckland', value=display_datetime(*auckland_time), inline=False)
             else:
                 datetime_embed.add_field(name='Hawaii', value=display_datetime(*hawaii_time, verbose=verbose))
@@ -131,4 +133,5 @@ class Utilities(commands.Cog):
 
 
 async def setup(bot):
+    """Cog Setup"""
     await bot.add_cog(Utilities(bot))

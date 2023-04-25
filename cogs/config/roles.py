@@ -1,3 +1,5 @@
+"""Roles Dict -- TODO Move this into a DB config"""
+
 # Based on either User Inputs (e.g. game_modes, other_games)
 # or Function keys (e.g. topics, gp roles)
 

@@ -43,7 +43,7 @@ class Cache(commands.Cog):
         try:
             await cache.add(cache_key, cache_value, cache_name=cache_name)
         except ValueError as e:
-            logger.info(f'Key already exists: {e}')
+            logger.info('Key already exists: %s', e)
             embed = error_embed(
                 title='Cache Add (K/V)',
                 description=f'Error adding Key/Value to "{cache_name}" cache!\n\n'

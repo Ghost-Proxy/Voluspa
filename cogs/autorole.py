@@ -1,41 +1,44 @@
+"""Autorole Cog"""
+
 # import re
 import asyncio
 import logging
-from typing import Any, List, Dict, Tuple, Sequence, Iterable, Collection
+from typing import Any, Dict, Sequence, Collection
 from collections import OrderedDict
 
 import discord
 from discord.ext import commands
 
-from modules.custom_embed import default_embed, format_list
-from modules.styles import STYLES
-from cogs.config.roles import ROLES
-from modules.misc import chunk_list
-
-from voluspa import CONFIG
-
-from templates.autorole import offboard_message, onboard_member_message, onboard_friend_message
-
 from titlecase import titlecase
 
+from modules.custom_embed import default_embed, format_list
+from modules.styles import Styles
+from modules.misc import chunk_list
+from cogs.config.roles import ROLES
+from voluspa import CONFIG
+from templates.autorole import offboard_message, onboard_member_message, onboard_friend_message
+
 logger = logging.getLogger('voluspa.cog.autorole')
+styles = Styles()
 
 
 # TODO: Configurable matching rules?
 def process_role_inputs(role_inputs, role_dict, allow_all=False):
+    """Process requested role inputs"""
     roles_to_update = set()
-    for ri in role_inputs:
+    for rinput in role_inputs:
         for role, allowed_names in role_dict.items():
             for name in allowed_names:
-                if ((allow_all and ri.lower() == 'all') or
-                        ri.lower() == name.lower() or
-                        ri.replace(' ', '') == name.lower()):
+                if ((allow_all and rinput.lower() == 'all') or
+                        rinput.lower() == name.lower() or
+                        rinput.replace(' ', '') == name.lower()):
                     roles_to_update.add(role)
                     break
     return roles_to_update
 
 
 def match_users(user_list, username):
+    """Find all matching users in list that match username"""
     matched_users = [user for user in user_list if username[0] in user['name'] or username[0] in user['nick']]
     if len(username) >= 2:
         matched_users = [user for user in matched_users if user['salt'] == username[1]]
@@ -52,6 +55,7 @@ class Autorole(commands.Cog):
         self.roles_dicts = ROLES
 
     async def toggle_role(self, ctx, role_name, role_category):
+        """Toggles role state"""
         role = discord.utils.get(ctx.message.guild.roles, name=role_name)
         if role not in ctx.message.author.roles:
             await self.update_roles(ctx, role_category, [role_name])
@@ -73,6 +77,7 @@ class Autorole(commands.Cog):
                            options: Dict = None,
                            allow_all=False,
                            use_role_label=False):
+        """Update roles based on requested changes"""
         # TODO: Make it so that if the roles list is not supplied, the entire roles_dict is used?
         async with ctx.typing():
             # Set options and values
@@ -94,7 +99,7 @@ class Autorole(commands.Cog):
                 return
 
             # Process input and sanitize
-            logger.info(f'update_roles - roles_input: {roles}')
+            logger.info('update_roles - roles_input: %s', roles)
             roles_to_update = process_role_inputs(roles, role_dict, allow_all=allow_all)
 
             if not list(roles_to_update):
@@ -122,14 +127,14 @@ class Autorole(commands.Cog):
             elif action == 'remove':
                 await user.remove_roles(*updated_roles)
             else:
-                print(f"Unknown Action for Update Roles!")
+                print("Unknown Action for Update Roles!")
                 return
 
             if confirm:
                 confirm_embed = default_embed(
                     title='Role Update',
                     description=f'\n{update_message.capitalize()} role(s):{format_list(role_results)}',
-                    color=STYLES.colors.success
+                    color=styles.colors('success')
                 )
                 await ctx.send(f'{ctx.message.author.mention}', embed=confirm_embed)
 
@@ -146,19 +151,21 @@ class Autorole(commands.Cog):
                                    action: str = 'add',
                                    success_callbacks: Sequence[Any] = None,
                                    allow_conflict_resolution: bool = True):
-        # Args are multiple user names (potentially _n_)
-        # Search member list for each user name provided
-        #  - if more then one user name matches, return a list of matches and ask for a retry
-        #  - if only one match, sets friend role for discord user
+        """Assign requested roles to user
 
-        # <Member id=962762036347236771 name='Zed' discriminator='6791' bot=False nick=None
-        # guild=<Guild id=374330517165965313 name='Ghost Proxy' chunked=True>>,
+        Args are multiple user names (potentially _n_)
+        Search member list for each user name provided
+            - if more then one user name matches, return a list of matches and ask for a retry
+            - if only one match, sets friend role for discord user
 
-        # RegEx Filter: r'^\S+#\d+$' # TODO...
-        # TODO: Check if member is set, and then remove, but prompt?
-        # TODO: Add verification of role before message
+        <Member id=962762036347236771 name='Zed' discriminator='6791' bot=False nick=None
+        guild=<Guild id=374330517165965313 name='Ghost Proxy' chunked=True>>,
 
-        # TODO: Ugh... this is a mess and should be redone from scratch...
+        TODO: RegEx Filter: r'^\S+#\d+$'
+        TODO: Check if member is set, and then remove, but prompt?
+        TODO: Add verification of role before message
+        TODO: Ugh... this is a mess and should be redone from scratch...
+        """
         if action not in ['add', 'remove']:
             return
 
@@ -166,10 +173,10 @@ class Autorole(commands.Cog):
         if len(users) <= 0:
             await ctx.send(f'{ctx.message.author.mention} - Please provide User(s) to promote.')
 
-        logger.info(f'Raw Args: {users}')
+        logger.info('Raw Args: %s', users)
         requested_users = [user.casefold().split('#') for user in users]
 
-        logger.info(f'User Args: {requested_users}')
+        logger.info('User Args: %s', requested_users)
         discord_members = self.bot.get_all_members()
         # TODO: Would be nice to cache this, expire based on timeframes
         #  ...would be cool to tie cache invalidation to event callbacks...
@@ -191,7 +198,7 @@ class Autorole(commands.Cog):
         # logger.info(f'Discord Members:\n{member_list}') # -- this logs quite a bit
 
         user_results = [{req_user[0]: match_users(member_list, req_user)} for req_user in requested_users]
-        logger.info(f'Member Search Results:\n{user_results}\n')
+        logger.info('Member Search Results:\n%s\n', user_results)
 
         multiple_users_found = False
         for user_rec in user_results:
@@ -203,7 +210,7 @@ class Autorole(commands.Cog):
                 multiple_users_warn_embed = default_embed(
                     title='Multiple Users Found!',
                     description=f'\n:warning: Found multiple Users, need more info:{format_list(temp_list)}',
-                    color=STYLES.colors.warning
+                    color=styles.colors('warning')
                 )
                 await ctx.send(f'{ctx.message.author.mention}', embed=multiple_users_warn_embed)
             elif len(user_matches) == 1:
@@ -220,7 +227,7 @@ class Autorole(commands.Cog):
                                 description=f'\n:no_entry: Sorry, could not immediately change Roles for:\n\n'
                                 f'`{user_matches[0]["name"]}#{user_matches[0]["salt"]} ({user_matches[0]["nick"]})`'
                                 f'\n\nUser has the following conflicting Role(s):{format_list(conflicting_roles)}',
-                                color=STYLES.colors.danger
+                                color=styles.colors('danger')
                             )
                             await ctx.send(f'{ctx.message.author.mention}', embed=conflict_roles_embed)
 
@@ -230,7 +237,7 @@ class Autorole(commands.Cog):
                                 ' and continue with role updates?\n\n'
                                 '  To remove the role and continue select :white_check_mark:\n'
                                 '  To cancel the role change command select :no_entry:',
-                                color=STYLES.colors.warning
+                                color=styles.colors('warning')
                             )
                             role_conflict_msg = await ctx.send(embed=conflict_embed)
                             # TODO: Ask for a reset of conflicting role here :check
@@ -264,11 +271,11 @@ class Autorole(commands.Cog):
                 if ok_to_update_roles:
 
                     if action == 'add':
-                        action_message = f'**+** adding Role(s):'
+                        action_message = '**+** adding Role(s):'
                     elif action == 'remove':
-                        action_message = f'**-** removing Role(s):'
+                        action_message = '**-** removing Role(s):'
                     else:  # TODO: Pretty sure this should not be possible... ?
-                        action_message = f'setting Role(s):'
+                        action_message = 'setting Role(s):'
 
                     role_embed = default_embed(
                         title=':white_check_mark: Setting User Roles',
@@ -276,7 +283,7 @@ class Autorole(commands.Cog):
                         f'({user_matches[0]["nick"]})`\n\n'
                         f'{action_message}'
                         f'{format_list(roles)}',
-                        color=STYLES.colors.success
+                        color=styles.colors('success')
                     )
 
                     # await self.update_roles(ctx, 'ghost_proxy_roles', ['gpf'])  # TODO: Abstract this to params...
@@ -296,28 +303,28 @@ class Autorole(commands.Cog):
                     await ctx.send(f'{ctx.message.author.mention}', embed=role_embed)
 
                     if success_callbacks:
-                        for cb in success_callbacks:
+                        for callback in success_callbacks:
                             try:
-                                await cb(user_matches[0])
-                            except Exception as e:
-                                logger.info(f'Success Callback Exception: {e}')
+                                await callback(user_matches[0])
+                            except Exception as exc:
+                                logger.info('Success Callback Exception: %s', exc)
             else:
                 error_embed = default_embed(
                     title='No Matching User',
                     description=f'\n:no_entry: Sorry, could not find a matching User for:\n\n'
                     f'\n`{req_user}`'
                     f'\n\nPlease try again.',
-                    color=STYLES.colors.danger
+                    color=styles.colors('danger')
                 )
                 await ctx.send(f'{ctx.message.author.mention}', embed=error_embed)
 
         if multiple_users_found:
             multiple_users_embed = default_embed(
                 title='Multiple Users Found',
-                description=f'\n**NOTE:** _Multiple User results were found for 1 or more requested Users._\n\n'
+                description='\n**NOTE:** _Multiple User results were found for 1 or more requested Users._\n\n'
                 f'Please review the results above and then try again with a full Username.\n\n'
                 f'_Example:_  `<user>#<id>`  ->  `$p2f guardian#1234`',
-                color=STYLES.colors.info
+                color=styles.colors('info')
             )
             await ctx.send(embed=multiple_users_embed)
 
@@ -332,9 +339,9 @@ class Autorole(commands.Cog):
             return user == ctx.message.author and reaction.message.id == confirm_msg.id
 
         try:
-            reaction, user = await self.bot.wait_for('reaction_add', check=check, timeout=60)
+            reaction, _user = await self.bot.wait_for('reaction_add', check=check, timeout=60)
         except asyncio.TimeoutError:
-            await ctx.send(f'Request timed out... :(')
+            await ctx.send('Request timed out... :(')
             return False
         else:
             # print(f'reaction_emoji: {reaction} | {reaction.emoji}')
@@ -363,7 +370,7 @@ class Autorole(commands.Cog):
         Multiple roles can be added at once, e.g. `$lfg-add c g` adds @crucible and @gambit.
         """
         # $lfg (no param) -- Lists current LFG roles set
-        logger.info(f'roles input: {roles}')
+        logger.info('roles input: %s', roles)
         await self.update_roles(
             ctx,
             'game_modes',
@@ -553,7 +560,8 @@ class Autorole(commands.Cog):
 
         async def send_welcome_guild_message(user_rec):
             new_member = self.bot.get_user(user_rec['id'])
-            guild_welcome = f"_Greetings to our new member, {new_member.mention}! :tada: Welcome to Ghost Proxy!_ <:ghost_proxy_2:455130686290919427>"
+            guild_welcome = f"_Greetings to our new member, {new_member.mention}! :tada: " \
+                "Welcome to Ghost Proxy!_ <:ghost_proxy_2:455130686290919427>"
             guild_channel = ctx.bot.get_channel(CONFIG.Voluspa.private_guild_channel_id)
             await guild_channel.send(guild_welcome)
 
@@ -931,4 +939,5 @@ class Autorole(commands.Cog):
 
 
 async def setup(bot):
+    """Cog setup"""
     await bot.add_cog(Autorole(bot))

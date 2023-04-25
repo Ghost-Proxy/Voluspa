@@ -8,18 +8,6 @@ import sys
 import traceback
 import asyncio
 
-# Custom Imports
-from modules.config import CONFIG
-from modules.logger import Archivist
-
-archivist = Archivist()
-logger = archivist.get_logger()
-
-from modules.fun import Quotes
-#from modules.database import Database
-from modules.discord_utils import get_prefix, update_status_task
-from modules.exceptions import VoluspaError, BungieAPIError, BungieAPIOffline
-
 # Third-Party Imports
 import discord
 from discord import app_commands
@@ -35,20 +23,31 @@ else:
 
 # Caches
 from aiocache import caches
+
+# Custom Imports
+from modules.config import CONFIG
+from modules.logger import Archivist
+
+from modules.fun import Quotes
+# from modules.database import Database
+from modules.discord_utils import get_prefix, update_status_task
+from modules.exceptions import BungieAPIError, BungieAPIOffline
+
+# Init
+archivist = Archivist()
+logger = archivist.get_logger()
 caches.set_config(CONFIG.Voluspa.cache)
 
-# New as of discordpy 1.5.1
+# Setup initial client (Intents new as of discordpy 1.5.1)
 intents = discord.Intents.default()
 intents.members = True
 intents.presences = True
 intents.message_content = True
-
-# Setup Initial Stuff
 client = discord.Client(intents=intents)
 
 # These should perhaps be cogs..?
 quotes = Quotes()
-#db = Database()
+# db = Database()
 
 cog_extensions = [
     'cogs.autorole',
@@ -80,7 +79,8 @@ bot = commands.Bot(
 
 @bot.event
 async def on_ready():
-    logger.info('*** Logged in as: {} (ID: {}) ***'.format(bot.user.name, bot.user.id))
+    """Bot on_ready event"""
+    logger.info('*** Logged in as: %s (ID: %s) ***', bot.user.name, bot.user.id)
     logger.info('// VOLUSPA WARMIND ONLINE!!')
 
     if not hasattr(bot, 'uptime'):
@@ -102,7 +102,7 @@ async def on_ready():
 
 @bot.event
 async def on_member_join(member):
-
+    """on_member_join auto-firing event"""
     server_info_channel = discord.utils.get(member.guild.channels, name='server-info')
     rules_channel = discord.utils.get(member.guild.channels, name='rules-conduct')
     # server-info ID: 548653299109462017 | <#server-info:548653299109462017>
@@ -118,12 +118,12 @@ async def on_member_join(member):
         color=0x009933
     )
     embed.add_field(
-        name=f'Welcome to Ghost Proxy! <:ghost_proxy:455130405398380564>',
+        name='Welcome to Ghost Proxy! <:ghost_proxy:455130405398380564>',
         value=welcome_msg,
         inline=False
     )
     embed.set_footer(
-        text=f'via Völuspá with \u2764',
+        text='via Völuspá with \u2764',
         icon_url=f"{CONFIG.Resources.image_bucket_root_url}/voluspa/Voluspa_icon_64x64.png"
     )
     if channel is not None:
@@ -133,6 +133,7 @@ async def on_member_join(member):
 # https://gist.github.com/AileenLumina/510438b241c16a2960e9b0b014d9ed06
 @bot.event
 async def on_command_error(ctx, error):
+    """Custom error handler for on_command_error"""
     # if command has local error handler, return
     if hasattr(ctx.command, 'on_error'):
         return
@@ -146,10 +147,10 @@ async def on_command_error(ctx, error):
     if isinstance(error, commands.BotMissingPermissions):
         missing = [perm.replace('_', ' ').replace('guild', 'server').title() for perm in error.missing_perms]
         if len(missing) > 2:
-            fmt = '{}, and {}'.format("**, **".join(missing[:-1]), missing[-1])
+            fmt = f'{"**, **".join(missing[:-1])}, and {missing[-1]}'
         else:
             fmt = ' and '.join(missing)
-        _message = 'I need the **{}** permission(s) to run this command.'.format(fmt)
+        _message = f'I need the **{fmt}** permission(s) to run this command.'
         await ctx.send(_message)
         return
 
@@ -158,16 +159,16 @@ async def on_command_error(ctx, error):
     #     return
 
     if isinstance(error, commands.CommandOnCooldown):
-        await ctx.send("This command is on cooldown, please retry in {}s.".format(math.ceil(error.retry_after)))
+        await ctx.send(f"This command is on cooldown, please retry in {math.ceil(error.retry_after)}s.")
         return
 
     if isinstance(error, commands.MissingPermissions):
         missing = [perm.replace('_', ' ').replace('guild', 'server').title() for perm in error.missing_perms]
         if len(missing) > 2:
-            fmt = '{}, and {}'.format("**, **".join(missing[:-1]), missing[-1])
+            fmt = f'{"**, **".join(missing[:-1])}, and {missing[-1]}'
         else:
             fmt = ' and '.join(missing)
-        _message = 'You need the **{}** permission(s) to use this command.'.format(fmt)
+        _message = f'You need the **{fmt}** permission(s) to use this command.'
         await ctx.send(_message)
         return
 
@@ -196,12 +197,13 @@ async def on_command_error(ctx, error):
         return
 
     # ignore all other exception types, but print them to stderr
-    print('Ignoring exception in command {}:'.format(ctx.command), file=sys.stderr)
+    print(f'Ignoring exception in command {ctx.command}:', file=sys.stderr)
 
     traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
 
 # https://github.com/Rapptz/RoboDanny/blob/rewrite/cogs/stats.py
 async def on_app_command_error(interaction: discord.Interaction, error: app_commands.AppCommandError) -> None:
+    """Command error handler for on_app_command_error"""
     # Why is this necessary?
     error = getattr(error, 'original', error)
 
@@ -211,10 +213,10 @@ async def on_app_command_error(interaction: discord.Interaction, error: app_comm
     if isinstance(error, app_commands.BotMissingPermissions):
         missing = [perm.replace('_', ' ').replace('guild', 'server').title() for perm in error.missing_permissions]
         if len(missing) > 2:
-            fmt = '{}, and {}'.format("**, **".join(missing[:-1]), missing[-1])
+            fmt = f'{"**, **".join(missing[:-1])}, and {missing[-1]}'
         else:
             fmt = ' and '.join(missing)
-        _message = 'I need the **{}** permission(s) to run this command.'.format(fmt)
+        _message = f'I need the **{fmt}** permission(s) to run this command.'
         await interaction.response.send_message(_message, ephemeral=True)
         return
 
@@ -223,16 +225,19 @@ async def on_app_command_error(interaction: discord.Interaction, error: app_comm
     #     return
 
     if isinstance(error, app_commands.CommandOnCooldown):
-        await interaction.response.send_message("This command is on cooldown, please retry in {}s.".format(math.ceil(error.retry_after)), ephemeral=True)
+        await interaction.response.send_message(
+            f"This command is on cooldown, please retry in {math.ceil(error.retry_after)}s.",
+            ephemeral=True
+            )
         return
 
     if isinstance(error, app_commands.MissingPermissions):
         missing = [perm.replace('_', ' ').replace('guild', 'server').title() for perm in error.missing_permissions]
         if len(missing) > 2:
-            fmt = '{}, and {}'.format("**, **".join(missing[:-1]), missing[-1])
+            fmt = f'{"**, **".join(missing[:-1])}, and {missing[-1]}'
         else:
             fmt = ' and '.join(missing)
-        _message = 'You need the **{}** permission(s) to use this command.'.format(fmt)
+        _message = f'You need the **{fmt}** permission(s) to use this command.'
         await interaction.response.send_message(_message, ephemeral=True)
         return
 
@@ -256,7 +261,7 @@ async def on_app_command_error(interaction: discord.Interaction, error: app_comm
         return
 
     # ignore all other exception types, but print them to stderr
-    print('Ignoring exception in command {}:'.format(interaction.command), file=sys.stderr)
+    print(f'Ignoring exception in command {interaction.command}:', file=sys.stderr)
 
     traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
 
@@ -297,12 +302,13 @@ bot.tree.on_error = on_app_command_error
 
 
 async def main():
+    """Main entrypoint for the whole show!!"""
     logger.info('// Völuspá / Booting...')
 
     async with bot:
         logger.info('Initializing bot...')
         for extension in cog_extensions:
-            logger.info(f'Loading extension [{extension}]...')
+            logger.info('Loading extension [%s]...', extension)
             await bot.load_extension(extension)
         logger.info('Starting bot...')
         await bot.start(CONFIG.Discord.api_key)

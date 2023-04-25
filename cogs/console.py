@@ -1,3 +1,5 @@
+"""Secret debug console via Jishaku"""
+
 from discord.ext import commands
 from jishaku.cog import JishakuBase, jsk
 from jishaku.metacog import GroupCogMeta
@@ -5,12 +7,13 @@ from jishaku.metacog import GroupCogMeta
 
 @commands.group(alias=['>'])
 async def jk(self, ctx):
-    pass
+    """Jishaku command"""
 
 
 class Console(JishakuBase, metaclass=GroupCogMeta, command_parent=jk):
-    pass
+    """Jishaku console"""
 
 
 async def setup(bot: commands.Bot):
+    """Cog setup"""
     await bot.add_cog(Console(bot))

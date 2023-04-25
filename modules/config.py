@@ -1,6 +1,10 @@
+"""Voluspa Dynamic Configuration"""
+
 import os
-import yaml
 import datetime
+
+import yaml
+
 # import functools
 # @functools.lru_cache()
 
@@ -11,11 +15,13 @@ from config.cache_config import CACHE_CONFIG
 # Load in our secrets and config files
 # config = configparser.ConfigParser()
 def read_yaml(yaml_file):
-    with open(yaml_file, 'r') as yfile:
+    """Reads the YAML config file and returns the yaml fully loaded"""
+    with open(yaml_file, 'r', encoding=str) as yfile:
         return yaml.full_load(yfile)
 
 
 def bool_converter(value):
+    """Handles casting common string values for booleans"""
     if value.lower() in ['true', 1, 'yes', 'on', 'y']:
         return True
     if value.lower() in ['false', 0, 'no', 'off', 'n']:
@@ -24,6 +30,7 @@ def bool_converter(value):
 
 
 def cast_to_native_type(value):
+    """Attempts to cast values to native types"""
     if value is None:
         return value
     supported_types = [int, float, bool_converter]  # haha, bool() is too greedy
@@ -36,6 +43,7 @@ def cast_to_native_type(value):
 
 
 def getenv_cast(env_var, default=None):
+    """Gets the requested env var and attempts to cast it to native type"""
     return cast_to_native_type(os.getenv(env_var, default))
 
 
@@ -65,7 +73,7 @@ def read_config():
 
     secrets_path = os.path.join(os.getcwd(), './config/secrets.yaml')
     secrets_file = None
-    print(f'Attempting to load secrets from file...')
+    print('Attempting to load secrets from file...')
     if os.path.isfile(secrets_path):
         print('Found secrets.yml loading...')
         secrets_file = read_yaml('./config/secrets.yaml')
@@ -95,9 +103,9 @@ def read_config():
     if 'Voluspa' not in secrets:
         secrets['Voluspa'] = {}
     voluspa_config = ['VOLUSPA_PREFIX', 'VOLUSPA_FEEDBACK_CHANNEL_ID', 'VOLUSPA_PRIVATE_GUILD_CHANNEL_ID']
-    for ve in voluspa_config:
-        if os.getenv(ve):
-            secrets['Voluspa'][ve.split('_', maxsplit=1)[1].lower()] = getenv_cast(ve)
+    for vol_env in voluspa_config:
+        if os.getenv(vol_env):
+            secrets['Voluspa'][vol_env.split('_', maxsplit=1)[1].lower()] = getenv_cast(vol_env)
 
     # ADDITIONAL CONFIG
     # Handle cache
