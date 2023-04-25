@@ -188,7 +188,7 @@ class Autorole(commands.Cog):
             }
             for member in discord_members if not member.bot
         ]
-        logger.info(f'Discord Members:\n{member_list}')
+        # logger.info(f'Discord Members:\n{member_list}') # -- this logs quite a bit
 
         user_results = [{req_user[0]: match_users(member_list, req_user)} for req_user in requested_users]
         logger.info(f'Member Search Results:\n{user_results}\n')
