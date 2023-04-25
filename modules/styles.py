@@ -1,5 +1,8 @@
 """Provides a unified message style and theme color palette"""
 
+from modules.exceptions import VoluspaError
+
+
 STYLES = {
     'colors': {
         'voluspa': 0x009933,
@@ -20,4 +23,8 @@ class Styles():
 
     def colors(self, color_name):
         """Return the relevant color code"""
-        return self.styles.get(color_name, None)
+        color = self.styles['colors'].get(color_name)
+        if color:
+            return color
+
+        raise VoluspaError('Unknown color selection!')

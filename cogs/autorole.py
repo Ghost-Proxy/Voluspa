@@ -73,8 +73,8 @@ class Autorole(commands.Cog):
                            ctx,
                            role_class: str,
                            roles: Sequence[str],
-                           user_id: int = None,
-                           options: Dict = None,
+                           user_id: int | None = None,
+                           options: Dict | None = None,
                            allow_all=False,
                            use_role_label=False):
         """Update roles based on requested changes"""
@@ -147,9 +147,9 @@ class Autorole(commands.Cog):
                                    roles: Sequence[str],
                                    users: Collection[str],
                                    # role_limit: str = None,
-                                   role_limits: Sequence[str] = None,
+                                   role_limits: Sequence[str] | None = None,
                                    action: str = 'add',
-                                   success_callbacks: Sequence[Any] = None,
+                                   success_callbacks: Sequence[Any] | None = None,
                                    allow_conflict_resolution: bool = True):
         """Assign requested roles to user
 

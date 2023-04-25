@@ -6,6 +6,7 @@ import statistics
 
 from modules.config import CONFIG
 from modules.discord_utils import send_multipart_msg
+from modules.exceptions import VoluspaError
 from modules.external_services.bungie import async_bungie_request_handler
 
 import discord
@@ -81,34 +82,40 @@ async def async_get_destiny_profile_characters(destiny_membership_id, membership
     profile_params = {'components': 'Profiles,Characters'}  # ?components=Profiles,Characters
     raw_json = await async_bungie_request_handler(target_endpoint, params=profile_params)
     logger.info('Successfully retrieved characters for %s', target_endpoint)
-    bungie_response = raw_json['Response']
-    characters_data = bungie_response['characters']['data']
-    characters = []
-    for char in characters_data.values():
-        characters.append({'classType': char['classType'], 'light': char['light']})
-    return characters
+    if raw_json:
+        bungie_response = raw_json['Response']
+        characters_data = bungie_response['characters']['data']
+        characters = []
+        for char in characters_data.values():
+            characters.append({'classType': char['classType'], 'light': char['light']})
+        return characters
+    raise VoluspaError('raw_json was empty!')
 
 
 async def async_get_member_data_by_id(membership_id, membership_type, platform_type=4):  # platform_type 4 is PC
     # https://bungie-net.github.io/multi/operation_get_User-GetMembershipDataById.html#operation_get_User-GetMembershipDataById
     target_endpoint = f'/User/GetMembershipsById/{membership_id}/{membership_type}/'
     raw_json = await async_bungie_request_handler(target_endpoint)
-    # logger.info('MEMBER DATA INFO:\n{}'.format(raw_json))
-    bungie_response = raw_json['Response']
-    destiny_memberships = bungie_response['destinyMemberships']
-    destiny_membership_info = [dm for dm in destiny_memberships if dm['membershipType'] == platform_type][0]
-    # logger.info('> Returning: {}'.format(destiny_membership_info['membershipId']))
-    return destiny_membership_info['membershipId']
+    # logger.info('MEMBER DATA INFO:\n{}'.format(raw_json))\
+    if raw_json:
+        bungie_response = raw_json['Response']
+        destiny_memberships = bungie_response['destinyMemberships']
+        destiny_membership_info = [dm for dm in destiny_memberships if dm['membershipType'] == platform_type][0]
+        # logger.info('> Returning: {}'.format(destiny_membership_info['membershipId']))
+        return destiny_membership_info['membershipId']
+    raise VoluspaError('raw_json was empty!')
 
 
 async def async_get_clan_members():
     target_endpoint = f'/GroupV2/{CONFIG.Bungie.clan_group_id}/Members/'
     raw_json = await async_bungie_request_handler(target_endpoint)
-    bungie_results = raw_json['Response']
-    member_list = bungie_results['results']
-    num_members = bungie_results['totalResults']
-    logger.info('BUNGIE MEMBER LIST:\n{}'.format(len(member_list)))
-    return num_members, member_list
+    if raw_json:
+        bungie_results = raw_json['Response']
+        member_list = bungie_results['results']
+        num_members = bungie_results['totalResults']
+        logger.info('BUNGIE MEMBER LIST:\n{}'.format(len(member_list)))
+        return num_members, member_list
+    raise VoluspaError('raw_json was empty!')
 
 
 def get_destiny_member_info(member):
@@ -127,45 +134,51 @@ def get_destiny_member_info(member):
 async def async_get_bungie_clan_members():
     target_endpoint = f'/GroupV2/{CONFIG.Bungie.clan_group_id}/Members/'
     response = await async_bungie_request_handler(target_endpoint)
-    logger.info(f'Bungie Response: {response}')
-    bungie_results = response['Response']
-    logger.info('BUNGIE MEMBER LIST:\n{}'.format(bungie_results))
-    member_results = bungie_results['results']
-    num_members = bungie_results['totalResults']
-    member_list = [member['destinyUserInfo']['displayName'] for member in member_results]
-    return num_members, member_list, member_results
+    if response:
+        logger.info(f'Bungie Response: {response}')
+        bungie_results = response['Response']
+        logger.info('BUNGIE MEMBER LIST:\n{}'.format(bungie_results))
+        member_results = bungie_results['results']
+        num_members = bungie_results['totalResults']
+        member_list = [member['destinyUserInfo']['displayName'] for member in member_results]
+        return num_members, member_list, member_results
+    raise VoluspaError('response was empty!')
 
 
 async def async_get_bungie_member_list():
     target_endpoint = f'/GroupV2/{CONFIG.Bungie.clan_group_id}/Members/'
     raw_json = await async_bungie_request_handler(target_endpoint)
-    bungie_results = raw_json['Response']
-    logger.info('BUNGIE MEMBER LIST:\n{}'.format(bungie_results))
-    member_results = bungie_results['results']
-    num_members = raw_json['Response']['totalResults']
-    member_list = [member['destinyUserInfo']['displayName'] for member in member_results]
-    return num_members, member_list, member_results
+    if raw_json:
+        bungie_results = raw_json['Response']
+        logger.info('BUNGIE MEMBER LIST:\n{}'.format(bungie_results))
+        member_results = bungie_results['results']
+        num_members = raw_json['Response']['totalResults']
+        member_list = [member['destinyUserInfo']['displayName'] for member in member_results]
+        return num_members, member_list, member_results
+    raise VoluspaError('raw_json was empty!')
 
 
 async def async_get_bungie_member_type_dict():
     target_endpoint = f'/GroupV2/{CONFIG.Bungie.clan_group_id}/Members/'
     raw_json = await async_bungie_request_handler(target_endpoint)
-    bungie_results = raw_json['Response']
-    logger.info('BUNGIE MEMBER LIST:\n{}'.format(bungie_results))
-    member_results = bungie_results['results']
-    num_members = raw_json['Response']['totalResults']
-    # member_list = [{'displayName': member['destinyUserInfo']['displayName'], 'memberType': member['memberType']} for member in member_results]
-    member_dict = {'members': [], 'admins': []}
-    # Member type 1 is recruit?
-    # Member type 2 is normal member
-    # Member type 3 is admin
-    # Member type 5 is founder
-    for member in member_results:
-        if member['memberType'] == 2:
-            member_dict['members'].append(member['destinyUserInfo']['displayName'])
-        elif member['memberType'] in {3, 5}:
-            member_dict['admins'].append(member['destinyUserInfo']['displayName'])
-    return num_members, member_dict
+    if raw_json:
+        bungie_results = raw_json['Response']
+        logger.info('BUNGIE MEMBER LIST:\n{}'.format(bungie_results))
+        member_results = bungie_results['results']
+        num_members = raw_json['Response']['totalResults']
+        # member_list = [{'displayName': member['destinyUserInfo']['displayName'], 'memberType': member['memberType']} for member in member_results]
+        member_dict = {'members': [], 'admins': []}
+        # Member type 1 is recruit?
+        # Member type 2 is normal member
+        # Member type 3 is admin
+        # Member type 5 is founder
+        for member in member_results:
+            if member['memberType'] == 2:
+                member_dict['members'].append(member['destinyUserInfo']['displayName'])
+            elif member['memberType'] in {3, 5}:
+                member_dict['admins'].append(member['destinyUserInfo']['displayName'])
+        return num_members, member_dict
+    raise VoluspaError('raw_json was empty!')
 
 
 def filter_members_by_field(member_dict, field_name):
@@ -188,14 +201,18 @@ def get_members_attr_list_by_role(member_dict, role_name, attr):
 async def async_bungie_search_users(player_name):
     search_url = f'/User/SearchUsers/?q={player_name}'
     raw_json = await async_bungie_request_handler(search_url)
-    bungie_results = raw_json['Response']
-    logger.info('Bungie Search response:\n{}'.format(bungie_results))
-    if len(bungie_results) == 0:
-        endpoint_path = f'/Destiny2/SearchDestinyPlayer/{4}/{player_name}/'
-        raw_json = await async_bungie_request_handler(endpoint_path)
+    if raw_json:
         bungie_results = raw_json['Response']
-        logger.info(f'Destiny Search response:\n{bungie_results}')
-    return bungie_results
+        logger.info('Bungie Search response:\n{}'.format(bungie_results))
+        if len(bungie_results) == 0:
+            endpoint_path = f'/Destiny2/SearchDestinyPlayer/{4}/{player_name}/'
+            player_raw_json = await async_bungie_request_handler(endpoint_path)
+            if player_raw_json:
+                bungie_results = player_raw_json['Response']
+                logger.info(f'Destiny Search response:\n{bungie_results}')
+            raise VoluspaError('player_raw_json was empty!')
+        return bungie_results
+    raise VoluspaError('raw_json was empty!')
 
 
 def get_discord_member_record(member):

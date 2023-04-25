@@ -24,7 +24,8 @@ emoji==2.2.0
 titlecase==2.4.0
 
 # Discord.py DEBUG
-jishaku==2.5.1
+# jishaku==2.5.1  <-- This relies on line-profiler which doesn't build ATM on Apple Silicon :(
+jishaku @ git+https://github.com/Gorialis/jishaku@bf26bea
 
 # TESTING
 # tox==3.13.2

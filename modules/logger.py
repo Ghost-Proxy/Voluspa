@@ -60,12 +60,15 @@ def _setup_logging(log_level=logging.INFO):
     voluspa_file_handler.setFormatter(log_formatter)
 
     voluspa_logger.info('Logging online!')
+    for log_file in [log_file_path, discord_log_file_path, voluspa_log_file_path]:
+        voluspa_logger.info('Log file [%s] at: [%s]', file_exists_msg(log_file), log_file)
 
-    # TODO WTF...???!?! WHAT IS THIS?!?! rewrite this crap... come on
-    voluspa_logger.info(f'Log file [{"exists" if os.path.isfile(log_file_path) else "does NOT exist"}] at: [{log_file_path}]')
-    voluspa_logger.info(f'Log file [{"exists" if os.path.isfile(discord_log_file_path) else "does NOT exist"}] at: [{discord_log_file_path}]')
-    voluspa_logger.info(f'Log file [{"exists" if os.path.isfile(voluspa_log_file_path) else "does NOT exist"}] at: [{voluspa_log_file_path}]')
     return voluspa_logger
+
+
+def file_exists_msg(path):
+    """String helper for file existence msg"""
+    return "exists" if os.path.isfile(path) else "does NOT exist"
 
 
 class Archivist(object):

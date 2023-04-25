@@ -8,7 +8,7 @@ import yaml
 # import functools
 # @functools.lru_cache()
 
-from modules.misc import merge_dicts, AttrDict, memoize
+from modules.misc import merge_dicts, memoize
 from config.cache_config import CACHE_CONFIG
 
 
@@ -16,7 +16,7 @@ from config.cache_config import CACHE_CONFIG
 # config = configparser.ConfigParser()
 def read_yaml(yaml_file):
     """Reads the YAML config file and returns the yaml fully loaded"""
-    with open(yaml_file, 'r', encoding=str) as yfile:
+    with open(yaml_file, 'r', encoding='utf8') as yfile:
         return yaml.full_load(yfile)
 
 
@@ -59,10 +59,15 @@ def read_config():
     file_config = read_yaml('./config/config.yaml')
 
     print('Setting Voluspa boot settings...')
+    if sha:= os.getenv('SOURCE_VERSION'):
+        sha = sha[:10]
+    else:
+        sha = 'Unknown (local?)'
+
     voluspa_info = {
         'Voluspa': {
             'version': 'v0.0.13',
-            'sha': os.getenv('SOURCE_VERSION')[:10] if os.getenv('SOURCE_VERSION') else 'Unknown (local?)',
+            'sha': sha,
             'app_cwd': os.path.abspath(os.getcwd()),
             'boot_time': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         }
@@ -112,18 +117,12 @@ def read_config():
     secrets['Voluspa']['fancy_name'] = 'Völuspá'
     secrets['Voluspa']['cache'] = CACHE_CONFIG
 
-    merged_config_2 = merge_dicts(merged_config_1, secrets)
+    merged_config_final = merge_dicts(merged_config_1, secrets)
 
-    nested_config = AttrDict.from_nested_dict(merged_config_2)
-    # Add resources from env
-    # TODO Redo this flow...
-    if not nested_config.Resources.image_bucket_root_url:
-        nested_config.Resources.image_bucket_root_url = os.getenv('IMAGE_BUCKET_ROOT_URL', '')
+    if not merged_config_final['Resources']['image_bucket_rool_url']:
+        merged_config_final['Resources']['image_bucket_rool_url'] = os.getenv('IMAGE_BUCKET_ROOT_URL', '')
 
-    #print(f'Voluspa merged config -- Resources:\n{nested_config.Resources}')
-    #print(f'Voluspa merged config -- Voluspa:\n{nested_config.Voluspa}')
-
-    return nested_config
+    return merged_config_final
 
 
 memozied_config = memoize(read_config)

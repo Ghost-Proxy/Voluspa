@@ -39,6 +39,9 @@ class _MenuBase:
         await self._init_reactions()
         await self._control_loop()
 
+    async def _init_reactions(self):
+        """Empty stub for override"""
+
     def _init_menu_embed(self):
         menu_field = self._get_menu_field()
         self._menu_embed.add_field(
@@ -235,8 +238,8 @@ class MenuWithOptions(_MenuBase):
         option_strings = [self.option_to_string(o) for o in self._pages[self._current_page_index]]
         padding = self._padding * '\u2000'
 
-        for i in range(len(option_strings)):
-            option_strings[i] = f'{ri_at_index(i)}{padding}{option_strings[i]}'
+        for i, option_string in enumerate(option_strings):
+            option_strings[i] = f'{ri_at_index(i)}{padding}{option_string}'
 
         return '\n'.join(option_strings)
 
@@ -302,9 +305,9 @@ class MenuWithCustomOptions(MenuWithOptions):
         """
         super().__init__(ctx, title, options, pages, max_lines_per_page, option_padding, timeout)
 
-        for i in range(len(self._pages)):
+        for i, page in enumerate(self._pages):
             temp = {}
-            for k, v in self._pages[i].items():
+            for k, v in page.items():
                 temp[emojize(normalize(k), language='alias')] = v
             self._pages[i] = temp
 

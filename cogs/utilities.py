@@ -84,12 +84,6 @@ class Utilities(commands.Cog):
             tokyo_time = await get_online_datetime('Asia/Tokyo')
             auckland_time = await get_online_datetime('Pacific/Auckland')
 
-            if verbose:
-                berlin_time = await get_online_datetime('Europe/Berlin')
-                moscow_time = await get_online_datetime('Europe/Moscow')
-                shanghai_time = await get_online_datetime('Asia/Shanghai')
-                australia_east_time = await get_online_datetime('Australia/Sydney')
-
             datetime_embed = default_embed(
                 title=":globe_with_meridians: World Clocks :clock1:",
                 description='Provided by Völuspá Timekeeping',
@@ -105,6 +99,11 @@ class Utilities(commands.Cog):
             datetime_embed.add_field(name='\u200B', value='\u200B', inline=False)
 
             if verbose:
+                berlin_time = await get_online_datetime('Europe/Berlin')
+                moscow_time = await get_online_datetime('Europe/Moscow')
+                shanghai_time = await get_online_datetime('Asia/Shanghai')
+                australia_east_time = await get_online_datetime('Australia/Sydney')
+
                 datetime_embed.add_field(name='Hawaii', value=display_datetime(*hawaii_time), inline=False)
                 datetime_embed.add_field(name='Los Angeles', value=display_datetime(*pacific_time), inline=False)
                 datetime_embed.add_field(name='Denver', value=display_datetime(*mountain_time), inline=False)

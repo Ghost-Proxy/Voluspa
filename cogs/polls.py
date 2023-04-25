@@ -97,7 +97,7 @@ def gen_yticks(max_pt):
     return range(0, max_pt + step, step)
 
 
-def trunc_label(label, num_opts=None, max_lines=None, max_length=25):
+def trunc_label(label, num_opts=1, max_lines=None, max_length=25):
     """
     Breaks the label up into 25 character max lines.
     If the label space is too small, only some lines will be append and the rest will be represented with ...
@@ -156,39 +156,42 @@ class Polls(commands.Cog):
 
         logger.info('Tabulating %s polls', len(poll_ids))
 
-        id_fetch_point, poll_ids = await get_poll_context_channel(ctx, poll_ids)
-        if id_fetch_point is None:
-            return
+        poll_context = await get_poll_context_channel(ctx, poll_ids)
 
-        async with ctx.typing():
-            async for poll, pid in gen_polls_from_ids(ctx, poll_ids, id_fetch_point):
-                result_embed = default_embed(
-                    title=poll.embeds[0].title
-                )
+        if poll_context is not None:
+            if poll_context[0] is None:
+                return
+            id_fetch_point, poll_ids = poll_context
 
-                try:
-                    for _, desc, reaction in gen_poll_options(poll):
-                        respondents = []
-                        async for user in reaction.users():
-                            if not user.bot:
-                                user_line = escape_markdown(user.name) + "#" + user.discriminator
-                                user_nick = getattr(user, 'nick', None)
-                                if user_nick is not None:
-                                    user_line += " _" + escape_markdown(user_nick) + "_"
-                                respondents.append(user_line)
+            async with ctx.typing():
+                async for poll, pid in gen_polls_from_ids(ctx, poll_ids, id_fetch_point):
+                    result_embed = default_embed(
+                        title=poll.embeds[0].title
+                    )
 
-                        if len(respondents) == 0:
-                            respondents = "None"
-                        else:
-                            respondents = "\n".join(respondents)
+                    try:
+                        for _, desc, reaction in gen_poll_options(poll):
+                            respondents = []
+                            async for user in reaction.users():
+                                if not user.bot:
+                                    user_line = escape_markdown(user.name) + "#" + user.discriminator
+                                    user_nick = getattr(user, 'nick', None)
+                                    if user_nick is not None:
+                                        user_line += " _" + escape_markdown(user_nick) + "_"
+                                    respondents.append(user_line)
 
-                        field_title = reaction.emoji + " " + desc
-                        result_embed.add_field(name=field_title, value=respondents, inline=False)
-                except KeyError:
-                    await ctx.send(f'Uh oh, I was unable to process poll `{pid}`. Sorry!')
-                    continue
+                            if len(respondents) == 0:
+                                respondents = "None"
+                            else:
+                                respondents = "\n".join(respondents)
 
-                await ctx.send(embed=result_embed)
+                            field_title = reaction.emoji + " " + desc
+                            result_embed.add_field(name=field_title, value=respondents, inline=False)
+                    except KeyError:
+                        await ctx.send(f'Uh oh, I was unable to process poll `{pid}`. Sorry!')
+                        continue
+
+                    await ctx.send(embed=result_embed)
 
     @commands.command(name='poll-results', aliases=['pr', 'prd', 'poll-results-dark'])
     async def collate_poll(self, ctx, *poll_ids: str):
@@ -201,76 +204,79 @@ class Polls(commands.Cog):
 
         logger.info('Collating %s polls', len(poll_ids))
 
-        id_fetch_point, poll_ids = await get_poll_context_channel(ctx, poll_ids)
-        if id_fetch_point is None:
-            return
+        poll_context = await get_poll_context_channel(ctx, poll_ids)
 
-        async with ctx.typing():
-            async for poll, pid in gen_polls_from_ids(ctx, poll_ids, id_fetch_point):
-                poll_labels = []
-                poll_results = []
-                poll_title = trunc_label(poll.embeds[0].title, max_lines=2, max_length=50)
+        if poll_context is not None:
+            if poll_context[0] is None:
+                return
+            id_fetch_point, poll_ids = poll_context
 
-                try:
-                    for _, desc, reaction in gen_poll_options(poll):
-                        poll_labels.append(trunc_label(desc, len(poll.reactions)))
-                        poll_results.append(reaction.count - 1)
-                except KeyError:
-                    await ctx.send(f'Uh oh, I was unable to process poll `{pid}`. Sorry!')
-                    continue
+            async with ctx.typing():
+                async for poll, pid in gen_polls_from_ids(ctx, poll_ids, id_fetch_point):
+                    poll_labels = []
+                    poll_results = []
+                    poll_title = trunc_label(poll.embeds[0].title, max_lines=2, max_length=50)
 
-                data = pd.Series(poll_results, index=poll_labels)
+                    try:
+                        for _, desc, reaction in gen_poll_options(poll):
+                            poll_labels.append(trunc_label(desc, len(poll.reactions)))
+                            poll_results.append(reaction.count - 1)
+                    except KeyError:
+                        await ctx.send(f'Uh oh, I was unable to process poll `{pid}`. Sorry!')
+                        continue
 
-                axes = data.plot.bar(title=poll_title, x='options', color=plt.cm.tab10(range(len(data))))
-                axes.set_ylabel('Respondents')
+                    data = pd.Series(poll_results, index=poll_labels)
 
-                if ctx.invoked_with in ['prd', 'poll-results-dark']:
-                    line_colors = "#FFFFFF"
+                    axes = data.plot.bar(title=poll_title, x='options', color=plt.cm.tab10(range(len(data))))
+                    axes.set_ylabel('Respondents')
 
-                    axes.spines['bottom'].set_color(line_colors)
-                    axes.spines['top'].set_color(line_colors)
-                    axes.spines['left'].set_color(line_colors)
-                    axes.spines['right'].set_color(line_colors)
+                    if ctx.invoked_with in ['prd', 'poll-results-dark']:
+                        line_colors = "#FFFFFF"
 
-                    axes.tick_params(colors=line_colors)
+                        axes.spines['bottom'].set_color(line_colors)
+                        axes.spines['top'].set_color(line_colors)
+                        axes.spines['left'].set_color(line_colors)
+                        axes.spines['right'].set_color(line_colors)
 
-                    axes.yaxis.label.set_color(line_colors)
-                    axes.xaxis.label.set_color(line_colors)
+                        axes.tick_params(colors=line_colors)
 
-                    axes.title.set_color(line_colors)
+                        axes.yaxis.label.set_color(line_colors)
+                        axes.xaxis.label.set_color(line_colors)
 
-                    axes.set_facecolor("#2C2F33")
+                        axes.title.set_color(line_colors)
 
-                    bg_color = "#2C2F33"
-                    bar_top_color = line_colors
-                else:
-                    bg_color = "#FFFFFF"
-                    bar_top_color = "k"  # aka black
+                        axes.set_facecolor("#2C2F33")
 
-                # New padding technique for top of chart and bar text
-                _, top_ylim = plt.ylim()
-                top_ylim *= 1.02
-                plt.ylim(bottom=0, top=top_ylim)
+                        bg_color = "#2C2F33"
+                        bar_top_color = line_colors
+                    else:
+                        bg_color = "#FFFFFF"
+                        bar_top_color = "k"  # aka black
 
-                plt.yticks(gen_yticks(max(poll_results)))  # Appropriate tick spacing for number of respondents
-                plt.xticks(rotation=45, ha='right')
+                    # New padding technique for top of chart and bar text
+                    _, top_ylim = plt.ylim()
+                    top_ylim *= 1.02
+                    plt.ylim(bottom=0, top=top_ylim)
 
-                # Adds number of respondents at top of bars
-                for x, y in enumerate(poll_results):
-                    axes.text(x, y, str(y), ha='center', va='bottom', color=bar_top_color)
+                    plt.yticks(gen_yticks(max(poll_results)))  # Appropriate tick spacing for number of respondents
+                    plt.xticks(rotation=45, ha='right')
 
-                plt.tight_layout()  # Ensures label text is not cut off
+                    # Adds number of respondents at top of bars
+                    for x, y in enumerate(poll_results):
+                        axes.text(x, y, str(y), ha='center', va='bottom', color=bar_top_color)
 
-                png_wrapper = io.BytesIO()
-                plt.savefig(png_wrapper, format='png', facecolor=bg_color)
-                png_wrapper.seek(0)
+                    plt.tight_layout()  # Ensures label text is not cut off
 
-                dt = datetime.datetime
-                filename = "gp-poll-" + pid + "-" + dt.strftime(dt.utcnow(), "%Y-%m-%d-%H-%M-%S") + ".png"
-                await ctx.send(file=discord.File(png_wrapper, filename=filename))
+                    png_wrapper = io.BytesIO()
+                    plt.savefig(png_wrapper, format='png', facecolor=bg_color)
+                    png_wrapper.seek(0)
 
-                png_wrapper.close()
-                plt.close()
+                    dt = datetime.datetime
+                    filename = "gp-poll-" + pid + "-" + dt.strftime(dt.utcnow(), "%Y-%m-%d-%H-%M-%S") + ".png"
+                    await ctx.send(file=discord.File(png_wrapper, filename=filename))
+
+                    png_wrapper.close()
+                    plt.close()
 
 async def setup(bot):
     """Cog Setup"""

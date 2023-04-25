@@ -19,6 +19,8 @@ async def get_latest_xkcd_comic():
                 latest_xkcd_comic = await resp.json()
                 latest_xkcd_num = latest_xkcd_comic['num']
                 return latest_xkcd_num, latest_xkcd_comic
+            else:
+                return [None, None]
 
 
 async def get_xkcd_comic_num(num: int = 1):
@@ -32,35 +34,39 @@ async def get_xkcd_comic_num(num: int = 1):
 
 
 async def get_xkcd_comic(latest=False):
-    """Get an xkcd comic"""
+    """
+    Get an xkcd comic
+    {
+        "month": "12",
+        "num": 2085,
+        "link": "",
+        "year": "2018",
+        "news": "",
+        "safe_title": "arXiv",
+        "transcript": "",
+        "alt": "Both arXiv and archive.org are invaluable projects which...",
+        "img": "https://imgs.xkcd.com/comics/arxiv.png",
+        "title": "arXiv",
+        "day": "14"
+    }
+    """
+
     latest_xkcd_num, latest_xkcd_comic = await get_latest_xkcd_comic()
 
-    # {
-    #     "month": "12",
-    #     "num": 2085,
-    #     "link": "",
-    #     "year": "2018",
-    #     "news": "",
-    #     "safe_title": "arXiv",
-    #     "transcript": "",
-    #     "alt": "Both arXiv and archive.org are invaluable projects which, if they didn't exist, we would dismiss as obviously ridiculous and unworkable.",
-    #     "img": "https://imgs.xkcd.com/comics/arxiv.png",
-    #     "title": "arXiv",
-    #     "day": "14"
-    # }
+    if latest_xkcd_num:
+        if not latest:
+            rand_idx = random.randint(1, latest_xkcd_num)
+            original_xkcd_url = f'http://xkcd.com/{rand_idx}'
+            xkcd_comic = await get_xkcd_comic_num(rand_idx)
+        else:
+            original_xkcd_url = f'http://xkcd.com/{latest_xkcd_num}'
+            xkcd_comic = latest_xkcd_comic
 
-    if not latest:
-        rand_idx = random.randint(1, latest_xkcd_num)
-        original_xkcd_url = f'http://xkcd.com/{rand_idx}'
-        xkcd_comic = await get_xkcd_comic_num(rand_idx)
-    else:
-        original_xkcd_url = f'http://xkcd.com/{latest_xkcd_num}'
-        xkcd_comic = latest_xkcd_comic
+        if xkcd_comic:
+            xkcd_comic['date'] = f'{xkcd_comic["year"]}/{xkcd_comic["month"]}/{xkcd_comic["day"]}'
+            xkcd_comic['url'] = original_xkcd_url
 
-    xkcd_comic['date'] = f'{xkcd_comic["year"]}/{xkcd_comic["month"]}/{xkcd_comic["day"]}'
-    xkcd_comic['url'] = original_xkcd_url
-
-    return xkcd_comic
+            return xkcd_comic
 
 
 # TODO: Break this out into a better means of handling... could just be functional...
@@ -177,7 +183,7 @@ class RandomQuotes(object):
     async def get_ron_swanson_quote(self):
         """Get a Ron Swanson quote"""
         req = requests.get('https://ron-swanson-quotes.herokuapp.com/v2/quotes', timeout=20)
-        ron_quote = '"{}" -Ron Swanson'.format(req.json()[0])
+        ron_quote = f'"{req.json()[0]}" -Ron Swanson'
         return ron_quote
 
     async def get_inspirobot_quote(self):

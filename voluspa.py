@@ -80,11 +80,15 @@ bot = commands.Bot(
 @bot.event
 async def on_ready():
     """Bot on_ready event"""
-    logger.info('*** Logged in as: %s (ID: %s) ***', bot.user.name, bot.user.id)
+
+    if bot.user:
+        logger.info('*** Logged in as: %s (ID: %s) ***', bot.user.name, bot.user.id)
+    else:
+        logger.error('*** Unable to login!! ***')
     logger.info('// VOLUSPA WARMIND ONLINE!!')
 
     if not hasattr(bot, 'uptime'):
-        bot.uptime = datetime.datetime.utcnow()
+        setattr(bot, 'uptime', datetime.datetime.utcnow())
 
     await bot.change_presence(
         activity=discord.Game(name=await quotes.pick_quote('status')),
@@ -145,7 +149,7 @@ async def on_command_error(ctx, error):
         return
 
     if isinstance(error, commands.BotMissingPermissions):
-        missing = [perm.replace('_', ' ').replace('guild', 'server').title() for perm in error.missing_perms]
+        missing = [perm.replace('_', ' ').replace('guild', 'server').title() for perm in error.missing_permissions]
         if len(missing) > 2:
             fmt = f'{"**, **".join(missing[:-1])}, and {missing[-1]}'
         else:
@@ -163,7 +167,7 @@ async def on_command_error(ctx, error):
         return
 
     if isinstance(error, commands.MissingPermissions):
-        missing = [perm.replace('_', ' ').replace('guild', 'server').title() for perm in error.missing_perms]
+        missing = [perm.replace('_', ' ').replace('guild', 'server').title() for perm in error.missing_permissions]
         if len(missing) > 2:
             fmt = f'{"**, **".join(missing[:-1])}, and {missing[-1]}'
         else:
@@ -199,7 +203,8 @@ async def on_command_error(ctx, error):
     # ignore all other exception types, but print them to stderr
     print(f'Ignoring exception in command {ctx.command}:', file=sys.stderr)
 
-    traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
+    if isinstance(error, BaseException):
+        traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
 
 # https://github.com/Rapptz/RoboDanny/blob/rewrite/cogs/stats.py
 async def on_app_command_error(interaction: discord.Interaction, error: app_commands.AppCommandError) -> None:
