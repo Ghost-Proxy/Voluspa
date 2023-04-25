@@ -1,11 +1,13 @@
+"""Custom Exceptions"""
+
 
 class VoluspaError(Exception):
-    pass
+    """General Voluspa Error"""
 
 
 class BungieAPIError(Exception):
-    pass
+    """Bungie API Error"""
 
 
 class BungieAPIOffline(Exception):
-    pass
+    """Bungie API Offline"""

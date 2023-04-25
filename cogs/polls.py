@@ -140,7 +140,7 @@ class Polls(commands.Cog):
                 result_msg = await result_msg.edit(embed=poll_embed)
 
             react_char = '\U0001f1e6'
-            for arg_iter in range(1, len(poll_args)):
+            for _arg_iter in range(1, len(poll_args)):
                 await result_msg.add_reaction(react_char)
                 react_char = chr(ord(react_char) + 1)
 

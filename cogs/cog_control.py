@@ -1,9 +1,12 @@
+"""Meta Cog Cog"""
+
 from discord.ext import commands
 
 # From: https://gist.github.com/EvieePy/d78c061a4798ae81be9825468fe146be#file-owner-py
 
 
 class CogControl(commands.Cog):
+    """Cog for controlling Cogs"""
     # TODO: Use sub-command pattern... :D
     def __init__(self, bot):
         self.bot = bot
@@ -17,8 +20,8 @@ class CogControl(commands.Cog):
 
         try:
             self.bot.load_extension(cog)
-        except Exception as e:
-            await ctx.send(f'**`ERROR:`** {type(e).__name__} - {e}')
+        except Exception as exc:
+            await ctx.send(f'**`ERROR:`** {type(exc).__name__} - {exc}')
         else:
             await ctx.send('**`SUCCESS`**')
 
@@ -30,8 +33,8 @@ class CogControl(commands.Cog):
 
         try:
             self.bot.unload_extension(cog)
-        except Exception as e:
-            await ctx.send(f'**`ERROR:`** {type(e).__name__} - {e}')
+        except Exception as exc:
+            await ctx.send(f'**`ERROR:`** {type(exc).__name__} - {exc}')
         else:
             await ctx.send('**`SUCCESS`**')
 
@@ -44,11 +47,12 @@ class CogControl(commands.Cog):
         try:
             self.bot.unload_extension(cog)
             self.bot.load_extension(cog)
-        except Exception as e:
-            await ctx.send(f'**`ERROR:`** {type(e).__name__} - {e}')
+        except Exception as exc:
+            await ctx.send(f'**`ERROR:`** {type(exc).__name__} - {exc}')
         else:
             await ctx.send('**`SUCCESS`**')
 
 
 async def setup(bot):
+    """Cog setup"""
     await bot.add_cog(CogControl(bot))

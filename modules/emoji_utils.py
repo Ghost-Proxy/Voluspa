@@ -1,36 +1,40 @@
+"""Emoji Utilities Module"""
+
 from emoji import emojize
 
-def ri_alphabet(n):
-    if n < 1:
-        n = 1
-    elif n > 26:
-        n = 26
+def ri_alphabet(num):
+    """Regional Indicator Emoji lookup"""
+    if num < 1:
+        num = 1
+    elif num > 26:
+        num = 26
 
     current_emoji = '\U0001f1e6' # Regional Indicator A
     i = 0
-    while i < n:
+    while i < num:
         yield current_emoji
 
         current_emoji = chr(ord(current_emoji) + 1)
         i += 1
 
-def ri_at_index(i):
-    if i < 0:
-        i = 0
-    elif i > 25:
-        i = 25
+def ri_at_index(idx):
+    """Regional Indicator at index i"""
+    if idx < 0:
+        idx = 0
+    elif idx > 25:
+        idx = 25
+        
+    regional_indicator_a = '\U0001f1e6'
+    return chr(ord(regional_indicator_a) + idx)
 
-    a = '\U0001f1e6'
-
-    return chr(ord(a) + i)
-
-def index_of_ri(ri):
-    return ord(ri) - ord('\U0001f1e6')
+def index_of_ri(regional_indicator):
+    """Returns the index of the Regional Indicator"""
+    return ord(regional_indicator) - ord('\U0001f1e6')
 
 def normalize(name):
+    """Normalize the name"""
     if name[0] != ':' and name[-1] != ':':
-        temp = emojize(f':{name}:', use_aliases=True)
+        temp = emojize(f':{name}:', language='alias')
         if temp != f':{name}:':
             name = f':{name}:'
-
     return name

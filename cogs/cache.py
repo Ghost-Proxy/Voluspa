@@ -1,9 +1,12 @@
+"""Cache Cog"""
+
 import logging
+
+from discord.ext import commands
 
 import modules.cache as cache
 from modules.custom_embed import default_embed, success_embed, error_embed
 
-from discord.ext import commands
 
 logger = logging.getLogger('voluspa.cog.cache')
 
@@ -11,6 +14,7 @@ CACHE_NAME_PREFIX = 'cache_name='
 
 
 def check_for_cache_name(cache_name, cache_key, cache_value):
+    """Checks for Cache name"""
     if cache_value is None and CACHE_NAME_PREFIX in cache_key:
         _cache_name, cache_key = cache_key.split(' ')
         _cache_name = _cache_name.split(CACHE_NAME_PREFIX)[1]
@@ -42,8 +46,8 @@ class Cache(commands.Cog):
         )
         try:
             await cache.add(cache_key, cache_value, cache_name=cache_name)
-        except ValueError as e:
-            logger.info('Key already exists: %s', e)
+        except ValueError as exc:
+            logger.info('Key already exists: %s', exc)
             embed = error_embed(
                 title='Cache Add (K/V)',
                 description=f'Error adding Key/Value to "{cache_name}" cache!\n\n'
@@ -143,18 +147,19 @@ class Cache(commands.Cog):
     async def cache_delete(self, ctx, *, cache_key: str):
         """Deletes key/value from cache (CAUTION!)"""
         cache_name, cache_key, _ = check_for_cache_name(cache.CACHE_NAME, cache_key, None)
-        cache_value = await cache.delete(cache_key, cache_name=cache_name)
+        _cache_value = await cache.delete(cache_key, cache_name=cache_name)
         embed = default_embed(
             title='Cache Delete (K/V)',
             description=f'Deleted the following Key from "{cache_name}" cache'
         )
         embed.add_field(
             name=f'{cache_key}',
-            value=f'_deleted_',
+            value='_deleted_',
             inline=False
         )
         await ctx.send(embed=embed)
 
 
 async def setup(bot):
+    """Cog setup"""
     await bot.add_cog(Cache(bot))

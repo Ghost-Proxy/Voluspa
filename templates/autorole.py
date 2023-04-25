@@ -1,4 +1,6 @@
-onboard_member_message = """
+"""Templates for Autorole messages"""
+
+ONBOARD_MEMBER_MESSAGE = """
 Welcome to Ghost Proxy! <:ghost_proxy_2:455130686290919427>
 
 If you haven't yet, please read through our `#rules-conduct` and `#server-info` and then feel free to explore the server! A good place to start is `#voluspa`, our very own Warmind where you can set game roles, check who's online, and use a number of other helpful commands (type `$help`).
@@ -22,12 +24,12 @@ Thanks and eyes up, Guardian! <:cayde_thumbs_up:451649810894946314>
 _ _
 """
 
-offboard_message = """
-Sadly due to the Destiny clan limit, and since you haven't been in-game for a while, we need to remove you for now to make room for new members. 
+OFFBOARD_MESSAGE = """
+Sadly due to the Destiny clan limit, and since you haven't been in-game for a while, we need to remove you for now to make room for new members.
 
-However, if you do get back into the game please let us know. More than happy to invite you back! :smiley: 
+However, if you do get back into the game please let us know. More than happy to invite you back! :smiley:
 
-Also, you are totally welcome to stay in the GP Discord and chat/group for games! Plus, you have been granted the `ghost-proxy-legacy` role as tribute. <:ghost_proxy_2:455130686290919427> 
+Also, you are totally welcome to stay in the GP Discord and chat/group for games! Plus, you have been granted the `ghost-proxy-legacy` role as tribute. <:ghost_proxy_2:455130686290919427>
 
 Best wishes and hope to see you around! :heart:
 
@@ -35,7 +37,7 @@ Best wishes and hope to see you around! :heart:
 _ _
 """
 
-onboard_friend_message = """
+ONBOARD_FRIEND_MESSAGE = """
 Welcome to Ghost Proxy! <:ghost_proxy_2:455130686290919427>
 
 If you haven't yet, please read through our `#rules-conduct` and `#server-info` and then feel free to explore the server! A good place to start is `#voluspa`, our very own Warmind where you can set game roles, check who's online, and use a number of other helpful commands (type `$help`).
