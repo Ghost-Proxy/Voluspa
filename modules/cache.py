@@ -25,10 +25,10 @@ async def add(key, value, cache_name=CACHE_NAME):
         await cache.add(key, value)
         result = await cache.get(key) == value
         if result:
-            logger.info(f'(cache: {cache_name}) - SUCCESS wrote k/v [{key}]:[{value}]!')
+            logger.info('(cache: %s) - SUCCESS wrote k/v [%s]:[%s]!', cache_name, key, value)
             return result
 
-        logger.warning(f'(cache: {cache_name}) - ERROR writing k/v [{key}]:[{value}]!')
+        logger.warning('(cache: %s) - ERROR writing k/v [%s]:[%s]!', cache_name, key, value)
         return result
     raise VoluspaError('Unable to retrieve cache')
 
@@ -42,10 +42,10 @@ async def write(key, value, cache_name=CACHE_NAME):
         result = await cache.get(key) == value
         # assert await cache.get(key) == value
         if result:
-            logger.info(f'(cache: {cache_name}) - SUCCESS wrote k/v [{key}]:[{value}]!')
+            logger.info('(cache: %s) - SUCCESS wrote k/v [%s]:[%s]!', cache_name, key, value)
             return result
 
-        logger.warning(f'(cache: {cache_name}) - ERROR writing k/v [{key}]:[{value}]!')
+        logger.warning('(cache: %s) - ERROR writing k/v [%s]:[%s]!', cache_name, key, value)
         return result
     raise VoluspaError('Unable to retrieve cache')
 
@@ -56,10 +56,10 @@ async def read(key, cache_name=CACHE_NAME):
     if cache:
         value = await cache.get(key)
         if value:
-            logger.info(f'(cache: {cache_name}) - SUCCESS read k/v [{key}]:[{value}]')
+            logger.info('(cache: %s) - SUCCESS read k/v [%s]:[%s]!', cache_name, key, value)
             return value
 
-        logger.warning(f'(cache: {cache_name}) - ERROR reading k/v [{key}]:[{value}]!')
+        logger.warning('(cache: %s) - ERROR reading k/v [%s]:[%s]!', cache_name, key, value)
         return None
     raise VoluspaError('Unable to retrieve cache')
 
@@ -70,9 +70,9 @@ async def delete(key, cache_name=CACHE_NAME):
     if cache:
         result = await cache.delete(key)
         if result:
-            logger.info(f'(cache: {cache_name}) - SUCCESS deleted k/v [{key}]!')
+            logger.info('(cache: %s) - SUCCESS deleted k/v [%s]!', cache_name, key)
             return result
 
-        logger.warning(f'(cache: {cache_name}) - ERROR deleting k/v [{key}]!')
+        logger.warning('(cache: %s) - ERROR deleting k/v [%s]!', cache_name, key)
         return result
     raise VoluspaError('Unable to retrieve cache')

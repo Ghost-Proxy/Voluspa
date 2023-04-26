@@ -23,7 +23,7 @@ def ri_at_index(idx):
         idx = 0
     elif idx > 25:
         idx = 25
-        
+
     regional_indicator_a = '\U0001f1e6'
     return chr(ord(regional_indicator_a) + idx)
 

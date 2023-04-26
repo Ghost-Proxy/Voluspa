@@ -1,3 +1,4 @@
+# pylint: disable=too-few-public-methods
 """Logging Module"""
 
 import logging
@@ -129,7 +130,7 @@ class Menu(_MenuBase):
     def _split(self, raw, lines, max_chars_per_line, max_lines_per_page):
         i = 0
         if not lines:
-            lines = wrap(raw, width=max_chars_per_line)
+            lines = wrap(text=raw, width=max_chars_per_line)
         pages = []
         while i + max_lines_per_page < len(lines):
             pages.append("\n".join(lines[i:i + max_lines_per_page]))
@@ -246,7 +247,8 @@ class MenuWithOptions(_MenuBase):
     async def _reaction_handler(self, reaction):
         if reaction.emoji == _MenuBase.CHECK_MARK:
             return True
-        elif reaction.emoji in [e for e in ri_alphabet(len(self._pages[self._current_page_index]))]:
+
+        if reaction.emoji in list(ri_alphabet(len(self._pages[self._current_page_index]))):
             if self._pages[self._current_page_index][index_of_ri(reaction.emoji)] not in self._selected_options:
                 self._selected_options.append(self._pages[self._current_page_index][index_of_ri(reaction.emoji)])
             else:
@@ -337,7 +339,8 @@ class MenuWithCustomOptions(MenuWithOptions):
     async def _reaction_handler(self, reaction):
         if reaction.emoji == _MenuBase.CHECK_MARK:
             return True
-        elif reaction.emoji in [e for e in self._pages[self._current_page_index].keys()]:
+
+        if reaction.emoji in list(self._pages[self._current_page_index].keys()):
             if self._pages[self._current_page_index][reaction.emoji] not in self._selected_options:
                 self._selected_options.append(self._pages[self._current_page_index][reaction.emoji])
             else:
