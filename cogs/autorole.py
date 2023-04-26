@@ -161,7 +161,6 @@ class Autorole(commands.Cog):
         <Member id=962762036347236771 name='Zed' discriminator='6791' bot=False nick=None
         guild=<Guild id=374330517165965313 name='Ghost Proxy' chunked=True>>,
 
-        TODO: RegEx Filter: r'^\S+#\d+$'
         TODO: Check if member is set, and then remove, but prompt?
         TODO: Add verification of role before message
         TODO: Ugh... this is a mess and should be redone from scratch...
@@ -306,7 +305,7 @@ class Autorole(commands.Cog):
                         for callback in success_callbacks:
                             try:
                                 await callback(user_matches[0])
-                            except Exception as exc:
+                            except Exception as exc: # pylint: disable=broad-exception-caught
                                 logger.info('Success Callback Exception: %s', exc)
             else:
                 error_embed = default_embed(

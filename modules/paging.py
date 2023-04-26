@@ -54,7 +54,7 @@ class _MenuBase:
 
     async def _control_loop(self):
         try:
-            def check_in_ctx(reaction, user):
+            def check_in_ctx(reaction):
                 return reaction.message.id == self._menu_msg.id
 
             while True:

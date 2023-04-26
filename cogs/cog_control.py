@@ -20,7 +20,7 @@ class CogControl(commands.Cog):
 
         try:
             self.bot.load_extension(cog)
-        except Exception as exc:
+        except Exception as exc: # pylint: disable=broad-exception-caught
             await ctx.send(f'**`ERROR:`** {type(exc).__name__} - {exc}')
         else:
             await ctx.send('**`SUCCESS`**')
@@ -33,7 +33,7 @@ class CogControl(commands.Cog):
 
         try:
             self.bot.unload_extension(cog)
-        except Exception as exc:
+        except Exception as exc: # pylint: disable=broad-exception-caught
             await ctx.send(f'**`ERROR:`** {type(exc).__name__} - {exc}')
         else:
             await ctx.send('**`SUCCESS`**')
@@ -47,7 +47,7 @@ class CogControl(commands.Cog):
         try:
             self.bot.unload_extension(cog)
             self.bot.load_extension(cog)
-        except Exception as exc:
+        except Exception as exc: # pylint: disable=broad-exception-caught
             await ctx.send(f'**`ERROR:`** {type(exc).__name__} - {exc}')
         else:
             await ctx.send('**`SUCCESS`**')
