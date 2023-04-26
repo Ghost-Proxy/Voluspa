@@ -49,7 +49,7 @@ class AttrDict(dict):
         (as well as normally).
     """
     def __init__(self, *args, **kwargs):
-        super(AttrDict, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.__dict__ = self
 
     @staticmethod
@@ -57,8 +57,8 @@ class AttrDict(dict):
         """ Construct nested AttrDicts from nested dictionaries. """
         if not isinstance(data, dict):
             return data
-        else:
-            return AttrDict({key: AttrDict.from_nested_dict(data[key]) for key in data})
+
+        return AttrDict({key: AttrDict.from_nested_dict(data[key]) for key in data})
 
 
 # https://stackoverflow.com/questions/25833613/python-safe-method-to-get-value-of-nested-dictionary

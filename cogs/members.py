@@ -447,7 +447,8 @@ class Members(commands.Cog):
         player = None
         for player_result in itertools.islice(results, 0, 10):
             if 'blizzardDisplayName' in player_result:
-                #if player_name.lower() == player_result['displayName'].lower() or player_result['displayName'].lower() in player_name.lower():
+                #if player_name.lower() == player_result['displayName'].lower()
+                # or player_result['displayName'].lower() in player_name.lower():
                 player = player_result
         if player:
             logger.info('Found Player:\n MemberID: %s Name: %s BlizzardName: %s',

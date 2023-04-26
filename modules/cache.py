@@ -22,8 +22,8 @@ async def add(key, value, cache_name=CACHE_NAME):
     # This will fail if the key already exists
     cache = caches.get(cache_name)
     if cache:
-        await cache.add(key, value)
-        result = await cache.get(key) == value
+        await cache.add(key, value) # type: ignore
+        result = await cache.get(key) == value # type: ignore
         if result:
             logger.info('(cache: %s) - SUCCESS wrote k/v [%s]:[%s]!', cache_name, key, value)
             return result
@@ -38,8 +38,8 @@ async def write(key, value, cache_name=CACHE_NAME):
     # This also implies add -- AND is a forced overwrite
     cache = caches.get(cache_name)
     if cache:
-        await cache.set(key, value)
-        result = await cache.get(key) == value
+        await cache.set(key, value) # type: ignore
+        result = await cache.get(key) == value # type: ignore
         # assert await cache.get(key) == value
         if result:
             logger.info('(cache: %s) - SUCCESS wrote k/v [%s]:[%s]!', cache_name, key, value)
@@ -54,7 +54,7 @@ async def read(key, cache_name=CACHE_NAME):
     """Read the value from the requested key"""
     cache = caches.get(cache_name)
     if cache:
-        value = await cache.get(key)
+        value = await cache.get(key) # type: ignore
         if value:
             logger.info('(cache: %s) - SUCCESS read k/v [%s]:[%s]!', cache_name, key, value)
             return value
@@ -68,7 +68,7 @@ async def delete(key, cache_name=CACHE_NAME):
     """Delete the key (and value) requested"""
     cache = caches.get(cache_name)
     if cache:
-        result = await cache.delete(key)
+        result = await cache.delete(key) # type: ignore
         if result:
             logger.info('(cache: %s) - SUCCESS deleted k/v [%s]!', cache_name, key)
             return result
