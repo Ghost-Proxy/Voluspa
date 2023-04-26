@@ -9,11 +9,11 @@ from voluspa import CONFIG
 
 logger = logging.getLogger('voluspa.cache')
 
-if CONFIG.Voluspa.cache.get('redis', None):
+if CONFIG['Voluspa']['cache'].get('redis', None):
     CACHE_NAME = 'redis'
 else:
     CACHE_NAME = 'default'
-CACHE_TYPE = CONFIG.Voluspa.cache[CACHE_NAME].cache
+CACHE_TYPE = CONFIG['Voluspa']['cache'][CACHE_NAME].cache
 logger.info('Using "%s" cache (%s)', CACHE_NAME, CACHE_TYPE)
 
 

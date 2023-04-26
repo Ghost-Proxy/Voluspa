@@ -23,7 +23,7 @@ async def async_bungie_request_handler(
     resp = await async_request_handler(
         _request_url,
         target_endpoint,
-        headers={'X-API-Key': CONFIG.Bungie.api_key},
+        headers={'X-API-Key': CONFIG['Bungie']['api_key']},
         params=params,
         response_handler=response_handler
         )

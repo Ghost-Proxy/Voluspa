@@ -561,7 +561,7 @@ class Autorole(commands.Cog):
             new_member = self.bot.get_user(user_rec['id'])
             guild_welcome = f"_Greetings to our new member, {new_member.mention}! :tada: " \
                 "Welcome to Ghost Proxy!_ <:ghost_proxy_2:455130686290919427>"
-            guild_channel = ctx.bot.get_channel(CONFIG.Voluspa.private_guild_channel_id)
+            guild_channel = ctx.bot.get_channel(CONFIG['Voluspa']['private_guild_channel_id'])
             await guild_channel.send(guild_welcome)
 
         await self.assign_roles_to_user(

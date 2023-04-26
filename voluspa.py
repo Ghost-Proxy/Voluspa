@@ -36,7 +36,7 @@ from modules.exceptions import BungieAPIError, BungieAPIOffline
 # Init
 archivist = Archivist()
 logger = archivist.get_logger()
-caches.set_config(CONFIG.Voluspa.cache)
+caches.set_config(CONFIG['Voluspa']['cache'])
 
 # Setup initial client (Intents new as of discordpy 1.5.1)
 intents = discord.Intents.default()
@@ -128,7 +128,7 @@ async def on_member_join(member):
     )
     embed.set_footer(
         text='via Völuspá with \u2764',
-        icon_url=f"{CONFIG.Resources.image_bucket_root_url}/voluspa/Voluspa_icon_64x64.png"
+        icon_url=f"{CONFIG['Resources']['image_bucket_root_url']}/voluspa/Voluspa_icon_64x64.png"
     )
     if channel is not None:
         await channel.send(f'{member.mention}', embed=embed, delete_after=28800)  # delete after 8 hours
@@ -316,7 +316,7 @@ async def main():
             logger.info('Loading extension [%s]...', extension)
             await bot.load_extension(extension)
         logger.info('Starting bot...')
-        await bot.start(CONFIG.Discord.api_key)
+        await bot.start(CONFIG['Discord']['api_key'])
 
 
 if __name__ == '__main__':

@@ -18,7 +18,7 @@ def _setup_logging(log_level=logging.INFO):
     log_formatter = logging.Formatter('%(asctime)s [%(levelname)s] %(name)s:  %(message)s')
 
     # TODO if on heroku, don't run file logger?
-    log_file_path = os.path.join(CONFIG.Voluspa.app_cwd, 'logs/root.log')
+    log_file_path = os.path.join(CONFIG['Voluspa']['app_cwd'], 'logs/root.log')
     print(f'Bootstrap - Setting logger path to: [{log_file_path}]')
     file_handler = RotatingFileHandler(
         filename=log_file_path,
@@ -38,7 +38,7 @@ def _setup_logging(log_level=logging.INFO):
 
     discord_logger = logging.getLogger('discord')
     discord_logger.setLevel(log_level)
-    discord_log_file_path = os.path.join(CONFIG.Voluspa.app_cwd, 'logs/discord.log')
+    discord_log_file_path = os.path.join(CONFIG['Voluspa']['app_cwd'], 'logs/discord.log')
     discord_file_handler = RotatingFileHandler(
         filename=discord_log_file_path,
         encoding='utf-8',
@@ -49,7 +49,7 @@ def _setup_logging(log_level=logging.INFO):
     discord_logger.addHandler(discord_file_handler)
 
     voluspa_logger = logging.getLogger('voluspa')
-    voluspa_log_file_path = os.path.join(CONFIG.Voluspa.app_cwd, 'logs/voluspa.log')
+    voluspa_log_file_path = os.path.join(CONFIG['Voluspa']['app_cwd'], 'logs/voluspa.log')
     voluspa_file_handler = RotatingFileHandler(
         filename=voluspa_log_file_path,
         encoding='utf-8',

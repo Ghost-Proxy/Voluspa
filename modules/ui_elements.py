@@ -13,7 +13,7 @@ class FeedbackModal(discord.ui.Modal, title="Feedback"):
 
     async def on_submit(self, interaction: discord.Interaction):
         """Submits the modal"""
-        feedback_channel = interaction.client.get_channel(CONFIG.Voluspa.feedback_channel_id)
+        feedback_channel = interaction.client.get_channel(CONFIG['Voluspa']['feedback_channel_id'])
         await feedback_channel.send(f"Incoming message for the Vanguard:\n>>> {self.children[0].value}")
         await interaction.response.send_message(content="Your feedback has been sent.", ephemeral=True)
 
@@ -24,8 +24,8 @@ class IssueModal(discord.ui.Modal, title="New Github Issue"):
 
     async def on_submit(self, interaction: discord.Interaction):
         """Submits the modal"""
-        ghub = Github(CONFIG.Github.token)
-        repo = ghub.get_repo(CONFIG.Github.repo_name)
+        ghub = Github(CONFIG['Github']['token'])
+        repo = ghub.get_repo(CONFIG['Github']['repo_name'])
         issue = repo.create_issue(title=str(self.issue_title), body=str(self.body))
 
         await interaction.response.send_message(

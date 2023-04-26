@@ -107,7 +107,7 @@ async def async_get_member_data_by_id(membership_id, membership_type, platform_t
 
 async def async_get_clan_members():
     """Get a list of clan members"""
-    target_endpoint = f'/GroupV2/{CONFIG.Bungie.clan_group_id}/Members/'
+    target_endpoint = f'/GroupV2/{CONFIG['Bungie']['clan_group_id']}/Members/'
     raw_json = await async_bungie_request_handler(target_endpoint)
     if raw_json:
         bungie_results = raw_json['Response']
@@ -134,7 +134,7 @@ def get_destiny_member_info(member):
 
 async def async_get_bungie_clan_members():
     """Get Bungie Clan members"""
-    target_endpoint = f'/GroupV2/{CONFIG.Bungie.clan_group_id}/Members/'
+    target_endpoint = f'/GroupV2/{CONFIG['Bungie']['clan_group_id']}/Members/'
     response = await async_bungie_request_handler(target_endpoint)
     if response:
         logger.info('Bungie Response: %s', response)
@@ -149,7 +149,7 @@ async def async_get_bungie_clan_members():
 
 async def async_get_bungie_member_list():
     """Get a list of Bungie members"""
-    target_endpoint = f'/GroupV2/{CONFIG.Bungie.clan_group_id}/Members/'
+    target_endpoint = f'/GroupV2/{CONFIG['Bungie']['clan_group_id']}/Members/'
     raw_json = await async_bungie_request_handler(target_endpoint)
     if raw_json:
         bungie_results = raw_json['Response']
@@ -163,7 +163,7 @@ async def async_get_bungie_member_list():
 
 async def async_get_bungie_member_type_dict():
     """Get a Bungie member type dictionary"""
-    target_endpoint = f'/GroupV2/{CONFIG.Bungie.clan_group_id}/Members/'
+    target_endpoint = f'/GroupV2/{CONFIG['Bungie']['clan_group_id']}/Members/'
     raw_json = await async_bungie_request_handler(target_endpoint)
     if raw_json:
         bungie_results = raw_json['Response']

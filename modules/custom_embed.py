@@ -56,7 +56,7 @@ def default_embed(title='Völuspá', description='', color=0x009933, footer_note
     # embed.set_author(name='\uFEFF', icon_url=f'{CONFIG.Resources.image_bucket_root_url}/ghost-proxy/GP_Logo-2.png')
     embed.set_footer(
         text=f'via Völuspá with \u2764{f" | {footer_notes}" if footer_notes else ""}',
-        icon_url=f"{CONFIG.Resources.image_bucket_root_url}/voluspa/Voluspa_icon_64x64.png"
+        icon_url=f"{CONFIG['Resources']['image_bucket_root_url']}/voluspa/Voluspa_icon_64x64.png"
     )
     return embed
 

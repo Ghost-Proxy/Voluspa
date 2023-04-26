@@ -30,7 +30,7 @@ class DestinyArt(commands.Cog):
     """Destiny Art Cog"""
     def __init__(self, bot):
         self.bot = bot
-        self.base_image_url = f'{CONFIG.Resources.image_bucket_root_url}/destiny-art/'
+        self.base_image_url = f'{CONFIG['Resources']['image_bucket_root_url']}/destiny-art/'
         self.num_poses = 51
         self.num_dances = 55
         self.num_emotes = 46

@@ -52,9 +52,9 @@ class Systems(commands.Cog):
 
         # Shows the number of servers the bot is member of.
         embed.add_field(name="Warsats", value=f"{len(self.bot.guilds)}")
-        embed.add_field(name='Version', value=CONFIG.Voluspa.version)
+        embed.add_field(name='Version', value=CONFIG['Voluspa']['version'])
         # embed.add_field(name='SHA', value=CONFIG.Voluspa.sha, inline=False)
-        embed.add_field(name='Boot Time', value=CONFIG.Voluspa.boot_time, inline=False)
+        embed.add_field(name='Boot Time', value=CONFIG['Voluspa']['boot_time'], inline=False)
         embed.add_field(name='Uptime', value=f'{get_bot_uptime(self.bot)}', inline=False)
         embed.add_field(name='Developers', value='Mirage\nOxy\nStevenNic\nWindows98', inline=False)
 
@@ -64,11 +64,11 @@ class Systems(commands.Cog):
 
         # Logo
         #embed.set_image(url=f"{CONFIG.Resources.image_bucket_root_url}/voluspa/Voluspa_icon_64x48.png")
-        embed.set_thumbnail(url=f"{CONFIG.Resources.image_bucket_root_url}/voluspa/Voluspa_icon_64x48.png")
+        embed.set_thumbnail(url=f"{CONFIG['Resources']['image_bucket_root_url']}/voluspa/Voluspa_icon_64x48.png")
 
         embed.set_footer(
             text='via Völuspá with \u2764',
-            icon_url=f"{CONFIG.Resources.image_bucket_root_url}/voluspa/Voluspa_icon_64x64.png"
+            icon_url=f"{CONFIG['Resources']['image_bucket_root_url']}/voluspa/Voluspa_icon_64x64.png"
         )
         # give users a link to invite this bot to their server
         # embed.add_field(name="Invite", value="[Invite link](<insert your OAuth invitation link here>)")
