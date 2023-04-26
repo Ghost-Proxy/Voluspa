@@ -1,20 +1,30 @@
-# Völuspá
+# Völuspá</span>
+### **// Ghost Proxy** / Proto-Warmind AI
+#### _A custom Destiny 2 (and other games, admin, fun, etc...) Discord Bot_</td>
 
-> **// Ghost Proxy** / Proto-Warmind AI  
-> _Destiny 2 Discord Bot_
+</br>
 
-[![Docker Image CI](https://github.com/Ghost-Proxy/Voluspa/actions/workflows/docker-image.yml/badge.svg?branch=develop)](https://github.com/Ghost-Proxy/Voluspa/actions/workflows/docker-image.yml)  
-[![Pylint](https://github.com/Ghost-Proxy/Voluspa/actions/workflows/pylint.yml/badge.svg)](https://github.com/Ghost-Proxy/Voluspa/actions/workflows/pylint.yml)  
-[![Codecov](https://github.com/Ghost-Proxy/Voluspa/actions/workflows/codecov.yml/badge.svg)](https://github.com/Ghost-Proxy/Voluspa/actions/workflows/codecov.yml)  
-[![Dependency Review](https://github.com/Ghost-Proxy/Voluspa/actions/workflows/dependency-review.yml/badge.svg)](https://github.com/Ghost-Proxy/Voluspa/actions/workflows/dependency-review.yml)  
-[![Python application](https://github.com/Ghost-Proxy/Voluspa/actions/workflows/python-app.yml/badge.svg)](https://github.com/Ghost-Proxy/Voluspa/actions/workflows/python-app.yml)  
+--- 
 
----
-
-### Current Code Coverage
-
-https://app.codecov.io/gh/Ghost-Proxy/Voluspa  
-<img src='https://codecov.io/gh/Ghost-Proxy/Voluspa/branch/develop/graphs/icicle.svg?token=8ZKTJIKKNB' />
+<table border="0">
+    <tr>
+        <th>Status Badges</th>
+        <th>Code Coverage</th>
+    </tr>
+    <tr>
+        <td>
+            <a href='https://github.com/Ghost-Proxy/Voluspa/actions/workflows/docker-image.yml'><img src='https://github.com/Ghost-Proxy/Voluspa/actions/workflows/docker-image.yml/badge.svg?branch=develop' /></a><br/>
+            <a href='https://github.com/Ghost-Proxy/Voluspa/actions/workflows/pylint.yml'><img src='https://github.com/Ghost-Proxy/Voluspa/actions/workflows/pylint.yml/badge.svg' /></a><br/>
+            <a href='https://github.com/Ghost-Proxy/Voluspa/actions/workflows/codecov.yml'><img src='https://github.com/Ghost-Proxy/Voluspa/actions/workflows/codecov.yml/badge.svg' /></a><br/>
+            <a href='https://github.com/Ghost-Proxy/Voluspa/actions/workflows/dependency-review.yml'><img src='https://github.com/Ghost-Proxy/Voluspa/actions/workflows/dependency-review.yml/badge.svg' /></a><br/>
+            <a href='https://github.com/Ghost-Proxy/Voluspa/actions/workflows/python-app.yml'><img src='https://github.com/Ghost-Proxy/Voluspa/actions/workflows/python-app.yml/badge.svg' /></a><br/>
+            <a href='https://github.com/Ghost-Proxy/Voluspa/actions/workflows/devskim.yml'><img src='https://github.com/Ghost-Proxy/Voluspa/actions/workflows/devskim.yml/badge.svg' /></a>
+            <a href='https://github.com/Ghost-Proxy/Voluspa/actions/workflows/super-linter.yml'><img src='https://github.com/Ghost-Proxy/Voluspa/actions/workflows/super-linter.yml/badge.svg' /></a>
+        </td>
+        <td align="center" valign="center">https://app.codecov.io/gh/Ghost-Proxy/Voluspa</br>
+<img src='https://codecov.io/gh/Ghost-Proxy/Voluspa/branch/develop/graphs/icicle.svg?token=8ZKTJIKKNB' width='75%'/></td>
+    </tr>
+</table>
 
 ---
 
