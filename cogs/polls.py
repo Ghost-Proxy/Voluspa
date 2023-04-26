@@ -262,8 +262,8 @@ class Polls(commands.Cog):
                     plt.xticks(rotation=45, ha='right')
 
                     # Adds number of respondents at top of bars
-                    for x, y in enumerate(poll_results):
-                        axes.text(x, y, str(y), ha='center', va='bottom', color=bar_top_color)
+                    for x_axis, y_axis in enumerate(poll_results):
+                        axes.text(x_axis, y_axis, str(y_axis), ha='center', va='bottom', color=bar_top_color)
 
                     plt.tight_layout()  # Ensures label text is not cut off
 
@@ -271,8 +271,8 @@ class Polls(commands.Cog):
                     plt.savefig(png_wrapper, format='png', facecolor=bg_color)
                     png_wrapper.seek(0)
 
-                    dt = datetime.datetime
-                    filename = "gp-poll-" + pid + "-" + dt.strftime(dt.utcnow(), "%Y-%m-%d-%H-%M-%S") + ".png"
+                    current_datetime = datetime.datetime
+                    filename = "gp-poll-" + pid + "-" + current_datetime.strftime(current_datetime.utcnow(), "%Y-%m-%d-%H-%M-%S") + ".png"
                     await ctx.send(file=discord.File(png_wrapper, filename=filename))
 
                     png_wrapper.close()

@@ -3,7 +3,7 @@
 import sqlite3
 
 
-class Database(object):
+class Database():
     """Databse class"""
 
     # TODO:

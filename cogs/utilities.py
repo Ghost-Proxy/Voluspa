@@ -23,9 +23,9 @@ async def get_online_datetime(location):
                 #datetime_str = json_resp['datetime']
                 #return json_resp  #, datetime_str
                 return parse_datetime(json_resp['datetime']), json_resp['abbreviation']
-            else:
-                logger.info('Error: Unable to retrieve time for: %s | Resp: %s', location, resp)
-                return None, None
+
+            logger.info('Error: Unable to retrieve time for: %s | Resp: %s', location, resp)
+            return None, None
 
 
 def parse_datetime(dt_str):
@@ -40,10 +40,8 @@ def display_datetime(datetime_str, time_zone=None, verbose=True):
     if datetime_str:  # and type(datetime_str) == datetime.datetime.now():
         if verbose:
             return f'{datetime_str.strftime("%Y/%m/%d %a %I:%M %p")}{f" ({time_zone})" if time_zone else ""}'
-        else:
-            return f'{datetime_str.strftime("%a %I:%M %p")}{f" ({time_zone})" if time_zone else ""}'
-    else:
-        return 'Error (Missing)'
+        return f'{datetime_str.strftime("%a %I:%M %p")}{f" ({time_zone})" if time_zone else ""}'
+    return 'Error (Missing)'
 
 
 class Utilities(commands.Cog):

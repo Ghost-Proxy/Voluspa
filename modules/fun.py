@@ -19,8 +19,7 @@ async def get_latest_xkcd_comic():
                 latest_xkcd_comic = await resp.json()
                 latest_xkcd_num = latest_xkcd_comic['num']
                 return latest_xkcd_num, latest_xkcd_comic
-            else:
-                return [None, None]
+            return [None, None]
 
 
 async def get_xkcd_comic_num(num: int = 1):
@@ -70,7 +69,7 @@ async def get_xkcd_comic(latest=False):
 
 
 # TODO: Break this out into a better means of handling... could just be functional...
-class Quotes(object):
+class Quotes():
     """Quotes class"""
     def __init__(self):
         self.voluspa_quotes = {
@@ -162,7 +161,7 @@ class Quotes(object):
 
 
 # TODO: Replace with async http....
-class RandomQuotes(object):
+class RandomQuotes():
     """Random Quotes class"""
     def __init__(self):
         self.quote_funcs = [

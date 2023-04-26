@@ -4,7 +4,7 @@ import logging
 
 from discord.ext import commands
 
-import modules.cache as cache
+from modules import cache
 from modules.custom_embed import default_embed, success_embed, error_embed
 
 

@@ -71,7 +71,7 @@ def file_exists_msg(path):
     return "exists" if os.path.isfile(path) else "does NOT exist"
 
 
-class Archivist(object):
+class Archivist():
     """Archivist logging class"""
     logger = _setup_logging()
 

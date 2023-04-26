@@ -309,8 +309,8 @@ class MenuWithCustomOptions(MenuWithOptions):
 
         for i, page in enumerate(self._pages):
             temp = {}
-            for k, v in page.items():
-                temp[emojize(normalize(k), language='alias')] = v
+            for key, val in page.items():
+                temp[emojize(normalize(key), language='alias')] = val
             self._pages[i] = temp
 
     async def _init_reactions(self):
@@ -331,8 +331,8 @@ class MenuWithCustomOptions(MenuWithOptions):
         option_strings = []
         padding = self._padding * '\u2000'
 
-        for k, v in self._pages[self._current_page_index].items():
-            option_strings.append(f'{k}{padding}{self.option_to_string(v)}')
+        for key, val in self._pages[self._current_page_index].items():
+            option_strings.append(f'{key}{padding}{self.option_to_string(val)}')
 
         return '\n'.join(option_strings)
 
@@ -359,11 +359,11 @@ class MenuWithCustomOptions(MenuWithOptions):
         current_line = 0
         pages = []
         current_page = {}
-        for k, v in options.items():
+        for key, val in options.items():
             if current_line % max_lines_per_page == 0 and current_line > 0:
                 pages.append(current_page)
                 current_page = {}
-            current_page[k] = v
+            current_page[key] = val
             current_line += 1
 
         if len(current_page) > 0:

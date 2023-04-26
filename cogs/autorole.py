@@ -343,15 +343,14 @@ class Autorole(commands.Cog):
         except asyncio.TimeoutError:
             await ctx.send('Request timed out... :(')
             return False
-        else:
-            # print(f'reaction_emoji: {reaction} | {reaction.emoji}')
-            # await ctx.send(f'Received reaction: {reaction.emoji} from user: {user}')
-            if reaction.emoji == react_unicode['yes']:
-                return True
-            elif reaction.emoji == react_unicode['no']:
-                return False
-            else:
-                print('Something really horrible has happened, not sure what, but good luck...')
+
+        # print(f'reaction_emoji: {reaction} | {reaction.emoji}')
+        # await ctx.send(f'Received reaction: {reaction.emoji} from user: {user}')
+        if reaction.emoji == react_unicode['yes']:
+            return True
+        if reaction.emoji == react_unicode['no']:
+            return False
+        print('Something really horrible has happened, not sure what, but good luck...')
 
     @commands.command(name='lfg-add')  # , aliases=['game-role', 'lfg-role'])
     @commands.guild_only()

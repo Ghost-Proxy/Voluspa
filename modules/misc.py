@@ -102,20 +102,20 @@ def merge_dicts(dct, merge_dct, add_keys=True, skip_none=False):
             for k in set(dct).intersection(set(merge_dct))
         }
 
-    for k, v in merge_dct.items():
+    for key, val in merge_dct.items():
         # print(f'Merge processing -- key [{k}] with value [{v}]')
-        if v is None and skip_none:
+        if val is None and skip_none:
             # print(f'Hit NONE value with k [{k}]')
             continue
-        if isinstance(dct.get(k), dict) and isinstance(v, collections.abc.Mapping):
+        if isinstance(dct.get(key), dict) and isinstance(val, collections.abc.Mapping):
             # print(f'Nested Dict for both... k [{k}] v [{v}] -- other: [{dct[k]}]')
-            dct[k] = merge_dicts(dct[k], v, add_keys=add_keys, skip_none=skip_none)
+            dct[key] = merge_dicts(dct[key], val, add_keys=add_keys, skip_none=skip_none)
         # TODO: Ehh... kind of doesn't work with empty nested...
         # elif isinstance(v, dict):
         #     print(f'Nested Dict for new... k [{k}] v [{v}] ')
         #     dct[k] = merge_dicts(k, v, add_keys=add_keys, skip_none=skip_none)
         else:
             # print(f'Normal else, key: [{k}] and value: [{v}]')
-            dct[k] = v
+            dct[key] = val
 
     return dct
