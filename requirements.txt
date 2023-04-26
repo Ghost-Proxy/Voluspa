@@ -5,15 +5,15 @@ PyYAML==6.0
 uvloop==0.17.0
 
 # HTTP
-requests==2.28.0
+requests==2.28.2
 aiohttp>=3.7.4
 
 # SEARCH
 fuzzywuzzy[speedup]==0.18.0
 
 # API's
-discord.py[voice]==2.1.1
-PyGithub==1.58.0
+discord.py[voice]==2.2.2
+PyGithub==1.58.1
 
 # CHARTS
 matplotlib>=3.1.1
@@ -37,8 +37,8 @@ asyncpg==0.27.0
 # CACHE
 # https://github.com/argaen/aiocache
 ujson==5.7.0
-msgpack==1.0.4
-aiocache[redis,memcached]==0.12.0
+msgpack==1.0.5
+aiocache[redis,memcached]==0.12.1
 
 # https://github.com/aio-libs
 # aioredis==1.2.0
