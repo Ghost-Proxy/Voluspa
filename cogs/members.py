@@ -373,8 +373,8 @@ class Members(commands.Cog):
                 '{}\n\n' \
                 '{}\n\n' \
                 '{}'.format(
-                    'Minimum Light Level Threshold: {}\n'.format(min_level) if min_level else '',
-                    'Total Number of Characters in Clan: {}\n\n'.format(num_clan_chars) if min_level else '',
+                    f'Minimum Light Level Threshold: {min_level}\n' if min_level else '',
+                    f'Total Number of Characters in Clan: {num_clan_chars}\n\n' if min_level else '',
                     f'>={min_level}' if min_level else '',
                     num_filtered_chars,
                     min(all_chars),
@@ -458,12 +458,12 @@ class Members(commands.Cog):
             )
             #logger.info('Player Results:\n{}'.format(results))
             embed = discord.Embed(
-                title="{}".format(player['displayName']),
-                description="{}".format(player['about']),
+                title=f"{player['displayName']}",
+                description=f"{player['about']}",
                 color=0x009933
             )
             #embed.set_image(url='https://www.bungie.net{}'.format(player['profilePicturePath']))
-            embed.add_field(name='Blizzard ID', value="{}".format(player['blizzardDisplayName']))
+            embed.add_field(name='Blizzard ID', value=str(player['blizzardDisplayName']))
             if 'http' in player['profilePicturePath']:
                 url_target = player['profilePicturePath']
             else:
@@ -471,8 +471,8 @@ class Members(commands.Cog):
             embed.set_thumbnail(url=url_target)
         else:
             embed = discord.Embed(
-                title='{}'.format('Search for "{}"'.format(player_name)),
-                description='{}'.format('No results found or player is not registered on Bungie.net'),
+                title=f'Search for "{player_name}"',
+                description='No results found or player is not registered on Bungie.net',
                 color=0x993300
             )
         await ctx.send(embed=embed)
