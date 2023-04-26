@@ -22,7 +22,7 @@
             <a href='https://github.com/Ghost-Proxy/Voluspa/actions/workflows/super-linter.yml'><img src='https://github.com/Ghost-Proxy/Voluspa/actions/workflows/super-linter.yml/badge.svg' /></a>
         </td>
         <td align="center" valign="center">
-<a href='https://app.codecov.io/gh/Ghost-Proxy/Voluspa'><img src='https://codecov.io/gh/Ghost-Proxy/Voluspa/branch/develop/graphs/icicle.svg?token=8ZKTJIKKNB' width='75%'/></a></td>
+<a href='https://app.codecov.io/gh/Ghost-Proxy/Voluspa'><img src='https://codecov.io/gh/Ghost-Proxy/Voluspa/branch/develop/graphs/icicle.svg?token=8ZKTJIKKNB' width='auto'/></a></td>
     </tr>
 </table>
 
