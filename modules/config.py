@@ -1,7 +1,5 @@
 """Voluspa Dynamic Configuration"""
 
-VOLUSPA_VERSION = 'v0.2.1'
-
 import os
 import datetime
 
@@ -13,6 +11,7 @@ import yaml
 from modules.misc import merge_dicts, memoize
 from config.cache_config import CACHE_CONFIG
 
+VOLUSPA_VERSION = 'v0.2.1'
 
 # Load in our secrets and config files
 # config = configparser.ConfigParser()
