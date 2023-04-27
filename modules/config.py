@@ -74,8 +74,7 @@ def read_and_build_config():
     }
 
     merged_config_1 = merge_dicts(file_config, voluspa_info)
-    merged_config_1a = file_config | voluspa_info
-    print(f'Merged Config:\n{merged_config_1}\n\nzMerged config 1a: {merged_config_1a}')
+    # merged_config_1a = file_config | voluspa_info
 
     print('Pulling secrets from Env Vars...')
     env_secrets = {
@@ -113,10 +112,10 @@ def read_and_build_config():
     # ADDITIONAL CONFIG
     # Handle cache
     secrets['Voluspa']['fancy_name'] = 'Völuspá'
-    #secrets['Voluspa']['cache'] = CACHE_CONFIG
+    secrets['Voluspa']['cache'] = CACHE_CONFIG
 
     merged_config_final = merge_dicts(merged_config_1, secrets)
-    merged_config_final2 = merged_config_1 | secrets
+    # merged_config_final2 = merged_config_1 | secrets
 
     if 'image_bucket_rool_url' not in merged_config_final['Resources']:
         merged_config_final['Resources'] = {'image_bucket_rool_url': os.getenv('IMAGE_BUCKET_ROOT_URL', '')}
