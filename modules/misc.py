@@ -1,7 +1,7 @@
 """Misc Module"""
 
 import collections.abc
-from copy import deepcopy
+# from copy import deepcopy
 from typing import Any, List, Callable
 
 NEW_LINE = "\n"
@@ -122,35 +122,36 @@ def merge_dicts(dct, merge_dct, add_keys=True, skip_none=False) -> dict:
     return dct
 
 
-def dict_merge(*args, add_keys=True):
-    assert len(args) >= 2, "dict_merge requires at least two dicts to merge"
-    rtn_dct = args[0].copy()
-    dicts_to_merge = args[1:]
-    for merge_dct in dicts_to_merge:
-        if add_keys is False:
-            merge_dct = {key: merge_dct[key] for key in set(rtn_dct).intersection(set(merge_dct))}
-        for key, val in merge_dct.items():
-            if not rtn_dct.get(key):
-                rtn_dct[key] = val
-            elif key in rtn_dct and isinstance(val, type(rtn_dct[key])):
-                raise TypeError(f"Overlapping keys exist with different types: original is {type(rtn_dct[key])}, new value is {type(val)}")
-            elif isinstance(rtn_dct[key], dict) and isinstance(merge_dct[key], collections.abc.Mapping):
-                rtn_dct[key] = dict_merge(rtn_dct[key], merge_dct[key], add_keys=add_keys)
-            elif isinstance(val, list):
-                for list_value in val:
-                    if list_value not in rtn_dct[key]:
-                        rtn_dct[key].append(list_value)
-            else:
-                rtn_dct[key] = val
-    return rtn_dct
+# def dict_merge(*args, add_keys=True):
+#     assert len(args) >= 2, "dict_merge requires at least two dicts to merge"
+#     rtn_dct = args[0].copy()
+#     dicts_to_merge = args[1:]
+#     for merge_dct in dicts_to_merge:
+#         if add_keys is False:
+#             merge_dct = {key: merge_dct[key] for key in set(rtn_dct).intersection(set(merge_dct))}
+#         for key, val in merge_dct.items():
+#             if not rtn_dct.get(key):
+#                 rtn_dct[key] = val
+#             elif key in rtn_dct and isinstance(val, type(rtn_dct[key])):
+#                 raise TypeError(f"Overlapping keys exist with different types:" \
+#                     f"original is {type(rtn_dct[key])}, new value is {type(val)}")
+#             elif isinstance(rtn_dct[key], dict) and isinstance(merge_dct[key], collections.abc.Mapping):
+#                 rtn_dct[key] = dict_merge(rtn_dct[key], merge_dct[key], add_keys=add_keys)
+#             elif isinstance(val, list):
+#                 for list_value in val:
+#                     if list_value not in rtn_dct[key]:
+#                         rtn_dct[key].append(list_value)
+#             else:
+#                 rtn_dct[key] = val
+#     return rtn_dct
 
 
-def deep_merge(a: dict, b: dict) -> dict:
-    result = deepcopy(a)
-    for bk, bv in b.items():
-        av = result.get(bk)
-        if isinstance(av, dict) and isinstance(bv, dict):
-            result[bk] = deep_merge(av, bv)
-        else:
-            result[bk] = deepcopy(bv)
-    return result
+# def deep_merge(a: dict, b: dict) -> dict:
+#     result = deepcopy(a)
+#     for bk, bv in b.items():
+#         av = result.get(bk)
+#         if isinstance(av, dict) and isinstance(bv, dict):
+#             result[bk] = deep_merge(av, bv)
+#         else:
+#             result[bk] = deepcopy(bv)
+#     return result
