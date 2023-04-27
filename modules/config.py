@@ -1,5 +1,7 @@
 """Voluspa Dynamic Configuration"""
 
+VOLUSPA_VERSION = 'v0.2.1'
+
 import os
 import datetime
 
@@ -66,7 +68,7 @@ def read_and_build_config():
 
     voluspa_info: dict[str, dict[str, str]] = {
         'Voluspa': {
-            'version': 'v0.0.13',
+            'version': VOLUSPA_VERSION,
             'sha': sha,
             'app_cwd': os.path.abspath(os.getcwd()),
             'boot_time': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
