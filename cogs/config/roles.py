@@ -43,6 +43,7 @@ ROLES = {
         'og-rem': ['remnant', 'rem'],
         'og-ror2': ['risk of rain', 'ror', 'ror2', 'risk of rain 2'],
         'og-smash': ['super smash bros', 'smash', 'ssb', 'ssbu'],
+        'og-satis': ['satisfactory'],
         'og-sd': ['stardew valley', 'sd', 'stardew'],
         'og-sot': ['sea of thieves', 'sot'],
         'og-steep': ['steep'],
