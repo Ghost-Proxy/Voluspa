@@ -72,7 +72,8 @@ class _MenuBase:
             logger.info('%s timed out.', self._ctx.message.author)
         finally:
             await self._ctx.message.delete()
-            await self._menu_msg.delete()
+            if self._menu_msg:
+                await self._menu_msg.delete()
 
     async def _set_page(self, page_index):
         page_index %= len(self._pages)
