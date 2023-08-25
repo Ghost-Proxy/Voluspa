@@ -11,10 +11,12 @@ ROLES = {
         'strike-nf-pve': ['strike-nf-pve', 's', 'nf', 'pve', 'strike', 'nightfall']
     },
     'other_games': {
-        'og-ac': ['animal crossing', 'ac', 'animal crossing new horizons'],
+        'og-ac': ['animal crossing', 'anic', 'animal crossing new horizons'],
         'og-ant': ['anthem', 'ant'],
         'og-apex': ['apex legends', 'apex', 'apex: legends'],
+        'og-armcor': ['armored core', 'ac', 'armco'],
         'og-au': ['among us', 'au'],
+        'og-baldur': ['baldurs gate', 'bg'],
         'og-bl': ['borderlands', 'bl', 'borderlands 2', 'borderlands 3'],
         'og-cod': ['call of duty', 'cod', 'mw', 'modern warfare'],
         'og-c77': ['cyberpunk 2077', 'c77', 'cp77', 'cyberpunk'],
