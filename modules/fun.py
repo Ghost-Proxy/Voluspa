@@ -55,10 +55,10 @@ async def get_xkcd_comic(latest=False):
     if latest_xkcd_num:
         if not latest:
             rand_idx = random.randint(1, latest_xkcd_num)
-            original_xkcd_url = f'http://xkcd.com/{rand_idx}'
+            original_xkcd_url = f'https://xkcd.com/{rand_idx}'
             xkcd_comic = await get_xkcd_comic_num(rand_idx)
         else:
-            original_xkcd_url = f'http://xkcd.com/{latest_xkcd_num}'
+            original_xkcd_url = f'https://xkcd.com/{latest_xkcd_num}'
             xkcd_comic = latest_xkcd_comic
 
         if xkcd_comic:
@@ -165,10 +165,9 @@ class RandomQuotes():
     """Random Quotes class"""
     def __init__(self):
         self.quote_funcs = [
-            # self.get_ron_swanson_quote,
+            self.get_ron_swanson_quote,
             self.get_dad_joke,
-            # self.get_inspirobot_quote,
-            # self.get_chuck_norris_quote
+            self.get_inspirobot_quote,
         ]
 
     async def get_dad_joke(self):
@@ -187,13 +186,8 @@ class RandomQuotes():
 
     async def get_inspirobot_quote(self):
         """Get an inspirobot quote"""
-        req = requests.get('http://inspirobot.me/api?generate=true', timeout=20)
+        req = requests.get('https://inspirobot.me/api?generate=true', timeout=20)
         return req.text
-
-    async def get_chuck_norris_quote(self):
-        """Get a Chuck Norris quote"""
-        req = requests.get('http://api.icndb.com/jokes/random?limitTo=[nerdy]', timeout=20)
-        return req.json()['value']['joke']
 
     async def get_random_quote(self):
         """Get a RANDOM quote"""
