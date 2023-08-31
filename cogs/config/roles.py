@@ -1,3 +1,5 @@
+"""Roles Dict -- TODO Move this into a DB config"""
+
 # Based on either User Inputs (e.g. game_modes, other_games)
 # or Function keys (e.g. topics, gp roles)
 
@@ -9,10 +11,12 @@ ROLES = {
         'strike-nf-pve': ['strike-nf-pve', 's', 'nf', 'pve', 'strike', 'nightfall']
     },
     'other_games': {
-        'og-ac': ['animal crossing', 'ac', 'animal crossing new horizons'],
+        'og-ac': ['animal crossing', 'anic', 'animal crossing new horizons'],
         'og-ant': ['anthem', 'ant'],
         'og-apex': ['apex legends', 'apex', 'apex: legends'],
+        'og-armcor': ['armored core', 'ac', 'armco'],
         'og-au': ['among us', 'au'],
+        'og-baldur': ['baldurs gate', 'bg'],
         'og-bl': ['borderlands', 'bl', 'borderlands 2', 'borderlands 3'],
         'og-cod': ['call of duty', 'cod', 'mw', 'modern warfare'],
         'og-c77': ['cyberpunk 2077', 'c77', 'cp77', 'cyberpunk'],
@@ -42,10 +46,11 @@ ROLES = {
         'og-rdo': ['red dead online', 'rdo', 'red dead redemption 2', 'red dead'],
         'og-rem': ['remnant', 'rem'],
         'og-ror2': ['risk of rain', 'ror', 'ror2', 'risk of rain 2'],
-        'og-smash': ['super smash bros', 'smash', 'ssb', 'ssbu'],
         'og-satis': ['satisfactory'],
-        'og-sd': ['stardew valley', 'sd', 'stardew'],
+        'og-smash': ['super smash bros', 'smash', 'ssb', 'ssbu'],
         'og-sot': ['sea of thieves', 'sot'],
+        'og-sdew': ['stardew valley', 'sd', 'stardew'],
+        'og-star': ['starfield', 'sf'],      
         'og-steep': ['steep'],
         'og-stel': ['stellaris', 'stel'],
         'og-sts': ['slay the spire', 'sts'],

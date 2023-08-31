@@ -1,3 +1,5 @@
+"""Destiny Art Cog"""
+
 import logging
 import random
 
@@ -25,9 +27,10 @@ logger = logging.getLogger('voluspa.cog.DestinyArt')
 
 
 class DestinyArt(commands.Cog):
+    """Destiny Art Cog"""
     def __init__(self, bot):
         self.bot = bot
-        self.base_image_url = f'{CONFIG.Resources.image_bucket_root_url}/destiny-art/'
+        self.base_image_url = f"{CONFIG['Resources']['image_bucket_root_url']}/destiny-art/"
         self.num_poses = 51
         self.num_dances = 55
         self.num_emotes = 46
@@ -67,9 +70,10 @@ class DestinyArt(commands.Cog):
     #     await ctx.send(embed=xkcd_embed)
 
     def create_destiny_art_embed(self, num_images, art_type_prefix, title):
+        """Creates a Destiny Art embed"""
         rand_idx = random.randint(1, num_images)
         art_url = f'{art_type_prefix}_{rand_idx}_xxsm_opt_fit.gif'
-        logger.info(f'Sending Voluspa DestinyArt: [{art_url}]')
+        logger.info('Sending Voluspa DestinyArt: %s', art_url)
         art_embed = discord.Embed(
             title=title,
             color=0x009933
@@ -115,4 +119,5 @@ class DestinyArt(commands.Cog):
 
 
 async def setup(bot):
+    """Cog Setup"""
     await bot.add_cog(DestinyArt(bot))

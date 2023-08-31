@@ -1,10 +1,16 @@
+# pylint: disable=invalid-name
+# pylint: disable=broad-exception-raised
+"""Test Module"""
+
 from unittest import TestCase
 
 from modules.misc import merge_dicts
 
 
 class DictMergeTestCase(TestCase):
+    """Dictionary Merge Testing"""
     def test_merges_dicts(self):
+        """Test merging dicts"""
         a = {
             'a': 1,
             'b': {

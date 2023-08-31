@@ -1,11 +1,15 @@
+# pylint: disable=too-few-public-methods
+"""Logging Module"""
+
 import logging
 import asyncio
 from textwrap import wrap
 
+from emoji import emojize
+
 from modules.custom_embed import default_embed
 from modules.emoji_utils import ri_at_index, ri_alphabet, index_of_ri, normalize
 
-from emoji import emojize
 
 logger = logging.getLogger('voluspa.module.paging')
 
@@ -16,7 +20,7 @@ class _MenuBase:
     RIGHT_ARROW = '\u27a1'
 
     def __init__(self, ctx, title, pages, timeout):
-        logger.info(f'{ctx.message.author} created a menu.')
+        logger.info('%s created a menu.', ctx.message.author)
 
         # Paramaters
         self._ctx = ctx
@@ -30,19 +34,27 @@ class _MenuBase:
         self._current_page_index = 0
 
     async def run(self):
+        """Run the page"""
         self._init_menu_embed()
         self._menu_msg = await self._ctx.send(embed=self._menu_embed)
         await self._init_reactions()
         await self._control_loop()
 
+    async def _init_reactions(self):
+        """Empty stub for override"""
+
     def _init_menu_embed(self):
         menu_field = self._get_menu_field()
-        self._menu_embed.add_field(name=f'Page {self._current_page_index + 1}/{len(self._pages)}', value=menu_field, inline=False)
+        self._menu_embed.add_field(
+            name=f'Page {self._current_page_index + 1}/{len(self._pages)}',
+            value=menu_field,
+            inline=False
+            )
         self._menu_field_index = len(self._menu_embed.fields) - 1
 
     async def _control_loop(self):
         try:
-            def check_in_ctx(reaction, user):
+            def check_in_ctx(reaction):
                 return reaction.message.id == self._menu_msg.id
 
             while True:
@@ -57,17 +69,23 @@ class _MenuBase:
                 if not user.bot:
                     await reaction.remove(user)
         except asyncio.TimeoutError:
-            logger.info(f'{self._ctx.message.author} timed out.')
+            logger.info('%s timed out.', self._ctx.message.author)
         finally:
             await self._ctx.message.delete()
-            await self._menu_msg.delete()
+            if self._menu_msg:
+                await self._menu_msg.delete()
 
     async def _set_page(self, page_index):
         page_index %= len(self._pages)
         self._current_page_index = page_index
 
         menu_field = self._get_menu_field()
-        self._menu_embed.set_field_at(self._menu_field_index, name=f'Page {self._current_page_index + 1}/{len(self._pages)}', value=menu_field, inline=False)
+        self._menu_embed.set_field_at(
+            self._menu_field_index,
+            name=f'Page {self._current_page_index + 1}/{len(self._pages)}',
+            value=menu_field,
+            inline=False
+            )
 
         self._menu_msg = await self._menu_msg.edit(embed=self._menu_embed)
         await self._set_reactions()
@@ -75,7 +93,15 @@ class _MenuBase:
 
 class Menu(_MenuBase):
     """Create a menu from a raw string, a list of lines or a list of pages."""
-    def __init__(self, ctx, title, raw=None, lines=None, pages=None, max_chars_per_line=64, max_lines_per_page=16, timeout=60.0):
+    def __init__(self,
+                 ctx,
+                 title,
+                 raw=None,
+                 lines=None,
+                 pages=None,
+                 max_chars_per_line=64,
+                 max_lines_per_page=16,
+                 timeout=60.0):
         """
         PARAMS
         ------
@@ -105,7 +131,7 @@ class Menu(_MenuBase):
     def _split(self, raw, lines, max_chars_per_line, max_lines_per_page):
         i = 0
         if not lines:
-            lines = wrap(raw, width=max_chars_per_line)
+            lines = wrap(text=raw, width=max_chars_per_line)
         pages = []
         while i + max_lines_per_page < len(lines):
             pages.append("\n".join(lines[i:i + max_lines_per_page]))
@@ -159,11 +185,9 @@ class MenuWithOptions(_MenuBase):
     # Overrides
     def init_feedback_ui(self):
         """Initialise fields in the menu embed that represent the feedback ui."""
-        pass
 
     def update_feedback_ui(self):
         """Repaint feedback ui on option select."""
-        pass
 
     def option_to_string(self, option):
         """Must return a string representation of an option (returns 'option' by default)."""
@@ -185,7 +209,8 @@ class MenuWithOptions(_MenuBase):
 
     def set_feedback_ui_field_at(self, index, name, value, default, inline=True):
         """
-        Sets the field at index in the menu embed (must be a field created with add_feedback_ui_field). If value is empty, value = default.
+        Sets the field at index in the menu embed (must be a field created with add_feedback_ui_field).
+        If value is empty, value = default.
         """
         if index not in self._feedback_ui_field_indicies:
             logger.error('index not in _feedback_ui_field_indicies')
@@ -215,15 +240,16 @@ class MenuWithOptions(_MenuBase):
         option_strings = [self.option_to_string(o) for o in self._pages[self._current_page_index]]
         padding = self._padding * '\u2000'
 
-        for i in range(len(option_strings)):
-            option_strings[i] = f'{ri_at_index(i)}{padding}{option_strings[i]}'
+        for i, option_string in enumerate(option_strings):
+            option_strings[i] = f'{ri_at_index(i)}{padding}{option_string}'
 
         return '\n'.join(option_strings)
 
     async def _reaction_handler(self, reaction):
         if reaction.emoji == _MenuBase.CHECK_MARK:
             return True
-        elif reaction.emoji in [e for e in ri_alphabet(len(self._pages[self._current_page_index]))]:
+
+        if reaction.emoji in list(ri_alphabet(len(self._pages[self._current_page_index]))):
             if self._pages[self._current_page_index][index_of_ri(reaction.emoji)] not in self._selected_options:
                 self._selected_options.append(self._pages[self._current_page_index][index_of_ri(reaction.emoji)])
             else:
@@ -282,10 +308,10 @@ class MenuWithCustomOptions(MenuWithOptions):
         """
         super().__init__(ctx, title, options, pages, max_lines_per_page, option_padding, timeout)
 
-        for i in range(len(self._pages)):
+        for i, page in enumerate(self._pages):
             temp = {}
-            for k, v in self._pages[i].items():
-                temp[emojize(normalize(k), use_aliases=True)] = v
+            for key, val in page.items():
+                temp[emojize(normalize(key), language='alias')] = val
             self._pages[i] = temp
 
     async def _init_reactions(self):
@@ -306,15 +332,16 @@ class MenuWithCustomOptions(MenuWithOptions):
         option_strings = []
         padding = self._padding * '\u2000'
 
-        for k, v in self._pages[self._current_page_index].items():
-            option_strings.append(f'{k}{padding}{self.option_to_string(v)}')
+        for key, val in self._pages[self._current_page_index].items():
+            option_strings.append(f'{key}{padding}{self.option_to_string(val)}')
 
         return '\n'.join(option_strings)
 
     async def _reaction_handler(self, reaction):
         if reaction.emoji == _MenuBase.CHECK_MARK:
             return True
-        elif reaction.emoji in [e for e in self._pages[self._current_page_index].keys()]:
+
+        if reaction.emoji in list(self._pages[self._current_page_index].keys()):
             if self._pages[self._current_page_index][reaction.emoji] not in self._selected_options:
                 self._selected_options.append(self._pages[self._current_page_index][reaction.emoji])
             else:
@@ -333,11 +360,11 @@ class MenuWithCustomOptions(MenuWithOptions):
         current_line = 0
         pages = []
         current_page = {}
-        for k, v in options.items():
+        for key, val in options.items():
             if current_line % max_lines_per_page == 0 and current_line > 0:
                 pages.append(current_page)
                 current_page = {}
-            current_page[k] = v
+            current_page[key] = val
             current_line += 1
 
         if len(current_page) > 0:

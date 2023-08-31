@@ -1,21 +1,28 @@
+"""Voluspa Dynamic Configuration"""
+
 import os
-import yaml
 import datetime
+
+import yaml
+
 # import functools
 # @functools.lru_cache()
 
-from modules.misc import merge_dicts, AttrDict, memoize
+from modules.misc import merge_dicts, memoize
 from config.cache_config import CACHE_CONFIG
 
+VOLUSPA_VERSION = 'v0.2.1'
 
 # Load in our secrets and config files
 # config = configparser.ConfigParser()
 def read_yaml(yaml_file):
-    with open(yaml_file, 'r') as yfile:
+    """Reads the YAML config file and returns the yaml fully loaded"""
+    with open(yaml_file, 'r', encoding='utf8') as yfile:
         return yaml.full_load(yfile)
 
 
-def bool_converter(value):
+def bool_converter(value) -> bool:
+    """Handles casting common string values for booleans"""
     if value.lower() in ['true', 1, 'yes', 'on', 'y']:
         return True
     if value.lower() in ['false', 0, 'no', 'off', 'n']:
@@ -24,6 +31,7 @@ def bool_converter(value):
 
 
 def cast_to_native_type(value):
+    """Attempts to cast values to native types"""
     if value is None:
         return value
     supported_types = [int, float, bool_converter]  # haha, bool() is too greedy
@@ -36,11 +44,12 @@ def cast_to_native_type(value):
 
 
 def getenv_cast(env_var, default=None):
+    """Gets the requested env var and attempts to cast it to native type"""
     return cast_to_native_type(os.getenv(env_var, default))
 
 
 # TODO CLEANUP
-def read_config():
+def read_and_build_config():
     """
     Returns a nested config object for convenience
 
@@ -51,24 +60,22 @@ def read_config():
     file_config = read_yaml('./config/config.yaml')
 
     print('Setting Voluspa boot settings...')
-    voluspa_info = {
+    if sha:= os.getenv('SOURCE_VERSION'):
+        sha = sha[:10]
+    else:
+        sha = 'Unknown (local?)'
+
+    voluspa_info: dict[str, dict[str, str]] = {
         'Voluspa': {
-            'version': 'v0.0.13',
-            'sha': os.getenv('SOURCE_VERSION')[:10] if os.getenv('SOURCE_VERSION') else 'Unknown (local?)',
+            'version': VOLUSPA_VERSION,
+            'sha': sha,
             'app_cwd': os.path.abspath(os.getcwd()),
             'boot_time': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         }
     }
 
     merged_config_1 = merge_dicts(file_config, voluspa_info)
-    # print(f'Merged Config:\n{merged_config_1}')
-
-    secrets_path = os.path.join(os.getcwd(), './config/secrets.yaml')
-    secrets_file = None
-    print(f'Attempting to load secrets from file...')
-    if os.path.isfile(secrets_path):
-        print('Found secrets.yml loading...')
-        secrets_file = read_yaml('./config/secrets.yaml')
+    # merged_config_1a = file_config | voluspa_info
 
     print('Pulling secrets from Env Vars...')
     env_secrets = {
@@ -86,7 +93,11 @@ def read_config():
         }
     }
 
-    if secrets_file:
+    secrets_path: str = os.path.join(os.getcwd(), './config/secrets.yaml')
+    print('Attempting to load secrets from file...')
+    if os.path.isfile(secrets_path):
+        print('Found secrets.yml loading...')
+        secrets_file = read_yaml('./config/secrets.yaml')
         secrets = merge_dicts(secrets_file, env_secrets, skip_none=True)
     else:
         secrets = env_secrets
@@ -94,29 +105,22 @@ def read_config():
     # Pick up Voluspa named Env Vars
     if 'Voluspa' not in secrets:
         secrets['Voluspa'] = {}
-    voluspa_config = ['VOLUSPA_PREFIX', 'VOLUSPA_FEEDBACK_CHANNEL_ID', 'VOLUSPA_PRIVATE_GUILD_CHANNEL_ID']
-    for ve in voluspa_config:
-        if os.getenv(ve):
-            secrets['Voluspa'][ve.split('_', maxsplit=1)[1].lower()] = getenv_cast(ve)
+    voluspa_config: list[str] = ['VOLUSPA_PREFIX', 'VOLUSPA_FEEDBACK_CHANNEL_ID', 'VOLUSPA_PRIVATE_GUILD_CHANNEL_ID']
+    for vol_env in voluspa_config:
+        if os.getenv(vol_env):
+            secrets['Voluspa'][vol_env.split('_', maxsplit=1)[1].lower()] = getenv_cast(vol_env)
 
     # ADDITIONAL CONFIG
     # Handle cache
     secrets['Voluspa']['fancy_name'] = 'Völuspá'
     secrets['Voluspa']['cache'] = CACHE_CONFIG
 
-    merged_config_2 = merge_dicts(merged_config_1, secrets)
+    merged_config_final = merge_dicts(merged_config_1, secrets)
+    # merged_config_final2 = merged_config_1 | secrets
 
-    nested_config = AttrDict.from_nested_dict(merged_config_2)
-    # Add resources from env
-    # TODO Redo this flow...
-    if not nested_config.Resources.image_bucket_root_url:
-        nested_config.Resources.image_bucket_root_url = os.getenv('IMAGE_BUCKET_ROOT_URL', '')
+    if not merged_config_final['Resources']['image_bucket_root_url']:
+        merged_config_final['Resources'] = {'image_bucket_root_url': os.getenv('IMAGE_BUCKET_ROOT_URL', '')}
 
-    #print(f'Voluspa merged config -- Resources:\n{nested_config.Resources}')
-    #print(f'Voluspa merged config -- Voluspa:\n{nested_config.Voluspa}')
+    return merged_config_final
 
-    return nested_config
-
-
-memozied_config = memoize(read_config)
-CONFIG = memozied_config()
+CONFIG = memoize(read_and_build_config)()

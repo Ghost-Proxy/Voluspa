@@ -1,3 +1,5 @@
+"""Cache Config"""
+
 import os
 from urllib.parse import urlparse
 
@@ -5,6 +7,7 @@ from modules.misc import memoize
 
 
 def url_config(raw_url):
+    """URL config parser"""
     url = urlparse(raw_url)
     return {
         'endpoint': url.hostname,
@@ -18,7 +21,8 @@ def url_config(raw_url):
 REDIS_URL = os.getenv('REDIS_URL', None)
 
 
-def read_config():
+def read_and_build_config():
+    """Reads and builds the config"""
     # 'memcache': { },  # TODO: Once this gets properly supported...
     cache_config = {
         'default': {
@@ -53,5 +57,5 @@ def read_config():
     return cache_config
 
 
-memozied_config = memoize(read_config)
+memozied_config = memoize(read_and_build_config)
 CACHE_CONFIG = memozied_config()

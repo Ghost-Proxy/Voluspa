@@ -1,0 +1,6 @@
+[FORMAT]
+max-line-length=140
+
+[MESSAGES CONTROL]
+# globally disable pylint checks (comma separated)
+disable=too-few-public-methods, fixme # Comment out `fixme` to get notifications for all TODO's

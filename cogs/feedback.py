@@ -1,9 +1,11 @@
-import logging
+"""Feedback cog -- User Feedback, Github Issues"""
 
-from modules.ui_elements import FeedbackModal, IssueModal
+import logging
 
 import discord
 from discord.ext import commands
+
+from modules.ui_elements import FeedbackModal, IssueModal
 
 logger = logging.getLogger('voluspa.cog.feedback')
 
@@ -30,4 +32,5 @@ class Feedback(commands.Cog):
         logger.info('Feedback has been sent.')
 
 async def setup(bot):
+    """Cog Setup"""
     await bot.add_cog(Feedback(bot))

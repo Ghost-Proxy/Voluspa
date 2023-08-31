@@ -1,8 +1,7 @@
+"""Kudos Cog"""
+
 import logging
 
-import modules.cache as cache
-
-import discord
 from discord.ext import commands
 
 logger = logging.getLogger('voluspa.cog.kudos')
@@ -21,17 +20,20 @@ class Kudos(commands.Cog):
 
     @kudos.command(name='view-player', aliases=['vp'])
     async def view_player_kudos(self, ctx):
+        """View Player Kudos"""
         await ctx.send('view_player_kudos')
 
     @kudos.command(name='view-leaderboard', aliases=['vl'])
     async def view_kudos_leaderboard(self, ctx):
+        """View Kudos Leaderboard"""
         await ctx.send('view_kudos_leaderboard')
 
     @kudos.command(name='send', aliases=['s'])
     async def send_kudos(self, ctx):
+        """Send Kudos"""
         await ctx.send('send_kudos')
 
 
 async def setup(bot):
+    """Cog Setup"""
     await bot.add_cog(Kudos(bot))
-

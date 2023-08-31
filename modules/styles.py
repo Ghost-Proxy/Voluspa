@@ -1,4 +1,7 @@
-from modules.misc import AttrDict
+"""Provides a unified message style and theme color palette"""
+
+from modules.exceptions import VoluspaError
+
 
 STYLES = {
     'colors': {
@@ -13,4 +16,15 @@ STYLES = {
     }
 }
 
-STYLES = AttrDict.from_nested_dict(STYLES)
+class Styles():
+    """Styles Object"""
+    def __init__(self):
+        self.styles = STYLES
+
+    def colors(self, color_name):
+        """Return the relevant color code"""
+        color = self.styles['colors'].get(color_name)
+        if color:
+            return color
+
+        raise VoluspaError('Unknown color selection!')
