@@ -2,6 +2,7 @@
 
 # Based on either User Inputs (e.g. game_modes, other_games)
 # or Function keys (e.g. topics, gp roles)
+# '': [''],
 
 ROLES = {
     'game_modes': {
@@ -11,6 +12,15 @@ ROLES = {
         'strike-nf-pve': ['strike-nf-pve', 's', 'nf', 'pve', 'strike', 'nightfall']
     },
     'other_games': {
+        # Other Game Genres
+        'ogg-race': ['arcade & simulation racing'],
+        'ogg-shoot': ['first & third person shooters'],
+        'ogg-strat': ['strategy and simulation'],
+        'ogg-fight': ['2d & 3D fighting'],
+        'ogg-casual': ['casual and mobile'],
+        'ogg-board': ['tabletop and board games'],
+        # -----
+        # Individual Other Games
         'og-ac': ['animal crossing', 'anic', 'animal crossing new horizons'],
         'og-ant': ['anthem', 'ant'],
         'og-apex': ['apex legends', 'apex', 'apex: legends'],
