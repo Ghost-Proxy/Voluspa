@@ -50,7 +50,7 @@ quotes = Quotes()
 # db = Database()
 
 cog_extensions = [
-    'cogs.autorole',
+    'cogs.autorole_new',
     'cogs.systems',
     'cogs.funstuff',
     'cogs.members',
