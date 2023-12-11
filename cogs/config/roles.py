@@ -50,7 +50,7 @@ ROLES = {
         'og-smash': ['super smash bros', 'smash', 'ssb', 'ssbu'],
         'og-sot': ['sea of thieves', 'sot'],
         'og-sdew': ['stardew valley', 'sd', 'stardew'],
-        'og-star': ['starfield', 'sf'],      
+        'og-star': ['starfield', 'sf'],
         'og-steep': ['steep'],
         'og-stel': ['stellaris', 'stel'],
         'og-sts': ['slay the spire', 'sts'],
@@ -82,7 +82,8 @@ ROLES = {
     'topics': {
         'current-events': ['current events', 'ce', 'current-events', 'politics', 'news'],
         'stonks': ['stonks', 'stocks', 'finances', 'financial'],
-        'vog': ['vog', 'vault', 'glass', 'vault of glass']
+        'vog': ['vog', 'vault', 'glass', 'vault of glass'],
+        'nsfw': ['nsfw']
     },
     'ghost_proxy_roles': {
         'ghost-proxy-friend': ['gpf', 'gp-friend', 'ghost-proxy-friend'],
